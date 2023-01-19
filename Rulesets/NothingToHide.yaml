@@ -1,0 +1,5 @@
+id: NothingToHide
+inherits: Deathmatch
+title: nothingToHideTitle
+description: nothingToHideDescription
+fogOfWar: false

@@ -1,0 +1,29 @@
+import "CustomGameBots"
+
+ai PassiveAi { # pretty much does nothing
+  awake
+
+  update => false
+}
+
+
+ai TerritorialAi is MeleeAi { # will attack enemies in range, but won't move, build or collect resources
+  approachScoreForEnemy => 0.8
+  approachScoreForCreep => -1
+  collectGold(minersAtGoldSource, knownGoldSources, goldConsiderations) => REJECTED_ACTION
+  buildMinerProducer(builders, minerProducers, skillId) => REJECTED_ACTION
+  buildMiner(miners, minerProducers, minerId, skillId) => REJECTED_ACTION
+  moveToGold(allMiners, minersThatCanMove, knownGoldSources) => REJECTED_ACTION
+  researchUpgrade(majorProducerIds, minorProducerIds) => REJECTED_ACTION
+  playUpgrade(playableCards) => REJECTED_ACTION
+  buildHeroProducer(hero, heroProducer, heroProducerCard, buildersWithAp, skillId) => REJECTED_ACTION
+  playHeroProducerCard(heroProducerCard, emptyInfluencedCells) => REJECTED_ACTION
+  trainHero(hero, heroProducer, skillId) => REJECTED_ACTION
+  upgradeHero(hero, playableCards) => REJECTED_ACTION
+  buildUnitProducer(builders, unitProducers, producerWeights, buildSkills) => REJECTED_ACTION
+  trainUnit(unitProducers, trainUnitSkills, hero, heroProducer) => REJECTED_ACTION
+  explore => REJECTED_ACTION
+  changeStance(hero, soldiers, enemies) => REJECTED_ACTION
+  interact(player) => REJECTED_ACTION
+  concede(player, playableCards, miners, hero, heroProducer, unitProducers, soldiers) => REJECTED_ACTION
+}

@@ -1,0 +1,5 @@
+id: FullHand
+inherits: Deathmatch
+title: fullHandTitle
+description: fullHandDescription
+maxHandSize: 18

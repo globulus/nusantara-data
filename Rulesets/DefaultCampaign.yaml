@@ -1,0 +1,11 @@
+id: DefaultCampaign
+inherits: Deathmatch
+playable: false
+maxUndos: 0
+teamsShareVision: false
+randomizedFirstPlayer: false
+fogOfWar: true
+turnLength: -1
+maxHandSize: 6
+deterministicCombat: false
+autoCameraReposition: false

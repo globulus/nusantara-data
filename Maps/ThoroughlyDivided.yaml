@@ -1,0 +1,521 @@
+id: ThoroughlyDivided
+title: Thoroughly Divided
+description: Gold is scarce, but so are the routes to your opponent.
+size: 8
+kind: Hexagonal
+maxPlayers: 2
+defaultTerrain: grass
+hexes:
+- c:
+  - -7
+  - 0
+  - 7
+  t: river
+- c:
+  - -7
+  - 1
+  - 6
+  t: beach
+- c:
+  - -7
+  - 2
+  - 5
+  t: beach
+- c:
+  - -7
+  - 3
+  - 4
+  content: site
+- c:
+  - -7
+  - 7
+  - 0
+  t: forest
+  content: creepCampMedium
+- c:
+  - -6
+  - -1
+  - 7
+  t: beach
+- c:
+  - -6
+  - 0
+  - 6
+  t: river
+  content: creepCampSmall
+- c:
+  - -6
+  - 3
+  - 3
+  t: forest
+  content: beastDen
+- c:
+  - -5
+  - -2
+  - 7
+  t: beach
+- c:
+  - -5
+  - 0
+  - 5
+  t: river
+- c:
+  - -5
+  - 3
+  - 2
+  content: goldMine
+- c:
+  - -5
+  - 5
+  - 0
+  startingLocation: 1
+- c:
+  - -4
+  - 0
+  - 4
+  t: river
+- c:
+  - -4
+  - 2
+  - 2
+  t: forest
+  content: beastDen
+- c:
+  - -4
+  - 7
+  - -3
+  t: forest
+- c:
+  - -3
+  - -4
+  - 7
+  t: beach
+  content: site
+- c:
+  - -3
+  - -3
+  - 6
+  t: beach
+- c:
+  - -3
+  - -2
+  - 5
+  t: beach
+- c:
+  - -3
+  - -1
+  - 4
+  content: creepCampLarge
+- c:
+  - -3
+  - 0
+  - 3
+  t: river
+- c:
+  - -3
+  - 4
+  - -1
+  t: forest
+  content: creepCampSmall
+- c:
+  - -3
+  - 5
+  - -2
+  t: hills
+  content: site
+- c:
+  - -3
+  - 7
+  - -4
+  t: forest
+- c:
+  - -2
+  - -5
+  - 7
+  t: sea
+- c:
+  - -2
+  - -4
+  - 6
+  t: sea
+- c:
+  - -2
+  - -3
+  - 5
+  t: sea
+- c:
+  - -2
+  - -2
+  - 4
+  t: beach
+- c:
+  - -2
+  - -1
+  - 3
+  t: forest
+- c:
+  - -2
+  - 0
+  - 2
+  t: river
+  content: creepCampMedium
+- c:
+  - -2
+  - 7
+  - -5
+  t: beach
+  content: beastDen
+- c:
+  - -1
+  - -6
+  - 7
+  t: sea
+- c:
+  - -1
+  - -5
+  - 6
+  t: jungle
+  content: beastDen
+- c:
+  - -1
+  - -4
+  - 5
+  t: sea
+- c:
+  - -1
+  - -3
+  - 4
+  t: beach
+- c:
+  - -1
+  - -2
+  - 3
+  t: forest
+- c:
+  - -1
+  - -1
+  - 2
+  t: jungle
+- c:
+  - -1
+  - 0
+  - 1
+  t: river
+- c:
+  - -1
+  - 1
+  - 0
+  t: jungle
+- c:
+  - -1
+  - 2
+  - -1
+  t: forest
+  content: beastDen
+- c:
+  - -1
+  - 5
+  - -4
+  t: beach
+- c:
+  - -1
+  - 6
+  - -5
+  t: beach
+- c:
+  - -1
+  - 7
+  - -6
+  t: beach
+- c:
+  - 0
+  - -7
+  - 7
+  t: sea
+- c:
+  - 0
+  - -6
+  - 6
+  t: sea
+- c:
+  - 0
+  - -5
+  - 5
+  t: sea
+- c:
+  - 0
+  - -4
+  - 4
+  t: beach
+- c:
+  - 0
+  - -2
+  - 2
+  t: forest
+- c:
+  - 0
+  - -1
+  - 1
+  t: jungle
+- c:
+  - 0
+  - 0
+  - 0
+  t: river
+  content: site
+- c:
+  - 0
+  - 1
+  - -1
+  t: jungle
+- c:
+  - 0
+  - 2
+  - -2
+  t: forest
+- c:
+  - 0
+  - 4
+  - -4
+  t: beach
+- c:
+  - 0
+  - 5
+  - -5
+  t: sea
+- c:
+  - 0
+  - 6
+  - -6
+  t: sea
+- c:
+  - 0
+  - 7
+  - -7
+  t: sea
+- c:
+  - 1
+  - -7
+  - 6
+  t: beach
+- c:
+  - 1
+  - -6
+  - 5
+  t: beach
+- c:
+  - 1
+  - -5
+  - 4
+  t: beach
+- c:
+  - 1
+  - -2
+  - 1
+  t: forest
+  content: beastDen
+- c:
+  - 1
+  - -1
+  - 0
+  t: jungle
+- c:
+  - 1
+  - 0
+  - -1
+  t: river
+- c:
+  - 1
+  - 1
+  - -2
+  t: jungle
+- c:
+  - 1
+  - 2
+  - -3
+  t: forest
+- c:
+  - 1
+  - 3
+  - -4
+  t: beach
+- c:
+  - 1
+  - 4
+  - -5
+  t: sea
+- c:
+  - 1
+  - 5
+  - -6
+  t: jungle
+  content: beastDen
+- c:
+  - 1
+  - 6
+  - -7
+  t: sea
+- c:
+  - 2
+  - -7
+  - 5
+  t: beach
+  content: beastDen
+- c:
+  - 2
+  - 0
+  - -2
+  t: river
+  content: creepCampMedium
+- c:
+  - 2
+  - 1
+  - -3
+  t: forest
+- c:
+  - 2
+  - 2
+  - -4
+  t: beach
+- c:
+  - 2
+  - 3
+  - -5
+  t: sea
+- c:
+  - 2
+  - 4
+  - -6
+  t: sea
+- c:
+  - 2
+  - 5
+  - -7
+  t: sea
+- c:
+  - 3
+  - -7
+  - 4
+  t: beach
+- c:
+  - 3
+  - -5
+  - 2
+  t: hills
+  content: site
+- c:
+  - 3
+  - -4
+  - 1
+  t: forest
+  content: creepCampSmall
+- c:
+  - 3
+  - 0
+  - -3
+  t: river
+- c:
+  - 3
+  - 1
+  - -4
+  content: creepCampLarge
+- c:
+  - 3
+  - 2
+  - -5
+  t: beach
+- c:
+  - 3
+  - 3
+  - -6
+  t: beach
+- c:
+  - 3
+  - 4
+  - -7
+  t: beach
+  content: site
+- c:
+  - 4
+  - -7
+  - 3
+  t: forest
+- c:
+  - 4
+  - -2
+  - -2
+  t: forest
+  content: beastDen
+- c:
+  - 4
+  - 0
+  - -4
+  t: river
+- c:
+  - 5
+  - -7
+  - 2
+  t: forest
+- c:
+  - 5
+  - -5
+  - 0
+  startingLocation: 2
+- c:
+  - 5
+  - -3
+  - -2
+  content: goldMine
+- c:
+  - 5
+  - 0
+  - -5
+  t: river
+- c:
+  - 5
+  - 2
+  - -7
+  t: beach
+- c:
+  - 6
+  - -3
+  - -3
+  t: forest
+  content: beastDen
+- c:
+  - 6
+  - 0
+  - -6
+  t: river
+  content: creepCampSmall
+- c:
+  - 6
+  - 1
+  - -7
+  t: beach
+- c:
+  - 7
+  - -7
+  - 0
+  t: forest
+  content: creepCampMedium
+- c:
+  - 7
+  - -3
+  - -4
+  content: site
+- c:
+  - 7
+  - -2
+  - -5
+  t: beach
+- c:
+  - 7
+  - -1
+  - -6
+  t: beach
+- c:
+  - 7
+  - 0
+  - -7
+  t: river

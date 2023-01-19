@@ -1,0 +1,875 @@
+id: BasicTutorialMap
+title: basicMapTitle
+description: basicMapDescription
+size: 8
+kind: 0
+maxPlayers: 4
+defaultTerrain: grass
+hexes:
+- c:
+  - -7
+  - 0
+  - 7
+  t: grass
+- c:
+  - -7
+  - 1
+  - 6
+  t: beach
+- c:
+  - -7
+  - 2
+  - 5
+  t: beach
+- c:
+  - -7
+  - 3
+  - 4
+  t: beach
+- c:
+  - -7
+  - 4
+  - 3
+  t: grass
+- c:
+  - -7
+  - 5
+  - 2
+  t: grass
+- c:
+  - -7
+  - 6
+  - 1
+  t: grass
+  startingLocation: 3
+- c:
+  - -7
+  - 7
+  - 0
+  t: grass
+- c:
+  - -6
+  - -1
+  - 7
+  t: grass
+- c:
+  - -6
+  - 0
+  - 6
+  t: grass
+- c:
+  - -6
+  - 1
+  - 5
+  t: grass
+- c:
+  - -6
+  - 2
+  - 4
+  t: grass
+- c:
+  - -6
+  - 3
+  - 3
+  t: grass
+- c:
+  - -6
+  - 4
+  - 2
+  t: grass
+- c:
+  - -6
+  - 5
+  - 1
+  t: grass
+- c:
+  - -6
+  - 6
+  - 0
+  t: forest
+- c:
+  - -6
+  - 7
+  - -1
+  t: grass
+- c:
+  - -5
+  - -2
+  - 7
+  t: grass
+- c:
+  - -5
+  - -1
+  - 6
+  t: grass
+- c:
+  - -5
+  - 0
+  - 5
+  t: grass
+- c:
+  - -5
+  - 1
+  - 4
+  t: grass
+- c:
+  - -5
+  - 2
+  - 3
+  t: grass
+- c:
+  - -5
+  - 3
+  - 2
+  t: forest
+  content: beastDen
+- c:
+  - -5
+  - 4
+  - 1
+  t: forest
+- c:
+  - -5
+  - 5
+  - 0
+  t: grass
+- c:
+  - -5
+  - 6
+  - -1
+  t: grass
+- c:
+  - -5
+  - 7
+  - -2
+  t: grass
+- c:
+  - -4
+  - -3
+  - 7
+  t: grass
+- c:
+  - -4
+  - -2
+  - 6
+  t: grass
+  content: creepCampMedium
+- c:
+  - -4
+  - -1
+  - 5
+  t: grass
+- c:
+  - -4
+  - 0
+  - 4
+  t: hills
+- c:
+  - -4
+  - 1
+  - 3
+  t: hills
+- c:
+  - -4
+  - 2
+  - 2
+  t: grass
+- c:
+  - -4
+  - 3
+  - 1
+  t: grass
+- c:
+  - -4
+  - 4
+  - 0
+  t: grass
+- c:
+  - -4
+  - 5
+  - -1
+  t: grass
+  content: creepCampLarge
+- c:
+  - -4
+  - 6
+  - -2
+  t: grass
+- c:
+  - -4
+  - 7
+  - -3
+  t: grass
+- c:
+  - -3
+  - -4
+  - 7
+  t: forest
+  content: beastDen
+- c:
+  - -3
+  - -3
+  - 6
+  t: grass
+- c:
+  - -3
+  - -2
+  - 5
+  t: grass
+- c:
+  - -3
+  - -1
+  - 4
+  t: grass
+- c:
+  - -3
+  - 0
+  - 3
+  t: grass
+- c:
+  - -3
+  - 1
+  - 2
+  t: grass
+- c:
+  - -3
+  - 2
+  - 1
+  t: grass
+- c:
+  - -3
+  - 3
+  - 0
+  t: grass
+- c:
+  - -3
+  - 4
+  - -1
+  t: grass
+- c:
+  - -3
+  - 5
+  - -2
+  t: grass
+- c:
+  - -3
+  - 6
+  - -3
+  t: grass
+- c:
+  - -3
+  - 7
+  - -4
+  t: forest
+- c:
+  - -2
+  - -5
+  - 7
+  t: grass
+- c:
+  - -2
+  - -4
+  - 6
+  t: grass
+- c:
+  - -2
+  - -3
+  - 5
+  t: grass
+- c:
+  - -2
+  - -2
+  - 4
+  t: grass
+- c:
+  - -2
+  - -1
+  - 3
+  t: grass
+  content: creepCampMedium
+- c:
+  - -2
+  - 0
+  - 2
+  t: grass
+- c:
+  - -2
+  - 1
+  - 1
+  t: grass
+- c:
+  - -2
+  - 2
+  - 0
+  t: grass
+- c:
+  - -2
+  - 3
+  - -1
+  t: hills
+  content: beastDen
+- c:
+  - -2
+  - 4
+  - -2
+  t: hills
+- c:
+  - -2
+  - 5
+  - -3
+  t: grass
+- c:
+  - -2
+  - 6
+  - -4
+  t: forest
+  content: beastDen
+- c:
+  - -2
+  - 7
+  - -5
+  t: grass
+- c:
+  - -1
+  - -6
+  - 7
+  t: grass
+- c:
+  - -1
+  - -5
+  - 6
+  t: grass
+- c:
+  - -1
+  - -4
+  - 5
+  t: grass
+- c:
+  - -1
+  - -3
+  - 4
+  t: grass
+- c:
+  - -1
+  - -2
+  - 3
+  t: grass
+- c:
+  - -1
+  - -1
+  - 2
+  t: grass
+- c:
+  - -1
+  - 0
+  - 1
+  t: grass
+- c:
+  - -1
+  - 1
+  - 0
+  t: grass
+- c:
+  - -1
+  - 2
+  - -1
+  t: grass
+- c:
+  - -1
+  - 3
+  - -2
+  t: grass
+- c:
+  - -1
+  - 4
+  - -3
+  t: grass
+- c:
+  - -1
+  - 5
+  - -4
+  t: grass
+- c:
+  - -1
+  - 6
+  - -5
+  t: grass
+- c:
+  - -1
+  - 7
+  - -6
+  t: grass
+  startingLocation: 1
+- c:
+  - 0
+  - -7
+  - 7
+  t: grass
+- c:
+  - 0
+  - -6
+  - 6
+  t: grass
+- c:
+  - 0
+  - -5
+  - 5
+  t: forest
+- c:
+  - 0
+  - -4
+  - 4
+  t: forest
+  content: beastDen
+- c:
+  - 0
+  - -3
+  - 3
+  t: grass
+- c:
+  - 0
+  - -2
+  - 2
+  t: grass
+- c:
+  - 0
+  - -1
+  - 1
+  t: grass
+  content: creepCampSmall
+- c:
+  - 0
+  - 0
+  - 0
+  t: hills
+  content: goldMine
+- c:
+  - 0
+  - 1
+  - -1
+  t: hills
+- c:
+  - 0
+  - 2
+  - -2
+  t: grass
+- c:
+  - 0
+  - 3
+  - -3
+  t: grass
+- c:
+  - 0
+  - 4
+  - -4
+  t: grass
+- c:
+  - 0
+  - 5
+  - -5
+  t: grass
+- c:
+  - 0
+  - 6
+  - -6
+  t: grass
+  content: site
+- c:
+  - 0
+  - 7
+  - -7
+  t: grass
+- c:
+  - 1
+  - -7
+  - 6
+  t: grass
+  startingLocation: 2
+- c:
+  - 1
+  - -6
+  - 5
+  t: grass
+  content: site
+- c:
+  - 1
+  - -5
+  - 4
+  t: grass
+- c:
+  - 1
+  - -4
+  - 3
+  t: hills
+- c:
+  - 1
+  - -3
+  - 2
+  t: grass
+- c:
+  - 1
+  - -2
+  - 1
+  t: grass
+- c:
+  - 1
+  - -1
+  - 0
+  t: grass
+- c:
+  - 1
+  - 0
+  - -1
+  t: grass
+  content: creepCampSmall
+- c:
+  - 1
+  - 1
+  - -2
+  t: grass
+- c:
+  - 1
+  - 2
+  - -3
+  t: ocean
+- c:
+  - 1
+  - 3
+  - -4
+  t: grass
+- c:
+  - 1
+  - 4
+  - -5
+  t: grass
+- c:
+  - 1
+  - 5
+  - -6
+  t: grass
+- c:
+  - 1
+  - 6
+  - -7
+  t: grass
+- c:
+  - 2
+  - -7
+  - 5
+  t: grass
+- c:
+  - 2
+  - -6
+  - 4
+  t: grass
+- c:
+  - 2
+  - -5
+  - 3
+  t: grass
+- c:
+  - 2
+  - -4
+  - 2
+  t: hills
+- c:
+  - 2
+  - -3
+  - 1
+  t: grass
+- c:
+  - 2
+  - -2
+  - 0
+  t: grass
+- c:
+  - 2
+  - -1
+  - -1
+  t: grass
+- c:
+  - 2
+  - 0
+  - -2
+  t: grass
+- c:
+  - 2
+  - 1
+  - -3
+  t: grass
+- c:
+  - 2
+  - 2
+  - -4
+  t: grass
+- c:
+  - 2
+  - 3
+  - -5
+  t: forest
+  content: beastDen
+- c:
+  - 2
+  - 4
+  - -6
+  t: grass
+  content: goldMine
+- c:
+  - 2
+  - 5
+  - -7
+  t: grass
+- c:
+  - 3
+  - -7
+  - 4
+  t: beach
+- c:
+  - 3
+  - -6
+  - 3
+  t: grass
+- c:
+  - 3
+  - -5
+  - 2
+  t: grass
+- c:
+  - 3
+  - -4
+  - 1
+  t: grass
+- c:
+  - 3
+  - -3
+  - 0
+  t: forest
+- c:
+  - 3
+  - -2
+  - -1
+  t: grass
+- c:
+  - 3
+  - -1
+  - -2
+  t: grass
+- c:
+  - 3
+  - 0
+  - -3
+  t: grass
+- c:
+  - 3
+  - 1
+  - -4
+  t: hills
+- c:
+  - 3
+  - 2
+  - -5
+  t: forest
+- c:
+  - 3
+  - 3
+  - -6
+  t: forest
+- c:
+  - 3
+  - 4
+  - -7
+  t: beach
+- c:
+  - 4
+  - -7
+  - 3
+  t: beach
+  content: goldMine
+- c:
+  - 4
+  - -6
+  - 2
+  t: grass
+- c:
+  - 4
+  - -5
+  - 1
+  t: grass
+- c:
+  - 4
+  - -4
+  - 0
+  t: grass
+  content: beastDen
+- c:
+  - 4
+  - -3
+  - -1
+  t: grass
+- c:
+  - 4
+  - -2
+  - -2
+  t: grass
+  content: creepCampLarge
+- c:
+  - 4
+  - -1
+  - -3
+  t: grass
+- c:
+  - 4
+  - 0
+  - -4
+  t: hills
+- c:
+  - 4
+  - 1
+  - -5
+  t: grass
+- c:
+  - 4
+  - 2
+  - -6
+  t: grass
+- c:
+  - 4
+  - 3
+  - -7
+  t: beach
+- c:
+  - 5
+  - -7
+  - 2
+  t: beach
+- c:
+  - 5
+  - -6
+  - 1
+  t: grass
+- c:
+  - 5
+  - -5
+  - 0
+  t: grass
+- c:
+  - 5
+  - -4
+  - -1
+  t: forest
+- c:
+  - 5
+  - -3
+  - -2
+  t: grass
+- c:
+  - 5
+  - -2
+  - -3
+  t: grass
+- c:
+  - 5
+  - -1
+  - -4
+  t: grass
+- c:
+  - 5
+  - 0
+  - -5
+  t: grass
+- c:
+  - 5
+  - 1
+  - -6
+  t: grass
+- c:
+  - 5
+  - 2
+  - -7
+  t: beach
+- c:
+  - 6
+  - -7
+  - 1
+  t: beach
+- c:
+  - 6
+  - -6
+  - 0
+  t: grass
+- c:
+  - 6
+  - -5
+  - -1
+  t: grass
+- c:
+  - 6
+  - -4
+  - -2
+  t: grass
+- c:
+  - 6
+  - -3
+  - -3
+  t: grass
+- c:
+  - 6
+  - -2
+  - -4
+  t: grass
+- c:
+  - 6
+  - -1
+  - -5
+  t: grass
+- c:
+  - 6
+  - 0
+  - -6
+  t: grass
+- c:
+  - 6
+  - 1
+  - -7
+  t: grass
+- c:
+  - 7
+  - -7
+  - 0
+  t: grass
+- c:
+  - 7
+  - -6
+  - -1
+  t: grass
+  startingLocation: 4
+- c:
+  - 7
+  - -5
+  - -2
+  t: grass
+- c:
+  - 7
+  - -4
+  - -3
+  t: grass
+- c:
+  - 7
+  - -3
+  - -4
+  t: grass
+- c:
+  - 7
+  - -2
+  - -5
+  t: grass
+- c:
+  - 7
+  - -1
+  - -6
+  t: grass
+- c:
+  - 7
+  - 0
+  - -7
+  t: beach

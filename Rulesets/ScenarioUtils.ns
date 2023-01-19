@@ -1,0 +1,35 @@
+fn equalCoordinates(l1, l2) => l1.0 == l2.0 && l1.1 == l2.1 && l1.2 == l2.2
+
+siteIds = ["ruinedWell", "colonialShipwreck", "crumblingLookout", "abandonedArtillery",
+  "dischargedBallista", "wingedSerpentNest", "brokenTotem", "titheCollector", "mercilessRenegades"]
+
+fn claimSites(nature, cells) {
+  siteCells = cells.where(=> $0.content?.type.id in siteIds)
+  for cell in siteCells {
+    cell.content.setOwner(nature)
+  }
+}
+
+fn setCampUnits(nature, cells, campType, unitTypes) {
+  campCells = cells.where(=> $0.content?.type.id == campType)
+  for cell in campCells {
+    cell.summon(unitTypes.randomItem, nature)
+  }
+}
+
+fn updateNeutralContent(updateBeastDens = true, updateCreepCamps = true, updateSitesAndItems = true) {
+  nature = Game.nature
+  cells = Game.grid.cells
+  if updateBeastDens {
+    setCampUnits(nature, cells, "beastDen", ["goreilla", "kingPython", "fangedAmalgam", "firehornetSwarm"])
+  }
+  if updateCreepCamps {
+    setCampUnits(nature, cells, "creepCampSmall", ["rogueWarrior", "rogueShadespear", "ironBoar", "carnivora"])
+    setCampUnits(nature, cells, "creepCampMedium", ["deserterSquad", "raiderWarband", "millepede"])
+    setCampUnits(nature, cells, "creepCampLarge", ["dementedBeastlord", "hermitCyclops", "wingedSerpent"])
+  }
+  claimSites(nature, cells)
+  if updateSitesAndItems {
+    setCampUnits(nature, cells, "site", siteIds)
+  }
+}

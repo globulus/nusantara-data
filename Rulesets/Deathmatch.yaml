@@ -1,0 +1,120 @@
+id: Deathmatch
+title: deathmatchTitle
+description: deathmatchDescription
+playable: true
+maxUndos: 2
+maxTeams: 4
+teamsShareVision: true
+randomizedFirstPlayer: true
+fogOfWar: true
+turnLength: 1200
+maxHandSize: 6
+deterministicCombat: false
+autoCameraReposition: true
+winCondition: DestroyAll
+factionData:
+  sanghoy:
+    startingData:
+      resources:
+        g: 10
+        u: 0
+      cards: { }
+      units:
+        - sanghoyCamp
+        - thrall
+        - warrior
+    upgradeTree:
+      nodes:
+        - type: obsidianWeapons
+        - type: slaveAuctions
+        - type: strengthInUnity
+          subnodes:
+            - type: ironForging
+            - type: ransackers
+            - type: karrish
+              subnodes:
+                - type: thunderousHooves
+                - type: onslaught
+            - type: reignOfBeastlords
+              subnodes:
+                - type: eyeToEyeClawToClaw
+                - type: tasteOfManflesh
+        - type: ritesOfRogash
+          subnodes:
+            - type: harbingersOfChange
+            - type: theDreamFuel
+            - type: excrescence
+              subnodes: 
+                - type: shapingCorral
+                - type: toTheSkies
+            - type: beastmastery
+              subnodes:
+                - type: thickShell
+                - type: daringTamers
+  frenza:
+    # startingData:
+    #   resources:
+    #     g: 1000
+    #     u: 1000
+    #   cards:
+    #     airSuperiorityShipment: 1
+    #     eradicateThePestShipment: 1
+    #     emperorsFistShipment: 1
+    #     minorUpgrade: 14
+    #     majorUpgrade: 6
+    #   units:
+    #     - colonialHall
+    #     - settler
+    #     - rifleman
+    #     - barracks
+    #     - factory
+    #     - airfield
+    #     - magistratesCourt
+    startingData:
+      resources:
+        g: 10
+        u: 0
+      cards: { }
+      units:
+        - colonialHall
+        - settler
+        - rifleman
+    upgradeTree:
+      nodes:
+        - type: taxCollectors
+        - type: masterSculptors
+        - type: hardenedVeterans
+          subnodes:
+            - type: horsebackTraining
+            - type: sniperSchool
+            - type: viciousVanguard
+              subnodes:
+                - type: heliumPockets
+                - type: uncommonValor
+            - type: deathSquads
+              subnodes:
+                - type: superspread
+                - type: infantryFormations
+        - type: intensiveIndustrialization
+          subnodes:
+            - type: theThirdShift
+            - type: automatedDefenses
+            - type: engineKits
+              subnodes: 
+                - type: combatEngineers
+                - type: scrapyardColossus
+            - type: harnessingTheLightning
+              subnodes:
+                - type: differentialMachines
+                - type: voltWalkers
+    playerEffects:
+      - PayUpkeep
+      - StatusReport
+      - UncommonValor
+otokRuleset:
+  rounds: 3
+  initialResources: 10
+  resourcesPerDraft: 10
+  draftDuration: 90
+  combatTurnsPerRound: 5
+  combatTurnDuration: 15

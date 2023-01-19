@@ -1,0 +1,529 @@
+INFINITY = 1_000_000_000
+
+fn areAllies(caster, target) => caster.owner.isAllyOf(target.owner)
+
+fn isOrganicType(type) {
+  tags = type?.tags
+  return "organic" in tags && "invulnerable" !in tags
+}
+
+fn isOrganic(unit) => isOrganicType(unit.type)
+
+fn countUnitsOfType(player, typeId) => player.ownedUnits.count(=> $0.type.id == typeId) + player.hand.count(=> $0.type.id == typeId)
+
+fn countUnitsOfTypeNear(unit, typeId, range) => Game.unitsInRange(unit.coordinates, range).count(=> $0.type.id == typeId && unit.owner.id == $0.owner.id)
+
+fn animateHitOn(unit) {
+  Game.animateVisualFx([
+    [
+      type: "hit",
+      coordinates: unit.coordinates
+    ]
+  ])
+}
+
+effect AuraModifier {
+  trigger => Triggers.passive
+
+  run(caster, target) {
+    throw "Not implemented"
+  }
+
+  description(caster) => Game.describeAsStance(caster, run(caster, caster))
+
+  title {
+    throw "Not implemented"
+  }
+}
+
+effect Aura {
+  trigger => Triggers.aura
+
+  run(caster, target) {
+    around = Game.unitsInRange(Game.grid.locate(caster) ?? Game.grid.elementAt([0, 0, 0]), @range(caster))\
+      .where(=> @isValidTarget(caster, $0))
+    for unit in around {
+      if @stacks || !unit.hasTempEffect(@modifierId) {
+        @affect(unit, caster)
+      }
+    }
+  }
+
+  affect(unit, caster) {
+    unit.addTempEffect(@modifier(caster, unit), source: caster, duration: 1)
+  }
+
+  description(caster) {
+    desc = "Aura" \
+      + "\nRange: " + @range(caster) \
+      + "\nValid types: " + this?.validTypes.join(", ")
+    if stacks {
+      desc += "\nStacks"
+    }
+    desc += "\nEffect: " + @modifier(caster, null).description(caster)
+    return desc
+  }
+}
+
+effect AddCardToHand {
+  init(@typeId, @downtime, @goldCost, @uniqueCost, @actionsCost)
+
+  trigger => Triggers.cast
+
+  targets => Targets.none
+
+  isEnabled(caster) => [[caster.owner.canAddCards, "Your hand is full!"]]
+
+  cost(caster) => [g: goldCost, u: uniqueCost, ap: actionsCost]
+
+  run(caster, target) {
+    caster.owner.addToHand(typeId, this?.downtimeOverride(caster) ?? downtime)
+  }
+
+  description(caster) {
+    defaultDesc = Game.localizedStr(typeId + "Description")
+    return if defaultDesc.isEmpty \
+      "Add $typeId to hand with $downtime downtime for $(@cost(caster))." \
+      else defaultDesc
+  }
+
+  flavor(caster) => Game.localizedStr(typeId + "Flavor")
+}
+
+effect AddCardToHandWithRampingCost is AddCardToHand {
+  init(typeId, downtime, goldCost, uniqueCost, actionsCost, @goldRamp, @uniqueRamp, @actionsRamp) {
+    super.init(typeId, downtime, goldCost, uniqueCost, actionsCost)
+  }
+
+  cost(caster) {
+    countSame = countUnitsOfType(caster.owner, @typeId)
+    # Console.println("Same $(@typeId): $countSame")
+    # Console.println(Debug.callStack)
+    gold = Math.floor((this::goldCost ?? 0) * (1 + (goldRamp ?? 0) * countSame))
+    unique = Math.floor((this::uniqueCost ?? 0) * (1 + (uniqueRamp ?? 0) * countSame))
+    actions = Math.floor((this::actionsCost ?? 0) * (1 + (actionsRamp ?? 0) * countSame))
+    return [g: gold, u: unique, ap: actions]
+  }
+}
+
+effect AddCardToHandWithRampingCostIfUpgrade is AddCardToHandWithRampingCost {
+  init(typeId, downtime, goldCost, uniqueCost, actionsCost, goldRamp, uniqueRamp, actionsRamp, @requiredUpgrade) {
+    super.init(typeId, downtime, goldCost, uniqueCost, actionsCost, goldRamp, uniqueRamp, actionsRamp)
+  }
+
+  isEnabled(caster) => super.isEnabled(caster).addAll([[caster.owner.hasUpgrade(requiredUpgrade), "Owner doesn't have $(Game.localizedStr(@requiredUpgrade + "Title"))."]])
+
+  description(caster) => super.description(caster) + " If has $requiredUpgrade."
+}
+
+effect AddCardToHandIfUpgrade is AddCardToHand {
+  init(typeId, downtime, goldCost, uniqueCost, actionsCost, @requiredUpgrade) {
+    super.init(typeId, downtime, goldCost, uniqueCost, actionsCost)
+  }
+
+  isEnabled(caster) => super.isEnabled(caster).addAll([[caster.owner.hasUpgrade(requiredUpgrade), "Owner doesn't have $(Game.localizedStr(@requiredUpgrade + "Title"))."]])
+
+  description(caster) => super.description(caster) + " If has $requiredUpgrade."
+}
+
+effect Repair {
+  trigger => Triggers.cast
+
+  check(caster, target) => areAllies(caster, target) && !isOrganic(target) && target.hp <= target.health - @repairAmount
+
+  run(caster, target) {
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " repars " + Game.localizedStr(target.type.id + "Title") + " for $repairAmount.", LogLevels.info, caster.coordinates)
+    target.restoreHealth(@repairAmount)
+    Game.animateVisualFx([
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#00FF00"
+      ]
+    ])
+  }
+
+  description(caster) => "Repair $(@repairAmount)."
+}
+
+effect Heal {
+  init(@healAmount, goldCost, uniqueCost, apCost) {
+    @cost = fn (caster) => [g: goldCost, u: uniqueCost, ap: apCost]
+  }
+  
+  trigger => Triggers.cast
+
+  check(caster, target) => areAllies(caster, target) && isOrganic(target) && target.hp < target.health - healAmount
+
+  run(caster, target) {
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " heals " + Game.localizedStr(target.type.id + "Title") + " for $healthAmount.", LogLevels.info, caster.coordinates)
+    target.restoreHealth(@healAmount)
+    Game.animateVisualFx([
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#00FF00"
+      ]
+    ])
+  }
+
+  description(caster) => "Heal $(@healAmount)."
+}
+
+effect DrainAttack {
+  init(@healthRestored)
+
+  trigger => Triggers.attack
+
+  check(caster, target) => isOrganic(target)
+
+  run(caster, target) {
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " drains $healthRestored HP from " \
+      + Game.localizedStr(target.type.id + "Title") + ".", LogLevels.info, caster.coordinates)
+    caster.restoreHealth(healthRestored)
+    Game.animateVisualFx([
+      [
+        type: "boost",
+        coordinates: caster.coordinates,
+        color: "#00FF00"
+      ]
+    ])
+  }
+
+  description(caster) => "On attack, heal self by $healthRestored."
+}
+
+effect Morph {
+  trigger => Triggers.cast
+
+  check(caster, target) {
+    throw "Not implemented"
+  } 
+
+  run(caster, target) {
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " morphs " + Game.localizedStr(target.type.id + "Title") \
+      + " into " + Game.localizedStr(@newType + "Title") + ".", LogLevels.info, caster.coordinates)
+    Game.animateVisualFx([
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#FF0000"
+      ]
+    ])
+    target.setType(@newType)
+    target.restoreHealth(target.health)
+    target.setActions(0)
+  }
+
+  description(caster) => "Convert to $(@newType).\n" + Game.localizedStr(@newType + "Description")
+  flavor(caster) => Game.localizedStr(@newType + "Flavor")
+}
+
+effect MorphSelf {
+  trigger => Triggers.cast
+  targets => Targets.none
+
+  run(caster, target) {
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " morphs into " \
+      + Game.localizedStr(@newType + "Title") + ".", LogLevels.info, caster.coordinates)
+    caster.setType(@newType)
+    caster.restoreHealth(caster.health)
+    caster.setActions(0)
+  }
+
+  description(caster) => "Convert to $(@newType).\n" + Game.localizedStr(@newType + "Description")
+  flavor(caster) => Game.localizedStr(@newType + "Flavor")
+}
+
+effect TargetableSpell {
+  trigger => Triggers.cast
+
+  range(caster) => Game.grid.size
+
+  check(caster, target) {
+    throw "Not implemented"
+  }
+
+  run(caster, target) {
+    throw "Not implemented"
+  }
+}
+
+fn isCellVacant(cell) => cell.content == null
+
+fn hasVacantCell(unit, radius) => Game.grid.cellsAround(Game.grid.locate(unit).coordinates, radius, unit.owner).any(isCellVacant)
+fn getVacantCell(unit, radius) => Game.grid.cellsAround(Game.grid.locate(unit).coordinates, radius, unit.owner).first(isCellVacant)
+
+fn getVacantCellAroundCell(cell, player) => Game.grid.cellsAround(cell.coordinates, Game.grid.size, player).first(isCellVacant)
+fn getVacantCellAroundCellIncludingIt(cell, player) {
+  if isCellVacant(cell) {
+    return cell
+  }
+  return getVacantCellAroundCell(cell, player)
+}
+
+fn hasVacantInfluencableCell(unit, radius) => Game.grid.cellsAround(Game.grid.locate(unit).coordinates, radius, unit.owner).any(=> $0.isInfluencable() && isCellVacant($0))
+fn getVacantInfluencableCell(unit, radius) => Game.grid.cellsAround(Game.grid.locate(unit).coordinates, radius, unit.owner).first(=> $0.isInfluencable() && isCellVacant($0))
+
+fn getVacantInfluencableCellAroundCell(cell, player) => Game.grid.cellsAround(cell.coordinates, Game.grid.size, player).first(=> $0.isInfluencable() && isCellVacant($0))
+fn getVacantInfluencableCellAroundCellIncludingIt(cell, player) {
+  if isCellVacant(cell) && cell.isInfluencable() {
+    return cell
+  }
+  return getVacantInfluencableCellAroundCell(cell, player)
+}
+
+effect TrainHero {
+  init(@type)
+
+  trigger => Triggers.cast
+
+  cost(caster) => [g: 10, ap: 1]
+
+  targets => Targets.none
+
+  isEnabled(caster) => [
+    [caster.owner.hero == null, "You already have a hero!"],
+    [hasVacantInfluencableCell(caster, 1), "You need free space around!"]
+  ]
+
+  check(caster, target) => hasVacantInfluencableCell(caster, 1)
+
+  run(caster, target) {
+    player = caster.owner
+    targetCell = getVacantInfluencableCell(caster, 1)
+    hero = targetCell.summon(type, player)
+    player.setHero(hero)
+    player.addToHand("heroUpgrade", 0)
+  }
+
+  description(caster) => "Summon this Hero at the nearest cell!\n" + Game.localizedStr(type + "Description")
+  flavor(caster) => Game.localizedStr(type + "Flavor")
+}
+
+effect ReviveHeroTrigger {
+  trigger => Triggers.startOfTurn
+
+  targets => Targets.none
+
+  run(caster, target) {
+    player = caster.owner
+    if Game.grid.nonEmptyCells.any(=> $0.content?.id == player?.hero?.id) {
+      Console.println("Hero is already alive!")
+      return
+    }
+    targetCell = getVacantInfluencableCell(caster, 1)
+    if targetCell == null {
+      Console.println("No vacant cells to revive hero on")
+      return
+    }
+    caster.removeTempEffect("ReviveHeroTrigger")
+    hero = targetCell.setContent(player.hero)
+    hero.restoreHealth(hero.health)
+  }
+
+  sprite => "reviveHero"
+}
+
+reviveHeroSpellId = "reviveHeroToInfluencedCell"
+
+effect ReviveHero {
+  trigger => Triggers.cast
+
+  targets => Targets.none
+
+  cost(caster) => [g: 10 + (caster.owner.hero?.level ?? 0) * 3, ap: 1]
+
+  isEnabled(caster) {
+    hero = caster.owner.hero
+    return [
+      [hero != null, "You don't have a hero!"],
+      [!hero.isAlive, "Your hero is already alive!"],
+      [!caster.hasTempEffect("ReviveHeroTrigger"), "You're already reviving your hero!"],
+      [!caster.owner.hand.any(=> $0.type.id == reviveHeroSpellId), "You're already reviving your hero!"]
+    ]
+  }
+
+  check(caster, target) => hasVacantInfluencableCell(caster, 1)
+
+  run(caster, target) {
+    caster.addTempEffect(ReviveHeroTrigger(), caster, INFINITY)
+    Game.animateVisualFx([
+      [
+        type: "aura",
+        coordinates: caster.coordinates,
+        color: "#00FFFF"
+      ]
+    ])
+  }
+
+  description(caster) => "Re-summon your fallen Hero at the nearest empty cell!"
+}
+
+effect AddReviveHeroToHand {
+  trigger => Triggers.cast
+
+  targets => Targets.none
+
+  cost(caster) => [g: 15 + (caster.owner.hero?.level ?? 0) * 4, ap: 1]
+
+  isEnabled(caster) {
+    hero = caster.owner.hero
+    return [
+      [hero != null, "You don't have a hero!"],
+      [!hero.isAlive, "Your hero is already alive!"],
+      [!caster.hasTempEffect("ReviveHeroTrigger"), "You're already reviving your hero!"],
+      [caster.owner.canAddCards, "Your hand is full!"],
+      [!caster.owner.hand.any(=> $0.type.id == reviveHeroSpellId), "You're already reviving your hero!"]
+    ]
+  }
+
+  run(caster, target) {
+    caster.owner.addToHand(reviveHeroSpellId, 1)
+  }
+
+  description(caster) => "Add a Revive Hero spell to your hand!"
+}
+
+effect ReviveHeroToInfluencedCell is TargetableSpell {
+  targets => Targets.cell
+
+  check(caster, target) => target.content == null && target.influencer == caster.owner.id
+
+  run(caster, target) {
+    player = caster.owner
+    if Game.grid.nonEmptyCells.any(=> $0.content?.id == player?.hero?.id) {
+      Console.println("Hero is already alive!")
+      return
+    }
+    hero = target.setContent(player.hero)
+    hero.restoreHealth(hero.health)
+  }
+
+  description(caster) => "Select an empty cell under your influence. Revive your Hero at it!"
+}
+
+effect Sacrifice {
+  trigger => Triggers.cast
+
+  check(caster, target) => caster != target && areAllies(caster, target) && @isValidTarget(caster, target)
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "circle",
+        coordinates: caster.coordinates
+      ],
+      [
+        type: "bonefire",
+        coordinates: target.coordinates
+      ]
+    ])
+    target.destroy(caster)
+    @postSacrifice(caster, target)
+  }
+
+  description(caster) => "Destroy a target firiendly unit."
+}
+
+effect SelfDestructAtEndOfTurn {
+  trigger => Triggers.endOfTurn
+
+  run(caster, target) {
+    animateHitOn(caster)
+    caster.destroy(caster)
+  }
+
+  sprite => "sacrificeOfDeath"
+}
+
+CHAMPION_XP_EXTRA = "championXp"
+fn getChampionXp(unit) => unit.extras.first(=> $0.id == CHAMPION_XP_EXTRA).value
+fn getChampionLevel(unit) => getChampionXp(unit) // 80 + 1
+fn championGainXp(unit, xp) => unit.updateExtra(CHAMPION_XP_EXTRA, getChampionXp(unit) + xp)
+
+effect ChampionXpModifier is AuraModifier {
+  run(caster, target) {
+    l = getChampionLevel(target)
+    # Console.println("level " + l)
+    # Console.println("xp " + getChampionXp(target))
+    return [
+      attack: ["+", l],
+      defense: ["+", Math.floor(l / 3.0)],
+      attackCount: ["+", Math.floor(l / 6.0)],
+      retaliationCount: ["+", Math.floor(l / 5.0)],
+      speed: ["+", Math.floor(l / 5.0)],
+      regeneration: ["+", Math.round(l / 2.0)]
+    ]
+  }
+
+  sprite => "championSummon"
+
+  title => "championExperienceTitle"
+}
+
+effect ChampionAttack {
+  trigger => [Triggers.attack, Triggers.defend, Triggers.kill]
+
+  run(caster, target) {
+    championGainXp(caster, 10)
+  }
+
+  sprite => "Offense"
+
+  description(caster) => "Gain XP on every attack or retaliation."
+
+  flavor(caster) => "Every strike is one step closer to glory."
+}
+
+effect ChampionSummon {
+  trigger => Triggers.summon
+
+  run(caster, target) {
+    caster.addExtra(CHAMPION_XP_EXTRA, "championXpTitle", "heroStats", 0)
+    caster.addTempEffect(ChampionXpModifier(), caster, INFINITY)
+    caster.addTempEffect(ChampionAttack(), caster, INFINITY)
+  }
+
+  description(caster) => "A champion is ready to go forward..."
+}
+
+effect ChampionCastableEffect {
+  trigger => Triggers.cast
+
+  run(caster, target) {
+    championGainXp(caster, 30)
+    @runImpl(caster, target)
+  }
+}
+
+effect Swarm {
+  STEP_PERCENT = 10 # 10% of lost health triggers one point of loss
+
+  init(@attackLost, @attackCountLost, @speedLost)
+
+  trigger => Triggers.passive
+
+  run(caster, target) {
+    healthLost = (100 - Math.round(caster.hp * 100 / caster.health)) // STEP_PERCENT
+    return [
+      attack: ["-", healthLost * attackLost],
+      attackCount: ["-", healthLost * attackCountLost],
+      speed: ["-", healthLost * speedLost]
+    ]
+  }
+
+  description(caster) => "For every $STEP_PERCENT% health lost, lose $attackLost attack, $attackCountLost attack count and $speedLost speed. " \
+    + Game.describeAsStance(caster, run(caster, null))
+}
+
+effect LeaveCorpse {
+  init(@extraId, @extraTitle, @extraImage)
+
+  trigger => Triggers.onDie
+
+  run(caster, target) {
+    casterPosition = Game.grid.locate(caster)
+    casterPosition.addOrUpdateExtra(extraId, extraTitle, extraImage, caster.type.id)
+  }
+}

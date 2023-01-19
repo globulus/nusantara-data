@@ -1,0 +1,92 @@
+id: Blitzkrieg
+inherits: Deathmatch
+title: blitzkriegTitle
+description: blitzkriegDescription
+maxHandSize: 8
+factionData:
+  sanghoy:
+    startingData:
+      resources:
+        g: 20
+        u: 5
+      cards: { }
+      units:
+        - sanghoyCamp
+        - thrall
+        - thrall
+        - warrior
+        - runestoneOfRogash
+        - shadespear
+    upgradeTree:
+      nodes:
+        - type: obsidianWeapons
+        - type: slaveAuctions
+        - type: strengthInUnity
+          subnodes:
+            - type: ironForging
+            - type: ransackers
+            - type: karrish
+              subnodes:
+                - type: thunderousHooves
+                - type: onslaught
+            - type: reignOfBeastlords
+              subnodes:
+                - type: eyeToEyeClawToClaw
+                - type: tasteOfManflesh
+        - type: ritesOfRogash
+          subnodes:
+            - type: harbingersOfChange
+            - type: theDreamFuel
+            - type: excrescence
+              subnodes: 
+                - type: shapingCorral
+                - type: toTheSkies
+            - type: beastmastery
+              subnodes:
+                - type: thickShell
+                - type: daringTamers
+  frenza:
+    startingData:
+      resources:
+        g: 15
+        u: 2
+      cards: { }
+      units:
+        - colonialHall
+        - settler
+        - settler
+        - rifleman
+        - assassin
+        - magistratesCourt
+    upgradeTree:
+      nodes:
+        - type: taxCollectors
+        - type: masterSculptors
+        - type: hardenedVeterans
+          subnodes:
+            - type: horsebackTraining
+            - type: sniperSchool
+            - type: viciousVanguard
+              subnodes:
+                - type: heliumPockets
+                - type: uncommonValor
+            - type: deathSquads
+              subnodes:
+                - type: superspread
+                - type: infantryFormations
+        - type: intensiveIndustrialization
+          subnodes:
+            - type: theThirdShift
+            - type: automatedDefenses
+            - type: engineKits
+              subnodes: 
+                - type: combatEngineers
+                - type: scrapyardColossus
+            - type: harnessingTheLightning
+              subnodes:
+                - type: differentialMachines
+                - type: voltWalkers
+    playerEffects:
+      - PayUpkeep
+      - StatusReport
+      - UncommonValor

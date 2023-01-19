@@ -1,0 +1,759 @@
+id: neutral
+name: neutralName
+image: neutral
+playable: false
+units:
+  - id: goldMine
+    title: goldMineTitle
+    description: goldMineDescription
+    image: Images/goldMine
+    flavor: goldMineFlavor
+    h: 1000000000
+    stances:
+      - Ceasefire
+    tags:
+     - invulnerable
+    extras:
+      - id: mineableGold
+        title: mineableGoldTitle
+        image: mineableGold
+        value: !!int 300
+      - id: goldBatch
+        title: goldBatchTitle
+        image: mineableGold
+        value: !!int 5
+  - id: pandorasBox
+    title: pandorasBoxTitle
+    image: Images/pandorasBox
+    flavor: pandorasBoxFlavor
+    h: 1000000000
+    stances:
+      - Ceasefire
+    tags:
+     - invulnerable
+  - id: gemMine
+    title: gemMineTitle
+    description: gemMineDescription
+    image: Images/gemMine
+    flavor: gemMineFlavor
+    h: 1000000000
+    stances:
+      - Ceasefire
+    tags:
+     - invulnerable
+    extras:
+      - id: mineableGold
+        title: mineableGoldTitle
+        image: mineableGold
+        value: !!int 100
+      - id: goldBatch
+        title: goldBatchTitle
+        image: mineableGold
+        value: !!int 10
+  - id: beastDen
+    title: beastDenTitle
+    image: Images/kingPython
+    flavor: beastDenFlavor
+    h: 1
+    stances:
+      - Ceasefire
+  - id: creepCampSmall
+    title: creepCampTitle
+    image: Images/creepCamp
+    flavor: creepCampFlavor
+    h: 1
+    stances:
+      - Ceasefire
+  - id: creepCampMedium
+    title: creepCampTitle
+    image: Images/creepCamp
+    flavor: creepCampFlavor
+    h: 1
+    stances:
+      - Ceasefire
+  - id: creepCampLarge
+    title: creepCampTitle
+    image: Images/creepCamp
+    flavor: creepCampFlavor
+    h: 1
+    stances:
+      - Ceasefire
+  - id: site
+    title: siteTitle
+    image: Images/site
+    flavor: siteFlavor
+    h: 1
+    stances:
+      - Ceasefire
+
+  ## Creeps
+  - id: goreilla
+    title: goreillaTitle
+    description: goreillaDescription
+    image: Images/goreilla
+    flavor: goreillaFlavor
+    merit: 50
+    h: 20
+    a: 9
+    as: 1
+    rc: 2
+    d: 1
+    s: 1
+    m: walk
+    projectile: slash
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - leaveCorpse
+  - id: kingPython
+    title: kingPythonTitle
+    description: kingPythonDescription
+    image: Images/kingPython
+    flavor: kingPythonFlavor
+    merit: 50
+    h: 20
+    a: 7
+    as: 2
+    rc: 2
+    d: 0
+    s: 1
+    m: walk
+    projectile: slash
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - venomStrike
+      - leaveCorpse
+  - id: fangedAmalgam
+    title: fangedAmalgamTitle
+    description: fangedAmalgamDescription
+    image: Images/fangedAmalgam
+    flavor: fangedAmalgamFlavor
+    merit: 50
+    h: 18
+    a: 5
+    as: 2
+    ac: 2
+    rc: 3
+    d: 0
+    s: 1
+    m: walk
+    projectile: slash
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - leaveCorpse
+  - id: firehornetSwarm
+    title: firehornetSwarmTitle
+    description: firehornetSwarmDescription
+    image: Images/firehornetSwarm
+    flavor: firehornetSwarmFlavor
+    merit: 60
+    h: 20
+    a: 1
+    ac: 6
+    rc: 2
+    d: 0
+    s: 1
+    m: walk
+    projectile: slash
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - venomStrike
+      - firehornetSwarm
+      - leaveCorpse
+  - id: rogueWarrior
+    title: rogueWarriorTitle
+    description: warriorDescription
+    image: ../Sanghoy/Images/warrior
+    flavor: warriorFlavor
+    merit: 100
+    h: 50
+    a: 10
+    as: 3
+    rc: 4
+    d: 1
+    s: 3
+    m: walk
+    projectile: slash
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - minorBounty
+      - leaveCorpse
+  - id: rogueShadespear
+    title: rogueShadespearTitle
+    description: shadespearDescription
+    image: ../Sanghoy/Images/shadespear
+    flavor: shadespearFlavor
+    merit: 120
+    h: 40
+    a: 10
+    as: 2
+    rc: 4
+    d: 0
+    r: 2
+    s: 3
+    m: walk
+    projectile: spear
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - minorBounty
+      - leaveCorpse
+  - id: ironBoar
+    title: ironBoarTitle
+    description: ironBoarDescription
+    image: Images/ironBoar
+    flavor: ironBoarFlavor
+    merit: 130
+    h: 50
+    a: 7
+    as: 4
+    rc: 4
+    d: 3
+    s: 1
+    m: walk
+    projectile: impact
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - minorBounty
+      - leaveCorpse
+  - id: carnivora
+    title: carnivoraTitle
+    description: carnivoraDescription
+    image: Images/carnivora
+    flavor: carnivoraFlavor
+    merit: 140
+    h: 40
+    a: 9
+    rc: 5
+    d: 3
+    s: 1
+    m: immovable
+    projectile: slash
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - minorFeastOfFlesh
+      - minorBounty
+      - leaveCorpse
+  - id: deserterSquad
+    title: deserterSquadTitle
+    description: deserterSquadDescription
+    image: ../Frenza/Images/rifleman
+    flavor: deserterSquadFlavor
+    merit: 300
+    h: 80
+    a: 14
+    as: 2
+    rc: 5
+    d: 3
+    r: 2
+    s: 3
+    m: walk
+    projectile: bullet
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - mediumBounty
+      - leaveCorpse
+  - id: raiderWarband
+    title: raiderWarbandTitle
+    description: raiderDescription
+    image: ../Sanghoy/Images/raider
+    flavor: raiderFlavor
+    merit: 300
+    h: 75
+    a: 15
+    as: 3
+    rc: 5
+    d: 2
+    s: 7
+    m: riding
+    projectile: slash
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - mediumBounty
+      - leaveCorpse
+  - id: millepede
+    title: millepedeTitle
+    description: millepedeDescription
+    image: Images/millepede
+    flavor: millepedeFlavor
+    merit: 320
+    h: 90
+    a: 2
+    ac: 10
+    rc: 3
+    d: 1
+    s: 1
+    m: walk
+    projectile: slash
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - millepedeSwarm
+      - mediumBounty
+      - leaveCorpse
+  - id: dementedBeastlord
+    title: dementedBeastlordTitle
+    description: beastlordDescription
+    image: ../Sanghoy/Images/beastlord
+    flavor: dementedBeastlordFlavor
+    merit: 500
+    h: 90
+    reg: 1
+    a: 12
+    as: 3
+    ac: 2
+    rc: 6
+    d: 4
+    r: 2
+    s: 8
+    m: riding
+    projectile: spear
+    stances:
+      - StandGround
+    tags:
+      - organic
+      - beastman
+    skills:
+      - majorBounty
+      - leaveCorpse
+  - id: hermitCyclops
+    title: hermitCyclopsTitle
+    description: cyclopsDescription
+    image: ../Sanghoy/Images/cyclops
+    flavor: hermitCyclopsFlavor
+    merit: 500
+    h: 110
+    reg: 1
+    a: 25
+    as: 5
+    rc: 6
+    d: 5
+    s: 4
+    m: walk
+    projectile: impact
+    stances:
+      - StandGround
+    tags:
+      - organic
+      - beastman
+    skills:
+      - majorBounty
+      - leaveCorpse
+  - id: wingedSerpent
+    title: wingedSerpentTitle
+    description: wingedSerpentDescription
+    image: Images/wingedSerpent
+    flavor: wingedSerpentFlavor
+    merit: 500
+    h: 85
+    reg: 1
+    a: 18
+    as: 5
+    rc: 6
+    d: 4
+    r: 2
+    s: 2
+    m: fly
+    projectile: slash
+    stances:
+      - StandGround
+    tags:
+      - organic
+    skills:
+      - wingedSerpentSarcomancy
+      - majorBounty
+      - leaveCorpse
+  - id: vanguard
+    title: vanguardTitle
+    description: vanguardDescription
+    image: Images/vanguard
+    flavor: vanguardFlavor
+    merit: 600
+    h: 90
+    reg: 5
+    a: 20
+    as: 10
+    rc: 6
+    d: 5
+    s: 3
+    m: walk
+    projectile: slash
+    stances:
+      - Offense
+    tags:
+      - eldritch
+    skills:
+      - eldritchBlast
+      - majorBounty
+      - leaveCorpse
+
+  ## Specials
+  - id: regicideBanner
+    title: regicideBannerTitle
+    description: regicideBannerDescription
+    image: Images/banner
+    applyTeamColor: true
+    flavor: regicideBannerFlavor
+    merit: 100
+    h: 50
+    a: 0
+    d: 0
+    s: 3
+    m: walk
+    stances:
+      - Offense
+    skills:
+      - defeatOwner
+      - takeDamageIfNotMoved
+  - id: wonder
+    title: wonderTitle
+    description: wonderDescription
+    image: Images/wonder
+    flavor: wonderFlavor
+    playCost:
+      g: 30
+      u: 15
+    merit: 1000
+    h: 200
+    d: 1
+    m: immovable
+    stances:
+      - Offense
+    tags:
+      - building
+    skills:
+      - wonderSummon
+      - wonderTick
+      - leaveRuin
+
+  ## Tribes
+  - id: elrood
+    title: elroodTitle
+    description: elroodDescription
+    image: Images/elrood
+    flavor: elroodFlavor
+    merit: 800
+    h: 80
+    reg: 4
+    a: 18
+    as: 4
+    ac: 2
+    rc: 3
+    d: 2
+    s: 4
+    m: riding
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+      - beastman
+    skills:
+      - championSummon
+      # - crimsonSkullFlail
+      # - pathOfMaalaki
+  - id: crimsonOutrider
+    title: crimsonOutriderTitle
+    description: crimsonOutriderDescription
+    image: Images/crimsonOutrider
+    flavor: crimsonOutriderFlavor
+    merit: 180
+    h: 60
+    reg: 3
+    a: 15
+    as: 6
+    ac: 2
+    rc: 2
+    d: 1
+    s: 6
+    m: riding
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - tasteOfManflesh
+  
+  ## Interactables
+  - id: ruinedWell
+    title: ruinedWellTitle
+    description: ruinedWellDescription
+    image: Images/ruinedWell
+    flavor: sacrificialWellFlavor
+    merit: 260
+    h: 80
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+      - invulnerable
+    interactionEffect: RuinedWellInteraction
+  - id: colonialShipwreck
+    title: colonialShipwreckTitle
+    description: colonialShipwreckDescription
+    image: Images/colonialShipwreck
+    flavor: colonialShipwreckFlavor
+    merit: 260
+    h: 80
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+      - invulnerable
+    extras:
+      - id: lootRemaining
+        title: lootRemainingTitle
+        image: mineableGold
+        value: !!int 30
+    interactionEffect: ColonialShipwreckInteraction
+  - id: crumblingLookout
+    title: crumblingLookoutTitle
+    description: crumblingLookoutDescription
+    image: Images/crumblingLookout
+    flavor: crumblingLookoutFlavor
+    merit: 260
+    h: 40
+    reg: -2
+    m: immovable
+    sight: 2
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    interactionEffect: SwitchOwnerInteraction
+  - id: abandonedArtillery
+    title: abandonedArtilleryTitle
+    description: abandonedArtilleryDescription
+    image: Images/abandonedArtillery
+    flavor: abandonedArtilleryFlavor
+    merit: 260
+    h: 30
+    a: 20
+    as: 20
+    ac: 1
+    rc: 0
+    d: 0
+    r: 2
+    s: 1
+    m: immovable
+    projectile: shell
+    stances:
+      - Offense
+    tags:
+      - mech
+    interactionEffect: SwitchOwnerInteraction
+  - id: dischargedBallista
+    title: dischargedBallistaTitle
+    description: dischargedBallistaDescription
+    image: Images/dischargedBallista
+    flavor: dischargedBallistaFlavor
+    merit: 260
+    h: 80
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - invulnerable
+    interactionEffect: DischargedBallistaInteraction
+  - id: wingedSerpentNest
+    title: wingedSerpentNestTitle
+    description: wingedSerpentNestDescription
+    image: Images/wingedSerpentNest
+    flavor: wingedSerpentNestFlavor
+    merit: 260
+    h: 80
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+      - invulnerable
+    interactionEffect: WingedSerpentNestInteraction
+  - id: brokenTotem
+    title: brokenTotemTitle
+    description: brokenTotemDescription
+    image: Images/brokenTotem
+    flavor: brokenTotemFlavor
+    merit: 260
+    h: 80
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+      - invulnerable
+    interactionEffect: BrokenTotemInteraction
+  - id: titheCollector
+    title: titheCollectorTitle
+    description: titheCollectorDescription
+    image: Images/titheCollector
+    flavor: titheCollectorFlavor
+    merit: 260
+    h: 80
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+      - invulnerable
+    interactionEffect: TitheCollectorInteraction
+  - id: mercilessRenegades
+    title: mercilessRenegadesTitle
+    description: mercilessRenegadesDescription
+    image: Images/mercilessRenegades
+    flavor: mercilessRenegadesFlavor
+    merit: 260
+    h: 80
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+      - invulnerable
+    interactionEffect: MercilessRenegadesInteraction
+spells:
+  - id: mercilessAssassination
+    title: mercilessAssassinationTitle
+    description: mercilessAssassinationDescription
+    image: Images/mercilessRenegades
+    flavor: mercilessAssassinationFlavor
+    playCost:
+      g: 12
+    skill: mercilessAssassination
+  - id: reviveHeroToInfluencedCell
+    title: reviveHeroTitle
+    description: reviveHeroToInfluencedCellDescription
+    image: Images/heroStats
+    flavor: reviveHeroToInfluencedCellFlavor
+    skill: reviveHeroToInfluencedCell
+upgrades:
+  - id: minorUpgrade
+    title: minorUpgradeTitle
+    description: minorUpgradeDescription
+    image: Images/minorUpgrade
+    flavor: minorUpgradeFlavor
+    playCost:
+      g: 0
+      u: 0
+    kind: minor
+  - id: majorUpgrade
+    title: majorUpgradeTitle
+    description: majorUpgradeDescription
+    image: Images/majorUpgrade
+    flavor: majorUpgradeFlavor
+    playCost:
+      g: 0
+      u: 0
+    kind: major
+  - id: heroUpgrade
+    title: heroUpgradeTitle
+    description: heroUpgradeDescription
+    image: Images/heroUpgrade
+    flavor: heroUpgradeFlavor
+    playCost:
+      g: 0
+      u: 0
+    kind: hero
+  - id: heroStatsL1
+    title: heroStatsTitle
+    description: heroStatsDescription
+    image: Images/heroStats
+    flavor: heroStatsFlavor
+    kind: hero
+    skills:
+      - increaseHeroStats
+  - id: heroStatsL2
+    title: heroStatsTitle
+    description: heroStatsDescription
+    image: Images/heroStats
+    flavor: heroStatsFlavor
+    kind: hero
+    skills:
+      - increaseHeroStats
+  - id: heroStatsL3
+    title: heroStatsTitle
+    description: heroStatsDescription
+    image: Images/heroStats
+    flavor: heroStatsFlavor
+    kind: hero
+    skills:
+      - increaseHeroStats
+  - id: heroStatsL4
+    title: heroStatsTitle
+    description: heroStatsDescription
+    image: Images/heroStats
+    flavor: heroStatsFlavor
+    kind: hero
+    skills:
+      - increaseHeroStats
+  - id: buildWonder
+    title: buildWonderTitle
+    description: buildWonderDescription
+    image: Images/wonder
+    flavor: buildWonderFlavor
+    kind: major
+    skills:
+      - buildWonder
+  - id: darkWhispers
+    title: darkWhispersTitle
+    description: darkWhispersDescription
+    image: Images/darkWhispers
+    flavor: darkWhispersFlavor
+    kind: minor
+    skills:
+      - castDarkWhispers
+  - id: eldritchBlast
+    title: eldritchBlastTitle
+    description: eldritchBlastDescription
+    image: Images/eldritchBlast
+    flavor: eldritchBlastFlavor
+    kind: minor
+    skills:
+      - addEldritchBlast
+  - id: summoningRift
+    title: summoningRiftTitle
+    description: summoningRiftDescription
+    image: Images/summoningRift
+    flavor: summoningRiftFlavor
+    kind: minor
+    skills:
+      - summoningRift

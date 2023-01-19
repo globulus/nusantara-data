@@ -1,0 +1,61 @@
+id: CalamityOnTheHorizon
+title: calamityOnTheHorizonTitle
+description: calamityOnTheHorizonTitleDescription
+ruleset:
+  id: CalamityOnTheHorizonRuleset
+  inherits: DefaultCampaign
+  factionData:
+    sanghoy:
+      startingData:
+        resources:
+          g: 100
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes:
+          - type: obsidianWeapons
+      playerEffects:
+        - SpeedBoost
+    frenza:
+      startingData:
+        resources:
+          g: 10
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+  bans:
+    skills:
+      - sanghoyCampGenerateGold
+      - addMajorUpgrade
+      - buildSanghoyCamp
+      - buildWarCouncil
+      - buildTotem
+      - buildRunestoneOfRogash
+      - buildSacrificialWell
+      - pillage
+      - riseToWarchief
+    stances:
+      - March
+players:
+  - name: Player
+    color: red
+    team: 1
+    faction: sanghoy
+  - name: Kagaalu
+    color: orange
+    team: 1
+    faction: sanghoy
+    ai: PassiveAi
+  - name: Frenza
+    color: blue
+    team: 2
+    faction: frenza
+    ai: TerritorialAi
+  - name: Hostile Sanghoy
+    color: purple
+    team: 3
+    faction: sanghoy
+    ai: TerritorialAi

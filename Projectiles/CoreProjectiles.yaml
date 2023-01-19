@@ -1,0 +1,35 @@
+- id: spear
+  image: Core/spear
+  speed: 1.0
+  sounds:
+    attack: Core/arrowHit
+- id: slash
+  image: Core/slash
+  speed: 1.5
+  sounds:
+    cast: Core/slash
+- id: impact
+  image: Core/impact
+  speed: 1.75
+  sounds:
+    attack: Core/impact
+- id: bullet
+  image: Core/shell
+  speed: 2.0
+  sounds:
+    cast: Core/gunshot
+- id: shell
+  image: Core/shell
+  speed: 1.5
+  sounds:
+    cast: Core/cannon
+- id: bomb
+  image: Core/bomb
+  speed: 1.0
+  sounds:
+    attack: Core/explosion
+- id: electrical
+  image: Core/electrical
+  speed: 1.75
+  sounds:
+    cast: Core/electric

@@ -1,0 +1,145 @@
+- id: leaveCorpse
+  title: leaveCorpseTitle
+  image: ../Factions/Neutral/Images/corpse
+  effect: LeaveCorpse
+  params: ["corpse", "corpseTitle", "leaveCorpse"]
+- id: leaveWreck
+  title: leaveWreckTitle
+  image: ../Factions/Neutral/Images/wreck
+  effect: LeaveCorpse
+  params: ["wreck", "wreckTitle", "leaveWreck"]
+- id: leaveRuin
+  title: leaveRuinTitle
+  image: ../Factions/Neutral/Images/ruin
+  effect: LeaveCorpse
+  params: ["ruin", "ruinTitle", "leaveRuin"]
+- id: mineGold
+  title: mineGoldTitle
+  image: ../Factions/Neutral/Images/goldMine
+  effect: MineGold
+- id: addMinorUpgrade
+  title: addMinorUpgradeTitle
+  image: ../Factions/Neutral/Images/minorUpgrade
+  effect: AddCardToHand
+  params: ["minorUpgrade", !!int 1, !!int 8, !!int 0, !!int 1]
+- id: addMajorUpgrade
+  title: addMajorUpgradeTitle
+  image: ../Factions/Neutral/Images/majorUpgrade
+  effect: AddMajorUpgrade
+- id: siegeAttack
+  title: siegeAttackTitle
+  image: ./Neutral/siegeAttack
+  effect: SiegeAttack
+- id: minorBounty
+  title: minorBountyTitle
+  image: ../Factions/Neutral/Images/creepCamp
+  effect: RandomBounty
+  params: [!!int 1]
+- id: mediumBounty
+  title: mediumBountyTitle
+  image: ../Factions/Neutral/Images/creepCamp
+  effect: RandomBounty
+  params: [!!int 2]
+- id: majorBounty
+  title: majorBountyTitle
+  image: ../Factions/Neutral/Images/creepCamp
+  effect: RandomBounty
+  params: [!!int 3]
+- id: reviveHero
+  title: reviveHeroTitle
+  image: ../Factions/Neutral/Images/heroStats
+  effect: ReviveHero
+- id: addReviveHeroToHand
+  title: reviveHeroTitle
+  image: ../Factions/Neutral/Images/heroStats
+  effect: AddReviveHeroToHand
+- id: reviveHeroToInfluencedCell
+  title: reviveHeroTitle
+  image: ../Factions/Neutral/Images/heroStats
+  effect: ReviveHeroToInfluencedCell
+- id: increaseHeroStats
+  title: increaseHeroStatsTitle
+  image: ../Factions/Neutral/Images/heroStats
+  effect: IncreaseHeroStats
+- id: venomStrike
+  title: venomStrikeTitle
+  image: ../Factions/Neutral/Images/kingPython
+  effect: VenomStrike
+  params: [!!int 3, !!int 2]
+- id: minorFeastOfFlesh
+  title: feastOfFleshTitle
+  image: ../Factions/Neutral/Images/feastOfFlesh
+  effect: FeastOfFlesh
+  params: [!!int 6]
+- id: minorDrainAttack
+  title: drainAttackTitle
+  image: ../Factions/Sanghoy/Images/bloodBat
+  effect: DrainAttack
+  params: [!!int 5]
+- id: defeatOwner
+  title: defeatOwnerTitle
+  image: Neutral/defeatOwner
+  effect: DefeatOwner
+- id: takeDamageIfNotMoved
+  title: takeDamageIfNotMovedTitle
+  image: ../Factions/Neutral/Images/banner
+  effect: TakeDamageIfNotMoved
+- id: buildWonder
+  title: buildWonderTitle
+  image: ../Factions/Neutral/Images/wonder
+  effect: AddCardToHand
+  params: ["wonder", !!int 5, !!int 0, !!int 0, !!int 0]
+- id: wonderSummon
+  title: wonderTitle
+  image: ../Factions/Neutral/Images/wonder
+  effect: WonderSummon
+- id: wonderTick
+  title: wonderTitle
+  image: ../Factions/Neutral/Images/wonder
+  effect: WonderTick
+- id: championSummon
+  title: championSummonTitle
+  image: ../Factions/Neutral/Images/heroStats
+  effect: ChampionSummon
+- id: loadTransport
+  title: loadTransportTitle
+  image: Neutral/loadTransport
+  effect: LoadTransport
+- id: unloadTransport
+  title: unloadTransportTitle
+  image: Neutral/unloadTransport
+  effect: UnloadTransport
+- id: firehornetSwarm
+  title: swarmTitle
+  image: ../Factions/Neutral/Images/firehornetSwarm
+  effect: Swarm
+  params: [!!int 0, !!int 1, !!int 0]
+- id: millepedeSwarm
+  title: swarmTitle
+  image: ../Factions/Neutral/Images/millepede
+  effect: Swarm
+  params: [!!int 0, !!int 1, !!int 0]
+- id: wingedSerpentSarcomancy
+  title: wingedSerpentSarcomancyTitle
+  image: ../Factions/Neutral/Images/wingedSerpent
+  effect: WingedSerpentSarcomancy
+- id: mercilessAssassination
+  title: mercilessAssassinationTitle
+  image: ../Factions/Neutral/Images/mercilessRenegades
+  effect: MercilessAssassination
+- id: eldritchBlast
+  title: eldritchBlastTitle
+  image: ../Factions/Neutral/Images/eldritchBlast
+  effect: EldritchBlast
+- id: castDarkWhispers
+  title: darkWhispersTitle
+  image: ../Factions/Neutral/Images/darkWhispers
+  effect: CastDarkWhispers
+- id: addEldritchBlast
+  title: eldritchBlastTitle
+  image: ../Factions/Neutral/Images/eldritchBlast
+  effect: AddEldritchBlast
+- id: summoningRift
+  title: summoningRiftTitle
+  image: ../Factions/Neutral/Images/summoningRift
+  effect: SummoningRift

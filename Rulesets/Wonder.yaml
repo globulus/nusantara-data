@@ -1,0 +1,93 @@
+id: Wonder
+inherits: Deathmatch
+title: wonderTitle
+description: wonderRulesetDescription
+factionData:
+  sanghoy:
+    startingData:
+      resources:
+        g: 10
+        u: 0
+      cards: { }
+      units:
+        - sanghoyCamp
+        - thrall
+        - warrior
+    upgradeTree:
+      nodes:
+        - type: obsidianWeapons
+        - type: slaveAuctions
+        - type: strengthInUnity
+          subnodes:
+            - type: ironForging
+            - type: ransackers
+            - type: karrish
+              subnodes:
+                - type: thunderousHooves
+                - type: onslaught
+                - type: buildWonder
+            - type: reignOfBeastlords
+              subnodes:
+                - type: eyeToEyeClawToClaw
+                - type: tasteOfManflesh
+                - type: buildWonder
+        - type: ritesOfRogash
+          subnodes:
+            - type: harbingersOfChange
+            - type: theDreamFuel
+            - type: excrescence
+              subnodes: 
+                - type: shapingCorral
+                - type: toTheSkies
+                - type: buildWonder
+            - type: beastmastery
+              subnodes:
+                - type: thickShell
+                - type: daringTamers
+                - type: buildWonder
+  frenza:
+    startingData:
+      resources:
+        g: 10
+        u: 0
+      cards: { }
+      units:
+        - colonialHall
+        - settler
+        - rifleman
+    upgradeTree:
+      nodes:
+        - type: taxCollectors
+        - type: masterSculptors
+        - type: hardenedVeterans
+          subnodes:
+            - type: horsebackTraining
+            - type: sniperSchool
+            - type: viciousVanguard
+              subnodes:
+                - type: heliumPockets
+                - type: uncommonValor
+                - type: buildWonder
+            - type: deathSquads
+              subnodes:
+                - type: superspread
+                - type: infantryFormations
+                - type: buildWonder
+        - type: intensiveIndustrialization
+          subnodes:
+            - type: theThirdShift
+            - type: automatedDefenses
+            - type: engineKits
+              subnodes: 
+                - type: combatEngineers
+                - type: scrapyardColossus
+                - type: buildWonder
+            - type: harnessingTheLightning
+              subnodes:
+                - type: differentialMachines
+                - type: voltWalkers
+                - type: buildWonder
+    playerEffects:
+      - PayUpkeep
+      - StatusReport
+      - UncommonValor

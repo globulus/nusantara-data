@@ -1,0 +1,1106 @@
+id: sanghoy
+name: sanghoyName
+flavor: sanghoyFlavor
+image: Images/sanghoy
+playable: true
+uniqueResource: blood
+music:
+  - Sounds/musicPrimalLands
+  - Sounds/musicTheJungleGodAwakens
+units:
+  - id: sanghoyCamp
+    title: sanghoyCampTitle
+    description: sanghoyCampDescription
+    image: Images/sanghoyCamp
+    flavor: sanghoyCampFlavor
+    merit: 300
+    h: 150
+    s: 2
+    m: immovable
+    influence:
+      kind: radial
+      amount: 2
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - trainThrall
+      - trainWarrior
+      - addMajorUpgrade
+      - sanghoyCampGenerateGold
+      - leaveRuin
+  - id: warCouncil
+    title: warCouncilTitle
+    description: warCouncilDescription
+    image: Images/warCouncil
+    flavor: warCouncilFlavor
+    merit: 280
+    h: 100
+    s: 2
+    m: immovable
+    sight: 2
+    influence:
+      kind: radial
+      amount: 1
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - warCouncilAttack
+      - trainShadespear
+      - trainRaider
+      # - trainWarchief
+      - trainMantlet
+      - trainBloodProwler
+      - addMinorUpgrade
+      - leaveRuin
+  - id: totem
+    title: totemTitle
+    description: totemDescription
+    image: Images/totem
+    flavor: totemFlavor
+    merit: 270
+    h: 90
+    s: 2
+    m: immovable
+    influence:
+      kind: radial
+      amount: 1
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - trainSarcomancer
+      - trainShaper
+      - addBloodlust
+      - addMinorUpgrade
+      - leaveRuin
+      # - tributeToRogash
+  - id: runestoneOfRogash
+    title: runestoneOfRogashTitle
+    description: runestoneOfRogashDescription
+    image: Images/runestoneOfRogash
+    flavor: runestoneOfRogashFlavor
+    merit: 250
+    h: 80
+    s: 1
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - trainKagaalu
+      - trainPyracmon
+      - trainMaim
+      - reviveHero
+      - addReviveHeroToHand
+      - leaveRuin
+  - id: sacrificialWell
+    title: sacrificialWellTitle
+    description: sacrificialWellDescription
+    image: Images/sacrificialWell
+    flavor: sacrificialWellFlavor
+    merit: 260
+    h: 80
+    s: 1
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - sacrificeOfBlood
+      - leaveRuin
+  - id: thrall
+    title: thrallTitle
+    description: thrallDescription
+    image: Images/thrall
+    flavor: thrallFlavor
+    sounds:
+      summon: Sounds/Thrall/Summon
+      select: Sounds/Thrall/Select
+      cast: Sounds/Thrall/Cast
+    merit: 50
+    h: 20
+    s: 2
+    m: walk
+    stances:
+      - Offense
+    tags:
+      - organic
+    skills:
+      - mineGold
+      - thrallRepair
+      - buildSanghoyCamp
+      - buildWarCouncil
+      - buildTotem
+      - buildRunestoneOfRogash
+      - buildSacrificialWell
+      - leaveCorpse
+  - id: warrior
+    title: warriorTitle
+    description: warriorDescription
+    image: Images/warrior
+    flavor: warriorFlavor
+    sounds:
+      summon: Sounds/Warrior/Summon
+      select: Sounds/Warrior/Select
+      attack: Sounds/Warrior/Attack
+      die: Sounds/Warrior/Die
+    canInteract: true
+    merit: 100
+    h: 40
+    a: 8
+    as: 3
+    ac: 2
+    rc: 2
+    d: 1
+    s: 3
+    m: walk
+    projectile: slash
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+    skills:
+      - collectBlood
+      - leaveCorpse
+  - id: shadespear
+    title: shadespearTitle
+    description: shadespearDescription
+    image: Images/shadespear
+    flavor: shadespearFlavor
+    sounds:
+      summon: Sounds/Shadespear/Summon
+      select: Sounds/Shadespear/Select
+      attack: Sounds/Shadespear/Attack
+    canInteract: true
+    merit: 120
+    h: 35
+    a: 8
+    as: 1
+    ac: 2
+    rc: 2
+    d: 0
+    r: 2
+    s: 3
+    m: walk
+    projectile: spear
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+      - JungleWalk
+    tags:
+      - organic
+    skills:
+      - collectBlood
+      - leaveCorpse
+  - id: raider
+    title: raiderTitle
+    description: raiderDescription
+    image: Images/raider
+    flavor: raiderFlavor
+    sounds:
+      summon: Sounds/Raider/Summon
+      select: Sounds/Raider/Select
+      attack: Sounds/Raider/Attack
+    canInteract: true
+    merit: 160
+    h: 60
+    a: 7
+    as: 3
+    ac: 3
+    rc: 2
+    d: 1
+    s: 5
+    m: riding
+    projectile: slash
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+    skills:
+      - collectBlood
+      - pillage
+      - riseToWarchief
+      - leaveCorpse
+  - id: warchief
+    title: warchiefTitle
+    description: warchiefDescription
+    image: Images/warchief
+    flavor: warchiefFlavor
+    sounds:
+      summon: Sounds/Warchief/Summon
+      select: Sounds/Warchief/Select
+      attack: Sounds/Warchief/Attack
+    canInteract: true
+    merit: 220
+    h: 70
+    a: 8
+    as: 2
+    ac: 3
+    rc: 2
+    d: 2
+    s: 5
+    m: riding
+    projectile: slash
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+    skills:
+      - collectBlood
+      - leadershipAura
+      - leaveCorpse
+  - id: mantlet
+    title: mantletTitle
+    description: mantletDescription
+    image: Images/mantlet
+    flavor: mantletFlavor
+    merit: 200
+    h: 60
+    a: 10
+    as: 5
+    d: 2
+    s: 2
+    m: walk
+    projectile: impact
+    stances:
+      - Offense
+      - March
+      - Camp
+    tags:
+      - mech
+    skills:
+      - collectBlood
+      - leaveWreck
+      - siegeAttack
+  - id: bloodProwler
+    title: bloodProwlerTitle
+    description: bloodProwlerDescription
+    image: Images/bloodProwler
+    flavor: bloodProwlerFlavor
+    merit: 500
+    h: 75
+    reg: 2
+    a: 10
+    as: 2
+    ac: 3
+    rc: 3
+    d: 3
+    s: 5
+    m: riding
+    projectile: slash
+    stances:
+      - Offense
+      - Defense
+      - March
+    tags:
+      - organic
+    skills:
+      - collectBlood
+      - onTheProwl
+      - bloodFrenzy
+      - leaveCorpse
+  - id: sarcomancer
+    title: sarcomancerTitle
+    description: sarcomancerDescription
+    image: Images/sarcomancer
+    flavor: sarcomancerFlavor
+    sounds:
+      summon: Sounds/Sarcomancer/Summon
+      select: Sounds/Sarcomancer/Select
+      cast: Sounds/Sarcomancer/Cast
+    merit: 160
+    h: 40
+    a: 7
+    as: 1
+    d: 0
+    s: 3
+    m: walk
+    projectile: slash
+    stances:
+      - Offense
+      - Defense
+      - Camp
+    tags:
+      - organic
+    skills:
+      - collectBlood
+      - leaveCorpse
+      - sarcomancy
+      - sarcomancerHeal
+      - amalgamation
+  - id: shaper
+    title: shaperTitle
+    description: shaperDescription
+    image: Images/shaper
+    flavor: shaperFlavor
+    sounds:
+      summon: Sounds/Shaper/Summon
+      select: Sounds/Shaper/Select
+      cast: Sounds/Shaper/Cast
+    merit: 160
+    h: 35
+    a: 0
+    d: 1
+    s: 3
+    m: walk
+    projectile: slash
+    stances:
+      - Offense
+      - Defense
+      - Camp
+    tags:
+      - organic
+    skills:
+      - collectBlood
+      - leaveCorpse
+      - shapeChironite
+      - shapeKavouros
+      - shapeBloodBat
+      - shapeCyclops
+      - shapeBeastlord
+      - shapeForehorn
+  - id: chironite
+    title: chironiteTitle
+    description: chironiteDescription
+    image: Images/chironite
+    flavor: chironiteFlavor
+    sounds:
+      summon: Sounds/Chironite/Summon
+      select: Sounds/Chironite/Select
+      attack: Sounds/Chironite/Attack
+    merit: 200
+    h: 70
+    reg: 1
+    a: 12
+    as: 3
+    ac: 2
+    rc: 3
+    d: 2
+    r: 2
+    s: 5
+    m: riding
+    projectile: spear
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - leaveCorpse
+      - tasteOfManflesh
+  - id: kavouros
+    title: kavourosTitle
+    description: kavourosDescription
+    image: Images/kavouros
+    flavor: kavourosFlavor
+    sounds:
+      summon: Sounds/Kavouros/Summon
+      select: Sounds/Kavouros/Select
+      attack: Sounds/Kavouros/Attack
+    merit: 180
+    h: 60
+    reg: 1
+    a: 8
+    as: 3
+    ac: 2
+    rc: 3
+    d: 3
+    s: 3
+    m: amphibious
+    projectile: slash
+    stances:
+      - Offense
+      - Defense
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - leaveCorpse
+      - tasteOfManflesh
+      - loadTransport
+      - unloadTransport
+  - id: bloodBat
+    title: bloodBatTitle
+    description: bloodBatDescription
+    image: Images/bloodBat
+    flavor: bloodBatFlavor
+    sounds:
+      summon: Sounds/BloodBat/Summon
+      select: Sounds/BloodBat/Select
+      attack: Sounds/BloodBat/Attack
+      die: Sounds/BloodBat/Die
+    merit: 230
+    h: 55
+    a: 7
+    as: 2
+    ac: 3
+    rc: 3
+    d: 2
+    s: 2
+    m: fly
+    projectile: slash
+    sight: 2
+    stances:
+      - Offense
+      - Defense
+      - Camp
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - leaveCorpse
+      - bloodBatDrainAttack
+  - id: cyclops
+    title: cyclopsTitle
+    description: cyclopsDescription
+    image: Images/cyclops
+    flavor: cyclopsFlavor
+    sounds:
+      summon: Sounds/Cyclops/Summon
+      select: Sounds/Cyclops/Select
+      attack: Sounds/Cyclops/Attack
+    merit: 500
+    h: 100
+    reg: 3
+    a: 30
+    as: 3
+    d: 3
+    s: 4
+    m: walk
+    projectile: impact
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - leaveCorpse
+      - siegeAttack
+      - tasteOfManflesh
+  - id: beastlord
+    title: beastlordTitle
+    description: beastlordDescription
+    image: Images/beastlord
+    flavor: beastlordFlavor
+    sounds:
+      summon: Sounds/Beastlord/Summon
+      select: Sounds/Beastlord/Select
+      attack: Sounds/Beastlord/Attack
+    merit: 430
+    h: 80
+    a: 12
+    as: 2
+    ac: 2
+    rc: 3
+    d: 3
+    r: 2
+    s: 5
+    m: riding
+    projectile: spear
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - leaveCorpse
+      - leadershipAura
+      - clawToClawAura
+      - tasteOfManflesh
+  - id: amalgam
+    title: amalgamTitle
+    description: amalgamDescription
+    image: Images/amalgam
+    flavor: amalgamFlavor
+    merit: 200
+    h: 80
+    reg: -10
+    a: 9
+    as: 5
+    ac: 3
+    rc: 3
+    d: 2
+    s: 3
+    m: walk
+    projectile: slash
+    stances:
+      - Offense
+      - March
+    tags:
+      - organic
+    skills:
+      - collectBlood
+      - leaveCorpse
+  - id: cyclopsBait
+    title: cyclopsBaitTitle
+    description: cyclopsBaitDescription
+    image: Images/cyclopsBait
+    flavor: cyclopsBaitFlavor
+    sounds:
+      summon: Sounds/CyclopsBait/Select
+      select: Sounds/CyclopsBait/Select
+    merit: 10
+    h: 15
+    a: 0
+    d: 0
+    s: 3
+    m: walk
+    projectile: slash
+    stances:
+      - March
+    tags:
+      - organic
+    skills:
+      - cyclopsBait
+  - id: forehorn
+    title: forehornTitle
+    description: forehornDescription
+    image: Images/forehorn
+    flavor: forehornFlavor
+    sounds:
+      summon: Sounds/Beastlord/Summon
+      select: Sounds/Cyclops/Select
+      attack: Sounds/Cyclops/Attack
+    merit: 450
+    h: 110
+    reg: 1
+    a: 13
+    ac: 1
+    rc: 2
+    d: 5
+    s: 4
+    m: walk
+    projectile: impact
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - leaveCorpse
+      - tasteOfManflesh
+      - trample
+heroes:
+  - id: pyracmon
+    title: pyracmonTitle
+    description: pyracmonDescription
+    image: Images/pyracmon
+    sounds:
+      summon: Sounds/Pyracmon/Summon
+      select: Sounds/Pyracmon/Select
+      attack: Sounds/Pyracmon/Attack
+      cast: Sounds/Pyracmon/Cast
+      die: Sounds/Pyracmon/Die
+    flavor: pyracmonFlavor
+    canInteract: true
+    merit: 1000
+    h: 50
+    reg: 2
+    a: 8
+    as: 2
+    ac: 2
+    rc: 2
+    d: 1
+    s: 3
+    m: walk
+    projectile: impact
+    v: 2
+    f: 2
+    g: 1
+    p: 0
+    vitalityProgression: 2
+    fortitudeProgression: 2
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - groundSlam
+      - bash
+      - smite
+    upgradeTree:
+      nodes:
+        - type: heroStatsL1
+          subnodes:
+            - type: heroStatsL2
+              subnodes:
+                - type: heroStatsL3
+                  subnodes:
+                    - type: heroStatsL4
+        - type: groundSlamL1
+          subnodes:
+            - type: groundSlamL2
+              subnodes:
+                - type: smite
+        - type: bashL1
+          subnodes:
+            - type: bashL2
+              subnodes:
+                - type: smite
+  - id: kagaalu
+    title: kagaaluTitle
+    description: kagaaluDescription
+    image: Images/kagaalu
+    sounds:
+      summon: Sounds/Kagaalu/Summon
+      select: Sounds/Kagaalu/Select
+      attack: Sounds/Kagaalu/Attack
+      cast: Sounds/Kagaalu/Cast
+      die: Sounds/Kagaalu/Die
+    flavor: kagaaluFlavor
+    canInteract: true
+    merit: 1000
+    h: 50
+    reg: 2
+    a: 6
+    as: 2
+    ac: 2
+    rc: 2
+    d: 0
+    r: 2
+    s: 3
+    m: walk
+    projectile: spear
+    v: 1
+    f: 1
+    g: 1
+    p: 2
+    vitalityProgression: 1
+    guardProgression: 1
+    prowessProgression: 2
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+    skills:
+      - collectBlood
+      - kagaalusSarcomancy
+      - sacrificeOfHealth
+      - sacrificeOfVigor
+      - sacrificeOfDeath
+    upgradeTree:
+      nodes:
+        - type: heroStatsL1
+          subnodes:
+            - type: heroStatsL2
+              subnodes:
+                - type: heroStatsL3
+                  subnodes:
+                    - type: heroStatsL4
+        - type: kagaalusSarcomancyL2
+          subnodes:
+            - type: kagaalusSarcomancyL3
+        - type: sacrificeOfHealth
+          subnodes:
+            - type: sacrificeOfVigor
+              subnodes:
+                - type: sacrificeOfDeath
+  - id: maim
+    title: maimTitle
+    description: maimDescription
+    image: Images/maim
+    sounds:
+      summon: Sounds/Maim/Summon
+      select: Sounds/Maim/Select
+      attack: Sounds/Maim/Attack
+      cast: Sounds/Maim/Cast
+    flavor: maimFlavor
+    canInteract: true
+    merit: 1000
+    h: 50
+    reg: 2
+    a: 8
+    as: 2
+    ac: 2
+    rc: 2
+    d: 1
+    s: 3
+    m: walk
+    projectile: slash
+    v: 1
+    f: 1
+    g: 2
+    p: 1
+    vitalityProgression: 1
+    guardProgression: 2
+    prowessProgression: 1
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - ferocityAura
+      - beastmastersWarcry
+      - leapAttack
+    upgradeTree:
+      nodes:
+        - type: heroStatsL1
+          subnodes:
+            - type: heroStatsL2
+              subnodes:
+                - type: heroStatsL3
+                  subnodes:
+                    - type: heroStatsL4
+        - type: ferocityAuraL1
+          subnodes:
+            - type: ferocityAuraL2
+        - type: beastmastersWarcryL1
+          subnodes:
+            - type: beastmastersWarcryL2
+        - type: leapAttackL1
+          subnodes:
+            - type: leapAttackL2
+spells:
+  - id: bloodlust
+    title: bloodlustTitle
+    description: bloodlustDescription
+    image: Images/bloodlust
+    flavor: bloodlustFlavor
+    playCost:
+      u: 2
+    skill: bloodlust
+  - id: sanghoyHorde
+    title: sanghoyHordeTitle
+    description: sanghoyHordeDescription
+    image: Images/sanghoyHorde
+    flavor: sanghoyHordeFlavor
+    playCost:
+      g: 4
+      u: 5
+    skill: sanghoyHorde
+  - id: karrish
+    title: karrishTitle
+    description: karrishSpellDescription
+    image: Images/karrish
+    flavor: karrishFlavor
+    playCost:
+      g: 5
+      u: 3
+    skill: karrish
+  - id: bloodToRogash
+    title: bloodToRogashTitle
+    description: bloodToRogashDescription
+    image: Images/bloodToRogash
+    flavor: bloodToRogashFlavor
+    playCost:
+      g: 7
+    skill: bloodToRogash
+  - id: horribleMisshaping
+    title: horribleMisshapingTitle
+    description: horribleMisshapingDescription
+    image: Images/horribleMisshaping
+    flavor: horribleMisshapingFlavor
+    playCost:
+      u: 6
+    skill: horribleMisshaping
+upgrades:
+  - id: obsidianWeapons
+    title: obsidianWeaponsTitle
+    description: obsidianWeaponsDescription
+    image: Images/obsidianWeapons
+    flavor: obsidianWeaponsFlavor
+    kind: minor
+    skills:
+      - obsidianWeapons
+  - id: slaveAuctions
+    title: slaveAuctionsTitle
+    description: slaveAuctionsDescription
+    image: Images/slaveAuctions
+    flavor: slaveAuctionsFlavor
+    kind: minor
+    skills:
+      - slaveAuctions
+  - id: strengthInUnity
+    title: strengthInUnityTitle
+    description: strengthInUnityDescription
+    image: Images/sanghoyHorde
+    flavor: strengthInUnityFlavor
+    kind: major
+    skills:
+      - addSanghoyHorde
+      - strengthInUnity
+  - id: ironForging
+    title: ironForgingTitle
+    description: ironForgingDescription
+    image: Images/ironForging
+    flavor: ironForgingFlavor
+    kind: minor
+    skills:
+      - ironForging
+  - id: ransackers
+    title: ransackersTitle
+    description: ransackersDescription
+    image: Images/mantlet
+    flavor: ransackersFlavor
+    kind: minor
+    skills:
+      - addMantlet
+  - id: karrish
+    title: karrishTitle
+    description: karrishUpgradeDescription
+    image: Images/karrish
+    flavor: karrishFlavor
+    kind: major
+    skills:
+      - increaseWarchiefStats
+      - addKarrish
+  - id: thunderousHooves
+    title: thunderousHoovesTitle
+    description: thunderousHoovesDescription
+    image: Images/bloodProwler
+    flavor: thunderousHoovesFlavor
+    kind: minor
+  - id: onslaught
+    title: onslaughtTitle
+    description: onslaughtDescription
+    image: Images/onslaught
+    flavor: onslaughtFlavor
+    kind: minor
+    skills:
+      - onslaught
+  - id: reignOfBeastlords
+    title: reignOfBeastlordsTitle
+    description: reignOfBeastlordsDescription
+    image: Images/reignOfBeastlords
+    flavor: reignOfBeastlordsFlavor
+    kind: major
+    skills:
+      - convertToBeastlord
+  - id: eyeToEyeClawToClaw
+    title: eyeToEyeClawToClawTitle
+    description: eyeToEyeClawToClawDescription
+    image: Images/eyeToEyeClawToClaw
+    flavor: eyeToEyeClawToClawFlavor
+    kind: minor
+  - id: tasteOfManflesh
+    title: tasteOfManfleshTitle
+    description: tasteOfManfleshDescription
+    image: Images/tasteOfManflesh
+    flavor: tasteOfManfleshFlavor
+    kind: minor
+  - id: ritesOfRogash
+    title: ritesOfRogashTitle
+    description: ritesOfRogashDescription
+    image: Images/sarcomancy
+    flavor: ritesOfRogashFlavor
+    kind: major
+    skills:
+      - addBloodToRogash
+  - id: theDreamFuel
+    title: theDreamFuelTitle
+    description: theDreamFuelDescription
+    image: Images/theDreamFuel
+    flavor: theDreamFuelFlavor
+    kind: minor
+    skills:
+      - theDreamFuel
+  - id: harbingersOfChange
+    title: harbingersOfChangeTitle
+    description: harbingersOfChangeDescription
+    image: Images/shaper
+    flavor: harbingersOfChangeFlavor
+    kind: minor
+    skills:
+      - harbingersOfChange
+  - id: excrescence
+    title: excrescenceTitle
+    description: excrescenceDescription
+    image: Images/excrescence
+    flavor: excrescenceFlavor
+    kind: major
+    skills:
+      - addHorribleMisshaping
+  - id: ePluribusUnum
+    title: ePluribusUnumTitle
+    description: ePluribusUnumDescription
+    image: Images/amalgam
+    flavor: ePluribusUnumFlavor
+    kind: minor
+    skills:
+      - addAmalgam
+  - id: thickShell
+    title: thickShellTitle
+    description: thickShellDescription
+    image: Images/kavouros
+    flavor: thickShellFlavor
+    kind: minor
+    skills:
+      - thickShell
+  - id: toTheSkies
+    title: toTheSkiesTitle
+    description: toTheSkiesDescription
+    image: Images/toTheSkies
+    flavor: toTheSkiesFlavor
+    kind: minor
+    skills:
+      - toTheSkies
+  - id: beastmastery
+    title: beastmasteryTitle
+    description: beastmasteryDescription
+    image: Images/maim
+    flavor: beastmasteryFlavor
+    kind: major
+    skills:
+      - addCyclopsBaits
+  - id: shapingCorral
+    title: shapingCorralTitle
+    description: shapingCorralDescription
+    image: Images/shapingCorral
+    flavor: shapingCorralFlavor
+    kind: minor
+    skills:
+      - shapingCorral
+  - id: daringTamers
+    title: daringTamersTitle
+    description: daringTamersDescription
+    image: Images/forehorn
+    flavor: daringTamersFlavor
+    kind: minor
+    skills:
+      - convertToForehorn
+  # Hero upgrades
+  - id: groundSlamL1
+    title: groundSlamL1Title
+    description: groundSlamDescription
+    image: Images/groundSlam
+    flavor: groundSlamFlavor
+    kind: hero
+  - id: groundSlamL2
+    title: groundSlamL2Title
+    description: groundSlamL2Description
+    image: Images/groundSlam
+    flavor: groundSlamFlavor
+    kind: hero
+  - id: bashL1
+    title: bashL1Title
+    description: bashDescription
+    image: Images/bash
+    flavor: bashFlavor
+    kind: hero
+  - id: bashL2
+    title: bashL2Title
+    description: bashL2Description
+    image: Images/bash
+    flavor: bashFlavor
+    kind: hero
+  - id: smite
+    title: smiteTitle
+    description: smiteDescription
+    image: Images/smite
+    flavor: smiteFlavor
+    kind: hero
+  - id: kagaalusSarcomancyL2
+    title: kagaalusSarcomancyL2Title
+    description: kagaalusSarcomancyL2Description
+    image: Images/kagaalusSarcomancy
+    flavor: kagaalusSarcomancyFlavor
+    kind: hero
+  - id: kagaalusSarcomancyL3
+    title: kagaalusSarcomancyL3Title
+    description: kagaalusSarcomancyL3Description
+    image: Images/kagaalusSarcomancy
+    flavor: kagaalusSarcomancyFlavor
+    kind: hero
+  - id: sacrificeOfHealth
+    title: sacrificeOfHealthTitle
+    description: sacrificeOfHealthDescription
+    image: Images/sacrificeOfHealth
+    flavor: sacrificeOfHealthFlavor
+    kind: hero
+  - id: sacrificeOfVigor
+    title: sacrificeOfVigorTitle
+    description: sacrificeOfVigorDescription
+    image: Images/sacrificeOfVigor
+    flavor: sacrificeOfVigorFlavor
+    kind: hero
+  - id: sacrificeOfDeath
+    title: sacrificeOfDeathTitle
+    description: sacrificeOfDeathDescription
+    image: Images/sacrificeOfDeath
+    flavor: sacrificeOfDeathFlavor
+    kind: hero
+  - id: ferocityAuraL1
+    title: ferocityAuraL1Title
+    description: ferocityAuraDescription
+    image: Images/ferocityAura
+    flavor: ferocityAuraFlavor
+    kind: hero
+  - id: ferocityAuraL2
+    title: ferocityAuraL2Title
+    description: ferocityAuraL2Description
+    image: Images/ferocityAura
+    flavor: ferocityAuraFlavor
+    kind: hero
+  - id: beastmastersWarcryL1
+    title: beastmastersWarcryL1Title
+    description: beastmastersWarcryDescription
+    image: Images/beastmastersWarcry
+    flavor: beastmastersWarcryFlavor
+    kind: hero
+  - id: beastmastersWarcryL2
+    title: beastmastersWarcryL2Title
+    description: beastmastersWarcryL2Description
+    image: Images/beastmastersWarcry
+    flavor: beastmastersWarcryFlavor
+    kind: hero
+  - id: leapAttackL1
+    title: leapAttackL1Title
+    description: leapAttackDescription
+    image: Images/leapAttack
+    flavor: leapAttackFlavor
+    kind: hero
+  - id: leapAttackL2
+    title: leapAttackL2Title
+    description: leapAttackL2Description
+    image: Images/leapAttack
+    flavor: leapAttackFlavor
+    kind: hero

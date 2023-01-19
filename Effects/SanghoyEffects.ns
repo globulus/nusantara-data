@@ -1,0 +1,1295 @@
+import "CommonEffects"
+
+fn isBeastman(unit) => "beastman" in unit.type?.tags
+
+fn rampingMorphCost(player, typeId, baseCost, rampCost) {
+  cost = baseCost + countUnitsOfType(player, typeId) * rampCost
+  if player.hasUpgrade("excrescence") {
+    cost -= 1
+  }
+  return cost
+}
+
+# Units
+
+effect CollectBlood {
+  amount = 1 # gain 1 blood for each attack
+
+  trigger = Triggers.attack
+
+  run(caster, target) {
+    caster.owner.addResources(["u": amount])
+    Game.animateVisualFx([
+      [
+        type: "blood",
+        coordinates: target.coordinates
+      ]
+    ])
+  }
+
+  description(caster) => "Gain $amount Blood for each attack."
+}
+
+effect BuildSanghoyCamp is AddCardToHandWithRampingCost {
+  typeId = "sanghoyCamp"
+  downtime = 3
+  goldCost = 20
+  goldRamp = 0.5
+  actionsCost = 1
+}
+
+effect BuildWarCouncil is AddCardToHandWithRampingCost {
+  typeId = "warCouncil"
+  downtime = 2
+  goldCost = 10
+  goldRamp = 0.5
+  actionsCost = 1
+  
+  isEnabled(caster) => super.isEnabled(caster).addAll([[caster.owner.owns("sanghoyCamp"), "You must own a sanghoy camp"]])
+}
+
+effect BuildTotem is AddCardToHandWithRampingCost {
+  typeId = "totem"
+  downtime = 2
+  goldCost = 9
+  goldRamp = 0.5
+  uniqueCost = 1
+  uniqueRamp = 0.75
+  actionsCost = 1
+  
+  isEnabled(caster) => super.isEnabled(caster).addAll([[caster.owner.owns("sanghoyCamp"), "You must own a sanghoy camp"]])
+}
+
+effect BuildRunestoneOfRogash is AddCardToHand {
+  typeId = "runestoneOfRogash"
+  downtime = 1
+  
+  isEnabled(caster) => super.isEnabled(caster).addAll([[caster.owner.owns("sanghoyCamp"), "You must own a sanghoy camp"]])
+
+  cost(caster) => [g: 8, ap: 1]
+}
+
+effect BuildSacrificialWell is AddCardToHand {
+  typeId = "sacrificialWell"
+  downtime = 2
+  
+  isEnabled(caster) => super.isEnabled(caster).addAll([[caster.owner.owns("totem"), "You must own a totem"]])
+
+  cost(caster) => [g: 12, ap: 1]
+}
+
+effect ThrallRepair is Repair {
+  repairAmount = 15
+
+  cost(caster) => [g: 1, ap: 1]
+}
+
+effect Pillage {
+  goldGained = 1
+
+  trigger = Triggers.attack
+
+  check(caster, target) => target.isBuilding
+
+  run(caster, target) {
+    caster.owner.addResources([g: goldGained])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " pillages $goldGained Gold!", LogLevels.info, caster.coordinates)
+    Game.animateVisualFx([
+      [
+        type: "earn",
+        coordinates: target.coordinates
+      ]
+    ])
+  }
+
+  description(caster) => "Gain $goldGained gold whenever your attack a building."
+}
+
+effect MorphToWarchief is Morph {
+  newType = "warchief"
+
+  targets => Targets.none
+
+  cost(caster) => [g: 4 + countUnitsOfType(caster.owner, newType) * 2, ap: 1]
+}
+
+effect MorphToChironite is Morph {
+  newType = "chironite"
+
+  cost(caster) => [u: rampingMorphCost(caster.owner, newType, 7, 2), ap: 1]
+
+  check(caster, target) => target.type.id in ["raider"]
+}
+
+effect MorphToKavouros is Morph {
+  newType = "kavouros"
+
+  cost(caster) => [u: rampingMorphCost(caster.owner, newType, 4, 2), ap: 1]
+
+  check(caster, target) => target.type.id in ["warrior", "shadespear"]
+}
+
+effect MorphToBloodBat is Morph {
+  newType = "bloodBat"
+
+  cost(caster) => [u: rampingMorphCost(caster.owner, newType, 8, 2), ap: 2]
+
+  check(caster, target) => target.type.id in ["warrior", "shadespear"]
+}
+
+effect MorphToCyclops is Morph {
+  newType = "cyclops"
+
+  cost(caster) => [u: rampingMorphCost(caster.owner, newType, 9, 3), ap: 2]
+
+  isEnabled(caster) => [[caster.owner.owns("sacrificialWell"), "You must own a sacrificial well"]]
+
+  check(caster, target) => target.type.id in ["warrior", "shadespear"]
+}
+
+effect MorphToBeastlord is Morph {
+  newType = "beastlord"
+
+  cost(caster) => [u: 8, ap: 2]
+
+  isEnabled(caster) => [[caster.owner.hasUpgrade("reignOfBeastlords"), "You must have Reign of Beastlords upgrade"]]
+
+  check(caster, target) => target.type.id in ["warchief"]
+}
+
+effect MorphToForehorn is Morph {
+  newType = "forehorn"
+
+  cost(caster) => [u: rampingMorphCost(caster.owner, newType, 9, 2), ap: 2]
+
+  isEnabled(caster) => [
+    [caster.owner.owns("sacrificialWell"), "You must own a sacrificial well"],
+    [caster.owner.hasUpgrade("daringTamers"), "You must have Daring Tamers upgrade"]
+  ] 
+
+  check(caster, target) => target.type.id in ["warrior", "shadespear"]
+}
+
+effect LeadershipAuraModifier is AuraModifier {
+  init(@attackModifier)
+
+  description(caster) => Game.localizedStr("leadershipAuraModifier").format([attackModifier])
+
+  sprite => "warchief"
+
+  title => "leadershipTitle"
+
+  run(caster, target) => [
+    attack: ["*", 1 + attackModifier / 100.0]
+  ]
+}
+
+effect LeadershipAura is Aura {
+  stacks = true
+  modifierId = "LeadershipAuraModifier"
+
+  init(@attackModifier)
+
+  range(caster) => 1
+
+  isValidTarget(caster, target) => target.owner.isAllyOf(caster.owner) && !target.isBuilding
+
+  modifier(caster, target) => LeadershipAuraModifier(attackModifier)
+}
+
+effect BloodFrenzy {
+  cutoff = 0.7
+  attackGained = 10
+
+  trigger = Triggers.passive
+
+  run(caster, target) => [
+    attack: ["+", if target.hp <= target.health * cutoff {
+      attackGained
+    } else {
+      0
+    }]
+  ]
+
+  description(caster) => "If the attacked enemy's health is below $(cutoff * 100)%, strike with $attackGained more attack."
+}
+
+effect OnTheProwl {
+  speedGained = 1
+  scentRange = 2
+  trigger = Triggers.passive
+
+  run(caster, target) => [
+    speed: ["+", if Game.unitsInRange(caster.coordinates, scentRange).any(=> !areAllies(caster, $0) && $0.hp < $0.health) {
+      speedGained
+    } else {
+      0
+    }]
+  ]
+
+  description(caster) => "If there are damaged enemies in range $scentRange, gain +$speedGained speed."
+}
+
+effect SarcomancyModifier is AuraModifier {
+  run(caster, target) => [
+    attack: ["+", 4],
+    defense: ["+", 1]
+  ]
+
+  sprite => "sarcomancy"
+
+  title => "sarcomancyTitle"
+}
+
+effect Sarcomancy {
+  damage = 10
+
+  trigger = Triggers.cast
+
+  cost(caster) => [u: if caster.owner.hasUpgrade("ritesOfRogash") 2 else 3, ap: 1]
+
+  range(caster) => 2
+
+  check(caster, target) => target.hp > damage && areAllies(caster, target) && isOrganic(target)
+
+  run(caster, target) {
+    target.takeDamage(damage, caster)
+    target.addTempEffect(SarcomancyModifier(), source: caster, duration: INFINITY)
+    Game.logEvent("A vile sarcomantic ritual affects " + Game.localizedStr(target.type.id + "Title") + ", damaging it by $damage! New flesh already begins growing...", \
+      LogLevels.info, target.coordinates)
+    Game.animateVisualFx([
+      [
+        type: "blood",
+        coordinates: target.coordinates
+      ],
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#FF0000"
+      ]
+    ])
+  }
+
+  description(caster) => "Deal $damage damage to a friendly unit and permanently add $(SarcomancyModifier().description(caster)) to it."
+}
+
+effect Amalgamation {
+  predicate(caster, target) => areAllies(caster, target) && target.type.id == "warrior"
+
+  trigger = Triggers.cast
+
+  cost(caster) => [u: 6, ap: 1]
+
+  range(caster) => 2
+
+  # isEnabled(caster) => [[caster.owner.hasUpgrade("ePluribusUnum"), "You must have E Pluribus Unum upgrade"]]
+
+  check(caster, target) => predicate(caster, target) && Game.unitsInRange(Game.grid.locate(target), 1).any(=> predicate(caster, $0))
+
+  run(caster, target) {
+    Game.logEvent("A horrible ritual binds two of " + Game.localizedStr(target.type.id + "Title") + " into a terrifying Amalgam!", \
+      LogLevels.info, target.coordinates)
+    otherTarget = Game.unitsInRange(Game.grid.locate(target), 1).first(=> predicate(caster, $0))
+    Game.animateVisualFx([
+      [
+        type: "blood",
+        coordinates: target.coordinates
+      ],
+      [
+        type: "blood",
+        coordinates: otherTarget.coordinates
+      ],
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#FF0000"
+      ]
+    ])
+    target.setType("amalgam")
+    target.restoreHealth(target.health)
+    otherTarget.destroy(caster)
+  }
+
+  description(caster) => "Destroy two adjunct Warriors to summon an Amalgam."
+}
+
+effect TributeToRogash {
+  ratio = 5
+  maxBlood = 10
+  trigger = Triggers.cast
+  cost(caster) => [ap: 1]
+  range(caster) => 1
+  check(caster, target) => areAllies(caster, target) && isOrganic(target)
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "blood",
+        coordinates: target.coordinates
+      ],
+      [
+        type: "bonefire",
+        coordinates: caster.coordinates
+      ]
+    ])
+    bloodGained = Math.min(maxBlood, target.hp // ratio)
+    caster.owner.addResources([u: bloodGained])
+    target.destroy(caster)
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " is sacrificed at " + Game.localizedStr(caster.type.id + "Title") \
+      + ", its fleshy carcass yielding $bloodGained Blood!", LogLevels.info, caster.coordinates)
+  }
+
+  description(caster) => "Destroy target allied organic unit. Gain 1 Blood for each $ratio HP, up to maximum $maxBlood."
+}
+
+effect Trample {
+  trigger = Triggers.attack
+  
+  check(caster, target) => !target.isBuilding
+
+  run(caster, target) {
+    destination = getVacantCell(target, 1)
+    if destination != null {
+      target.moveTo(destination.coordinates)
+      animateHitOn(target)
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " charges at " + Game.localizedStr(target.type.id + "Title") + ", knocking it back a cell!", \
+        LogLevels.info, target.coordinates)
+    }
+  }
+  
+  description(caster) => "Displace enemy to a random nearby cell."
+}
+
+# Heroes
+
+effect GroundSlam {
+  trigger = Triggers.cast
+  cost(caster) => [ap: 1]
+  targets => Targets.none
+
+  level(caster) => if caster.hasUpgrade("groundSlamL2") 2 \
+    else if caster.hasUpgrade("groundSlamL1") 1 \
+    else 0
+
+  isEnabled(caster) => [[level(caster) > 0, "You need to invest in Ground slam upgrades"]]
+
+  params(caster) {
+    l = level(caster)
+    p = caster.prowess
+    baseDamage = 8
+    damage = Math.floor(baseDamage * l * (1 + 0.05 * p))
+    baseRange = 1
+    range = Math.floor(baseRange * (1 + 0.05 * p + 0.45 * l))
+    return [damage: damage, range: range]
+  }
+
+  run(caster, target) {
+    p = params(caster)
+    casterLocation = caster.coordinates
+    around = Game.unitsInRange(casterLocation, p.range)\
+      .where(=> !areAllies(caster, $0))
+    Game.animateVisualFx([
+      [
+        type: "ripple",
+        coordinates: casterLocation,
+        color: "#FF0000"
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s tectonic slam damages $(around.size) enemies by $(p.damage).", \
+      LogLevels.info, caster.coordinates)
+    for unit in around {
+      unit.takeDamage(p.damage, caster)
+      animateHitOn(unit)
+    }
+  }
+
+  description(caster) {
+    p = params(caster)
+    return "Deal $(p.damage) to all enemies in radius $(p.range)."
+  }
+}
+
+effect Bash {
+  trigger = Triggers.cast
+  cost(caster) => [ap: 2]
+  check(caster, target) => !target.isBuilding && !areAllies(caster, target)
+
+  level(caster) => if caster.hasUpgrade("bashL2") 2 \
+    else if caster.hasUpgrade("bashL1") 1 \
+    else 0
+
+  isEnabled(caster) => [[level(caster) > 0, "You need to invest in Bash upgrades"]]
+
+  totalDamage(caster) {
+    l = level(caster)
+    p = caster.prowess
+    baseDamage = 13
+    return Math.floor((baseDamage + 5 * l) * (1 + 0.05 * p))
+  }
+
+  run(caster, target) {
+    damage = totalDamage(caster)
+    target.setActions(-target.speed) # stun
+    target.takeDamage(damage, caster)
+    Game.animateVisualFx([
+      [
+        type: "explosion",
+        coordinates: target.coordinates
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s mighty bash damages " + Game.localizedStr(target.type.id + "Title") + " by $damage and stuns it.", \
+      LogLevels.info, caster.coordinates)
+  }
+
+  description(caster) => "Deal $(totalDamage(caster)) to enemy and stun it."
+}
+
+effect SmiteModifier is AuraModifier {
+  run(caster, target) => [
+    defense: ["-", 1],
+    speed: ["-", 1],
+    regeneration: ["-", -1]
+  ]
+
+  sprite => "smite"
+
+  title => "smittenTitle"
+}
+
+effect Smite {
+  trigger = Triggers.attack
+
+  isEnabled(caster) => [[caster.hasUpgrade("smite"), "You must have the Smite hero upgrade"]]
+
+  check(caster, target) => !target.isBuilding
+
+  duration(caster) => Math.floor(2 + caster.prowess * 0.5)
+
+  run(caster, target) {
+    animateHitOn(target)
+    target.addTempEffect(SmiteModifier(), caster, duration(caster))
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " smites " + Game.localizedStr(target.type.id + "Title") + ", crushing its body and its will to live!", \
+      LogLevels.info, target.coordinates)
+  }
+
+  description(caster) => "On attack, add $(SmiteModifier().description(caster)) for duration $(duration(caster))."
+}
+
+effect KagaalusSarcomancyModifier is AuraModifier {
+  init(@level)
+
+  run(caster, target) => if areAllies(caster, target) [
+    attack: ["+", level],
+    defense: ["+", level // 2]
+  ] else [
+    attack: ["-", level],
+    defense: ["-", level // 2]
+  ]
+
+  sprite => "kagaalusSarcomancy"
+
+  title => "kagaalusSarcomancyTitle"
+}
+
+effect KagaalusSarcomancy {
+  damage = 8
+
+  trigger = Triggers.cast
+
+  cost(caster) => [u: 3, ap: 1]
+
+  range(caster) => 2
+
+  level(caster) => if caster.hasUpgrade("kagaalusSarcomancyL3") 3 \
+    else if caster.hasUpgrade("kagaalusSarcomancyL2") 2 \
+    else 1
+
+  isEnabled(caster) => [[level(caster) > 0, "You need to invest in Sarcomancy hero upgrades"]]
+
+  check(caster, target) => target.hp > damage && isOrganic(target) && !target.hasTempEffect("KagaalusSarcomancyModifier")
+
+  amount(caster) => Math.floor(level(caster) * (0.5 + 0.15 * caster.prowess))
+
+  run(caster, target) {
+    l = amount(caster)
+    Game.animateVisualFx([
+      [
+        type: "blood",
+        coordinates: target.coordinates
+      ],
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#FF0000"
+      ]
+    ])
+    target.takeDamage(damage, caster)
+    target.addTempEffect(KagaalusSarcomancyModifier(l), source: caster, duration: INFINITY)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Sarcomancy affects " + Game.localizedStr(target.type.id + "Title") + ". Its life will never be the same!", \
+      LogLevels.info, target.coordinates)
+  }
+
+  description(caster) {
+    l = amount(caster)
+    return "Deal $damage to a unit. If it's friendly, increase its attack by $l and defense by $(l // 2). If enemy, decrease attack and defense."
+  } 
+}
+
+effect SacrificeOfHealth is Sacrifice {
+  radius = 2
+
+  range(caster) => 1
+
+  cost(caster) => [u: 2, ap: 1]
+
+  isEnabled(caster) => [[caster.hasUpgrade("sacrificeOfHealth"), "You must have sacrifice of health upgrade"]]
+
+  isValidTarget(caster, target) => isOrganic(target)
+
+  healthRestored(caster) => Math.floor(5 + 3 * caster.prowess)
+
+  postSacrifice(caster, target) {
+    hp = healthRestored(caster)
+    around = Game.unitsInRange(Game.grid.locate(caster), radius)\
+      .where(=> areAllies(caster, $0) && !$0.isBuilding)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sacrifices " + Game.localizedStr(target.type.id + "Title") + " to restore $hp HP to $(around.size) allies!", \
+      LogLevels.info, target.coordinates)
+    for unit in around {
+      Game.animateVisualFx([
+        [
+          type: "boost",
+          coordinates: target.coordinates,
+          color: "#00FF00"
+        ]
+      ])
+      unit.restoreHealth(hp)
+    }
+  }
+
+  description(caster) => super.description(caster) + " Restore $(healthRestored(caster)) health to all friendly units in radius $radius."
+}
+
+effect SacrificeOfVigor is Sacrifice {
+  radius = 2
+
+  range(caster) => 1
+
+  cost(caster) => [u: 2, ap: 1]
+
+  isEnabled(caster) => [[caster.hasUpgrade("sacrificeOfVigor"), "You must have sacrifice of vigor upgrade"]]
+
+  isValidTarget(caster, target) => isOrganic(target)
+
+  apRestored(caster) => Math.floor(1 + (1 + 0.2 * caster.prowess))
+
+  postSacrifice(caster, target) {
+    ap = apRestored(caster)
+    around = Game.unitsInRange(Game.grid.locate(caster), radius)\
+      .where(=> areAllies(caster, $0) && !$0.isBuilding)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sacrifices " + Game.localizedStr(target.type.id + "Title") + " to restore $ap AP to $(around.size) allies!", \
+      LogLevels.info, target.coordinates)
+    for unit in around {
+      Game.animateVisualFx([
+        [
+          type: "boost",
+          coordinates: target.coordinates,
+          color: "#0000FF"
+        ]
+      ])
+      unit.restoreActions(ap)
+    }
+  }
+
+  description(caster) => super.description(caster) + " Restore $(apRestored(caster)) AP to all friendly units in radius $radius."
+}
+
+effect SacrificeOfDeath is Sacrifice {
+  radius = 2
+
+  range(caster) => 1
+
+  cost(caster) => [u: 2, ap: 1]
+
+  isEnabled(caster) => [[caster.hasUpgrade("sacrificeOfDeath"), "You must have sacrifice of death upgrade"]]
+
+  isValidTarget(caster, target) => isOrganic(target)
+
+  totalDamage(caster) => Math.floor(10 + 3 * caster.prowess)
+
+  postSacrifice(caster, target) {
+    damage = totalDamage(caster)
+    around = Game.unitsInRange(Game.grid.locate(caster), radius)\
+      .where(=> !areAllies(caster, $0) && !$0.isBuilding)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sacrifices " + Game.localizedStr(target.type.id + "Title") + " to damage $(around.size) enemies by $damage!", \
+      LogLevels.info, target.coordinates)
+    for unit in around {
+      animateHitOn(unit)
+      unit.takeDamage(damage, caster)
+    }
+  }
+
+  description(caster) => super.description(caster) + " Deal $(totalDamage(caster)) damage to all enemies in radius $radius."
+}
+
+effect FerocityAuraModifier is AuraModifier {
+  init(@level)
+
+  run(caster, target) => [
+    defense: ["+", level],
+    retaliationCount: ["+", level],
+    retaliationAttackModifier: ["+", 0.35 * level]
+  ]
+
+  sprite => "ferocityAura"
+
+  title => "ferocityTitle"
+}
+
+effect FerocityAura is Aura {
+  stacks = false
+
+  modifierId = "FerocityAuraModifier"
+
+  level(caster) => if caster.hasUpgrade("ferocityAuraL2") 2 \
+    else if caster.hasUpgrade("ferocityAuraL1") 1 \
+    else 0
+
+  totalLevel(caster) => Math.floor(level(caster) + (1 + 0.2 * caster.prowess))
+
+  range(caster) => totalLevel(caster)
+
+  isEnabled(caster) => [[level(caster) > 0, "You must have ferocity aura upgrade"]]
+
+  isValidTarget(caster, target) => target.owner.isAllyOf(caster.owner) && !target.isBuilding
+
+  modifier(caster, target) => FerocityAuraModifier(totalLevel(caster))
+}
+
+effect BeastmastersWarcryModifier is AuraModifier {
+  init(@level)
+
+  run(caster, target) => [
+    attack: ["+", Math.floor(level * 1.5)],
+    attackCount: ["+", Math.floor(level * 0.5)]
+  ]
+
+  sprite => "beastmastersWarcry"
+
+  title => "inspiredTitle"
+}
+
+effect BeastmastersWarcry {
+  radius = 2
+
+  trigger = Triggers.cast
+
+  cost(caster) => [u: 3, ap: 1]
+
+  targets => Targets.none
+
+  level(caster) => if caster.hasUpgrade("beastmastersWarcryL2") 2 \
+    else if caster.hasUpgrade("beastmastersWarcryL1") 1 \
+    else 0
+
+  isEnabled(caster) => [[level(caster) > 0, "You must have beastmaster's warcry upgrade"]]
+
+  modifierLevel(caster) => Math.floor(level(caster) + (1 + 0.2 * caster.prowess))
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "aura",
+        coordinates: caster.coordinates,
+        color: "#00FF00"
+      ]
+    ])
+    l = modifierLevel(caster)
+    modifier = BeastmastersWarcryModifier(l)
+    duration = Math.max(1, l // 2)
+    around = Game.unitsInRange(Game.grid.locate(caster), radius)\
+      .where(=> areAllies(caster, $0) && !$0.isBuilding && !$0.hasTempEffect("BeastmastersWarcryModifier"))
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s warcry inspires $(around.size) allies!", \
+      LogLevels.info, caster.coordinates)
+    for unit in around {
+      Game.animateVisualFx([
+        [
+          type: "boost",
+          coordinates: unit.coordinates,
+          color: "#00FF00"
+        ]
+      ])
+      unit.addTempEffect(modifier, caster, duration)
+    }
+  }
+  
+  description(caster) {
+    l = modifierLevel(caster)
+    return "Add $(BeastmastersWarcryModifier(l).description(caster)) for $l turns to all friendly units in radius $radius."
+  } 
+}
+
+effect LeapAttack {
+  trigger = Triggers.cast
+
+  cost(caster) => [ap: 3]
+
+  level(caster) => if caster.hasUpgrade("leapAttackL2") 2 \
+    else if caster.hasUpgrade("leapAttackL1") 1 \
+    else 0
+
+  isEnabled(caster) => [[level(caster) > 0, "You must have leap attack upgrade"]]
+
+  totalLevel(caster) => Math.floor(level(caster) + (1 + 0.2 * caster.prowess))
+
+  range(caster) => Math.floor(2 + 0.1 * caster.prowess)
+  
+  check(caster, target) => !areAllies(caster, target) && hasVacantInfluencableCell(target, 1)
+
+  totalDamage(caster) => Math.floor(totalLevel(caster) * 5)
+
+  run(caster, target) {
+    destination = getVacantInfluencableCell(target, 1)
+    caster.moveTo(destination.coordinates)
+    damage = totalDamage(caster)
+    animateHitOn(target)
+    target.takeDamage(damage, caster)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " ferociously leaps at " + Game.localizedStr(target.type.id + "Title") + " and damages it by $damage!", \
+      LogLevels.info, target.coordinates)
+  }
+  
+  description(caster) => "Move to a cell next to the target within range $(range(caster)), then deal $(totalDamage(caster)) damage to it."
+}
+
+# Upgrades & spells
+
+effect Bloodlust is TargetableSpell {
+  restoredAP = 2
+
+  check(caster, target) => areAllies(caster, target) && !target.isBuilding && target.ap < target.speed
+
+  run(caster, target) {
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " feels renewed thirst for carnage!", LogLevels.info, target.coordinates)
+    Game.animateVisualFx([
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#0000FF"
+      ]
+    ])
+    target.restoreActions(restoredAP)
+  }
+  
+  description(caster) => "Restore $restoredAP to a friendly unit."
+}
+
+effect ObsidianWeaponsModifier is AuraModifier {
+  run(caster, target) => [
+    attack: ["+", 2]
+  ]
+
+  sprite => "obsidianWeapons"
+
+  title => "obsidianWeaponsTitle"
+}
+
+effect ObsidianWeapons is Aura {
+  stacks = false
+  modifierId = "ObsidianWeaponsModifier"
+  validTypes = ["warrior", "shadespear", "raider", "warchief", "bloodProwler"]
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id in validTypes
+
+  modifier(caster, target) => ObsidianWeaponsModifier()
+}
+
+effect SlaveAuctions {
+  trigger = Triggers.startOfTurn
+
+  run(caster, target) {
+    player = caster.owner
+    camps = player.ownedUnits.where(=> $0.type.id == "sanghoyCamp")
+    numCamps = camps.size
+    player.addResources([g: numCamps * 1])
+    if numCamps > 0 {
+      Game.logEvent("As slaves are sold, each one of your $numCamps Camps produces extra Gold!", LogLevels.positive, camps.0.coordinates)
+    }
+  }
+
+  description(caster) => "At the start of turn, for each Sanghoy Camp you control, gain 1 Gold."
+}
+
+effect StrengthInUnity {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    player = caster.owner
+    warCouncils = player.ownedUnits.where(=> $0.type.id == "warCouncil")
+    numWarCouncil = warCouncils.size
+    for i in numWarCouncil.times {
+      player.addToHand("warrior", 0)
+    }
+    if numWarCouncil > 0 {
+      Game.logEvent("United we stand! Each one of your $numWarCouncil councils tributes an extra Warrior!", LogLevels.positive, warCouncils.0.coordinates)
+    }
+  }
+
+  description(caster) => "For each War Council you control, add a Warrior to your hand."
+}
+
+effect SanghoyHorde {
+  barbarianCount = 3
+
+  trigger = Triggers.cast
+
+  targets => Targets.cell
+
+  range(caster) => Game.grid.size
+
+  check(caster, target) => target.content == null
+
+  summonWarrior(caster, cell, owner) {
+    warrior = cell.summon("warrior", owner)
+    warrior.addTempEffect(SelfDestructAtEndOfTurn(), caster, 1)
+    warrior.restoreActions(warrior.speed)
+  }
+
+  run(caster, target) {
+    Game.logEvent("$barbarianCount Sanghoy Warriors band together against the common enemy, if only for a short while...", LogLevels.positive, target.coordinates)
+    player = caster.owner
+    summonWarrior(caster, target, player)
+    for i in 1..barbarianCount {
+      destination = getVacantCellAroundCellIncludingIt(target, player)
+      summonWarrior(caster, destination, player)
+    }
+  }
+
+  description(caster) => "Summon $barbarianCount Warriors that die at the end of the turn."
+}
+
+effect IronForgingModifier is AuraModifier {
+  run(caster, target) => [
+    attack: ["+", 2],
+    defense: ["+", 1]
+  ]
+
+  sprite => "ironForging"
+
+  title => "ironForgingTitle"
+}
+
+effect IronForging is Aura {
+  stacks = false
+  modifierId = "IronForgingModifier"
+  validTypes = ["warrior", "shadespear", "raider", "warchief", "beastlord", "chironite", "mantlet", "bloodProwler"]
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id in validTypes
+
+  modifier(caster, target) => IronForgingModifier()
+}
+
+effect IncreaseWarchiefStatsModifier is AuraModifier {
+  run(caster, target) => [
+    attack: ["+", 2],
+    defense: ["+", 1],
+    attackCount: ["+", 1],
+    retaliationCount: ["+", 1]
+  ]
+
+  sprite => "karrish"
+
+  title => "warchiefTitle"
+}
+
+effect IncreaseWarchiefStats is Aura {
+  stacks = false
+  modifierId = "IncreaseWarchiefStatsModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id == "warchief"
+
+  modifier(caster, target) => IncreaseWarchiefStatsModifier()
+
+  description(caster) => "To all allied Warchiefs: " + modifier(null, null).description(caster)
+}
+
+effect KarrishModifier is AuraModifier {
+  run(caster, target) => [
+    attack: ["+", 4],
+    attackCount: ["+", 3]
+  ]
+
+  sprite => "karrish"
+
+  title => "karrishTitle"
+}
+
+effect Karrish is TargetableSpell {
+  validTypes = ["warchief", "beastlord"]
+  duration = 1
+  radius = 1
+
+  range(caster) => Game.grid.size
+
+  check(caster, target) => areAllies(caster, target) \
+    && target.type.id in validTypes \
+    && target.ap > 0
+
+  run(caster, target) {
+    target.addTempEffect(KarrishModifier(), source: caster, duration)
+    attackTarget = Game.unitsInRange(Game.grid.locate(target), radius)\
+      .first(=> !areAllies($0, target) && target.owner.id != Game.nature.id)
+    if attackTarget != null {
+      Game.logEvent("Karrish is a feral custom, one that determines who is left and thus fit to lead.", \
+        LogLevels.info, target.coordinates)
+      Game.combat(target, attackTarget)
+    }
+  }
+  
+  description(caster) => "Add $(KarrishModifier().description(caster)) to target $validTypes for $duration turn. Attack a random enemy within range of $radius."
+}
+
+effect OnslaughtModifier is AuraModifier {
+  run(caster, target) => [
+    speed: ["+", 2],
+    sight: ["+", 1]
+  ]
+
+  sprite => "onslaught"
+
+  title => "onslaughtTitle"
+}
+
+effect Onslaught is Aura {
+  stacks = false
+  modifierId = "OnslaughtModifier"
+  validTypes = ["warrior", "shadespear", "raider", "warchief", "beastlord", "bloodProwler", "mantlet", "sarcomancer", "shaper", "kavouros"]
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id in validTypes
+
+  modifier(caster, target) => OnslaughtModifier()
+}
+
+effect ConvertToBeastlord {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    unit = caster.owner.ownedUnits.first(=> $0.type.id == "raider" || $0.type.id == "warchief")
+    if unit != null {
+      Game.logEvent(Game.localizedStr(unit.type.id + "Title") + " is reborn as a mighty Beastlord!", LogLevels.positive, unit.coordinates)
+      unit.setType("beastlord")
+      unit.restoreHealth(unit.health)
+      unit.setActions(0)
+      Game.animateVisualFx([
+        [
+          type: "blood",
+          coordinates: unit.coordinates
+        ]
+      ])
+    }
+  }
+}
+
+effect ClawToClawModifier is AuraModifier {
+  run(caster, target) => [
+    regeneration: ["+", 3],
+    speed: ["+", 1]
+  ]
+
+  sprite => "eyeToEyeClawToClaw"
+
+  title => "eyeToEyeClawToClawTitle"
+}
+
+effect ClawToClawAura is Aura {
+  stacks = true
+  validTypes = ["chironite", "kavouros", "bloodBat", "cyclops", "forehorn"]
+
+  isEnabled(caster) => [[caster.owner.hasUpgrade("eyeToEyeClawToClaw"), "You must have Eye to Eye Claw to Claw upgrade"]]
+
+  range(caster) => 2
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id in validTypes
+
+  modifier(caster, target) => ClawToClawModifier()
+}
+
+effect TasteOfManflesh is DrainAttack {
+  healthRestored = 6
+
+  isEnabled(caster) => [[caster.owner.hasUpgrade("tasteOfManflesh"), "You must have Taste of Manflesh upgrade"]]
+}
+
+effect BloodToRogash {
+  bloodPerUnit = 3
+  damage = 9
+  maxUnits = 4
+
+  trigger = Triggers.cast
+
+  targets => Targets.none
+
+  run(caster, target) {
+    player = caster.owner
+    units = Game.grid.visibleCells(player) \
+      .where(=> $0.content != null && !$0.content.isBuilding && $0.content.owner.id != Game.nature.id) \
+      .map(=> $0.content) \
+      .sortedBy(=> $0.hp - $1.hp) \
+      .take(maxUnits)
+    if units.size > 0 {
+      Game.logEvent("More, more blood, more fuel for Rogash's dream...", LogLevels.error, units.0.coordinates)
+    }
+    for unit in units {
+      Game.animateVisualFx([
+        [
+          type: "blood",
+          coordinates: unit.coordinates
+        ]
+      ])
+      unit.takeDamage(damage, caster)
+      player.addResources([u: bloodPerUnit])
+    }
+  }
+
+  description(caster) => "Deal $damage to a maximum of $maxUnits lowest HP visible units. Gain $bloodPerUnit Blood for each unit damaged."
+}
+
+effect TheDreamFuel {
+  trigger = Triggers.startOfTurn
+
+  unitsTaken = 5
+  damage = 5
+
+  run(caster, target) {
+    player = caster.owner
+    targets = player.ownedUnits\
+      .where(=> isOrganic($0) && $0.hp > damage)\
+      .sortedBy(=> $0.hp - $1.hp)\
+      .take(unitsTaken)
+    if targets.size > 0 {
+      Game.logEvent("More, more blood, more fuel for Rogash's dream...", LogLevels.error, targets.0.coordinates)
+    }
+    for unit in targets {
+      Game.animateVisualFx([
+        [
+          type: "blood",
+          coordinates: unit.coordinates
+        ]
+      ])
+      unit.takeDamage(damage, caster)
+    }
+    player.addResources([u: targets.size])
+  }
+
+  description(caster) => "At start of turn, deal $damage to at most $unitsTaken healthiest organic units. Gain Blood equal to number of damaged units."
+}
+
+effect HarbingersOfChangeModifier is AuraModifier {
+  run(caster, target) => [
+    speed: ["+", 1]
+  ]
+
+  sprite => "shaper"
+
+  title => "harbingersOfChangeTitle"
+}
+
+effect HarbingersOfChange is Aura {
+  stacks = false
+
+  modifierId = "HarbingersOfChangeModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id == "shaper"
+
+  modifier(caster, target) => HarbingersOfChangeModifier()
+
+  description(caster) => "Add to all allied Shapers: " + modifier(null, null).description(caster)
+}
+
+effect HorribleMisshapingModifier is AuraModifier {
+  init(@attack, @defense)
+
+  run(caster, target) => [
+    attack: ["+", attack],
+    defense: ["+", defense]
+  ]
+
+  sprite => "horribleMisshaping"
+
+  title => "horribleMisshapingTitle"
+}
+
+effect HorribleMisshaping {
+  discardedCards = 2
+  duration = 2
+  trigger = Triggers.cast
+  
+  range(caster) => Game.grid.size
+
+  check(caster, target) => areAllies(caster, target) && isOrganic(target)
+
+  run(caster, target) {
+    attack = 0
+    defense = 0
+    for i in 1...discardedCards {
+      randomUnit = caster.owner.hand.where(=> $0.type.type == "unit" && isOrganicType($0.type)).randomItem
+      if randomUnit == null {
+        break
+      }
+      attack += randomUnit.type.a
+      defense += randomUnit.type.d
+      caster.owner.removeFromHand(randomUnit.id)
+    }
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " never felt more powerful, finally fused with its brothers in arms!", LogLevels.info, target.coordinates)
+    Game.animateVisualFx([
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#FF0000"
+      ]
+    ])
+    target.addTempEffect(HorribleMisshapingModifier(attack, defense), caster, duration)
+  }
+
+  description(caster) => "Discard up to $discardedCards units from your hand and attach their Attack and Defense to the target unit for $duration turns."
+}
+
+effect ThickShellModifier is AuraModifier {
+  run(caster, target) => [
+    loadCapacity: ["+", 2],
+    defense: ["+", 3]
+  ]
+
+  sprite => "kavouros"
+
+  title => "thickShellTitle"
+}
+
+effect ThickShell is Aura {
+  stacks = false
+
+  modifierId = "ThickShellModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id == "kavouros"
+
+  modifier(caster, target) => ThickShellModifier()
+
+  description(caster) => "Add to all allied Kavouri: " + modifier(null, null).description(caster)
+}
+
+effect ToTheSkiesModifier is AuraModifier {
+  run(caster, target) => [
+    retaliationCount: ["=", 0],
+    speed: ["-", 1],
+    movementType: "fly"
+  ]
+
+  sprite => "toTheSkies"
+
+  title => "toTheSkiesTitle"
+}
+
+effect ToTheSkies is Aura {
+  stacks = false
+  modifierId = "ToTheSkiesModifier"
+  validTypes = ["warrior", "shadespear"]
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id in validTypes
+
+  modifier(caster, target) => ToTheSkiesModifier()
+
+  description(caster) => "Add to all allied " + validTypes.join(", ") + ": " + modifier(null, null).description(caster)
+}
+
+effect ConvertToForehorn {
+  COST = [u: 4]
+
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    if !caster.owner.canPay(COST) {
+      return
+    }
+    unit = caster.owner.ownedUnits.first(=> $0.type.id == "warrior")
+    if unit != null {
+      Game.logEvent(Game.localizedStr(target.type.id + "Title") + "'s hide is now thick, its limbs strong and its forehead horned!", LogLevels.info, unit.coordinates)
+      unit.setType("forehorn")
+      unit.restoreHealth(unit.health)
+      unit.setActions(0)
+      caster.owner.pay(COST)
+      Game.animateVisualFx([
+        [
+          type: "blood",
+          coordinates: unit.coordinates
+        ]
+      ])
+    }
+  }
+}
+
+effect AddCyclopsBaits {
+  trigger = Triggers.summon
+
+  amount = 2
+
+  run(caster, target) {
+    player = caster.owner
+    for i in amount.times {
+      player.addToHand("cyclopsBait", 0)
+    }
+  }
+
+  description(caster) => "Add $amount cyclops baits to hand."
+}
+
+effect CyclopsBait {
+  trigger = Triggers.afterDie
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "aura",
+        coordinates: target.coordinates,
+        color: "#FF0000"
+      ]
+    ])
+    target.summon("cyclops", caster.owner)
+    Game.logEvent("Finally, a Cyclops decides to show up...", LogLevels.info, target.coordinates)
+  }
+
+  description(caster) => "Summon a cyclops."
+}
+
+effect ShapingCorral {
+  trigger = Triggers.endOfTurn
+
+  cost(caster) => [u: 3]
+
+  run(caster, target) {
+    firstRaider = caster.owner.ownedUnits.first(=> $0.type.id == "raider")
+    if firstRaider != null {
+      Game.animateVisualFx([
+        [
+          type: "boost",
+          coordinates: firstRaider.coordinates,
+          color: "#FF0000"
+        ]
+      ])
+      Game.logEvent("Another proud Beastman steps out of the Shaping Corral.", LogLevels.positive, firstRaider.coordinates)
+      firstRaider.setType("chironite")
+    }
+  }
+
+  description(caster) => "Pay $(cost(caster)) and shape a Raider to a Chironite."
+}

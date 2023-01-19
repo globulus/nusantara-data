@@ -1,0 +1,7 @@
+id: BarbariansAtTheGates
+inherits: Deathmatch
+title: barbariansAtTheGatesTitle
+description: barbariansAtTheGatesDescription
+maxTeams: 2
+randomizedFirstPlayer: false
+winCondition: BarbariansAtTheGates

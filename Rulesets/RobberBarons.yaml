@@ -1,0 +1,5 @@
+id: RobberBarons
+inherits: Deathmatch
+title: robberBaronsTitle
+description: robberBaronsDescription
+winCondition: RobberBarons

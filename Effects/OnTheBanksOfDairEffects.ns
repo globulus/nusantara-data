@@ -1,0 +1,60 @@
+import "CommonEffects"
+
+CAMPAIGN_SPEED_BOOST = 2
+
+effect SpeedBoostModifier is AuraModifier {
+  run(caster, target) => [
+    speed: ["+", CAMPAIGN_SPEED_BOOST]
+  ]
+
+  sprite => "March"
+
+  title => "speedBoostTitle"
+}
+
+effect SpeedBoost is Aura {
+  stacks = false
+  modifierId = "SpeedBoostModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => target.type.id in ["warrior", "tonkaa", "kagaalu"]
+
+  modifier(caster, target) => SpeedBoostModifier()
+
+  affect(unit, caster) {
+    super.affect(unit, caster)
+    unit.restoreActions(CAMPAIGN_SPEED_BOOST)
+  }
+
+  sprite => "March"
+
+  title => "speedBoostTitle"
+
+  description(caster) => "Provides a global speed boost to your warriors!"
+}
+
+effect RockLob {
+  RANGE = 3
+  DAMAGE = 40
+
+  range(caster) => RANGE
+
+  trigger => Triggers.cast
+
+  check(caster, target) => !areAllies(caster, target)
+
+  run(caster, target) {
+    Game \
+      .,animateProjectile("stone", caster.coordinates, target.coordinates) \
+      .,animateVisualFx([
+        [
+          type: "hit",
+          coordinates: unit.coordinates
+        ]
+      ])
+    target.takeDamage(DAMAGE, caster)
+  }
+
+  description(caster) => "Deal $DAMAGE damage to an enemy in range $RANGE."
+}

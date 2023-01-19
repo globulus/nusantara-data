@@ -1,0 +1,4 @@
+stance JungleWalk {
+    attack = ["*", 0.8]
+    movementType = "jungleWalk"
+}

@@ -1,0 +1,32 @@
+stance StandGround {
+  
+}
+
+stance Offense {
+    retaliationAttackModifier = ["*", 0.5]
+}
+
+stance Defense {
+    speed = ["-", 1]
+    attack = ["*", 0.7]
+    defense = ["+", 1]
+}
+
+stance Ceasefire {
+    attack = ["=", 0]
+    defense = ["=", 0]
+}
+
+stance March {
+  attack = ["*", 0.5]
+  defense = ["*", 0.5]
+  speed = ["+", 2]
+  regeneration => ["-", Math.max(1, @unit.health * 0.05)]
+}
+
+stance Camp {
+  attack = ["*", 0.5]
+  speed = ["=", 1]
+  retaliationCount = ["+", 2]
+  regeneration => ["+", Math.max(1, @unit.health * 0.1)]
+}

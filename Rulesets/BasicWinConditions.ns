@@ -1,0 +1,215 @@
+import "ScenarioUtils"
+import "../Effects/CommonEffects"
+
+scenario DestroyAll {
+  onStart {
+    updateNeutralContent()
+  }
+
+  onStateChange {
+    # time = Console.clock()
+    players = Game.players
+    for player in players {
+      if player.state == PlayerStates.active && player.ownedUnits.isEmpty {
+        player.setState(PlayerStates.inactive)
+      }
+    }
+    # Console.println("Elapsed time: " + (Console.clock() - time))
+  }
+
+  checkVictory {
+    # time = Console.clock()
+    activePlayers = Game.activePlayers
+    # Console.println("Elapsed time: " + (Console.clock() - time))
+    # Console.println(activePlayers)
+    return if activePlayers.size == 1 {
+      activePlayers.0
+    } else {
+      null
+    }
+  }
+}
+
+scenario Regicide {
+  onStart {
+    updateNeutralContent()
+
+    # add banners
+    for player in Game.activePlayers {
+      mvu = player.ownedUnits.maxBy(=> $0.type.merit)
+      bannerLocation = getVacantInfluencableCell(mvu, 5)
+      if bannerLocation == null {
+        throw "No empty cells to place banner on!"
+      }
+      bannerLocation.summon("regicideBanner", player)
+    }
+  }
+
+  checkVictory {
+    activePlayers = Game.activePlayers
+    return if activePlayers.size == 1 {
+      activePlayers.0
+    } else {
+      null
+    }
+  }
+}
+
+scenario GreatFlood is DestroyAll {
+  TICK = 3
+
+  onTurnStart {
+    when Game.turn % TICK {
+      0 {
+        cells = Game.grid.ringAround([0, 0, 0], Game.grid.size - Game.turn // TICK)
+        for cell in cells {
+          cell.setTerrain("ocean")
+          cell.setContent(null)
+        }
+      }
+    }
+  }
+}
+
+scenario RushForGold is DestroyAll {
+  MAX_GOLD = 40
+  TURN_TAG = "turnTag"
+  TICK = 6
+  MAX_NEW_MINE_DISTANCE = 4
+
+  allMines => Game.grid.allUnits.where(=> "goldmine" in $0.type.id.lowercased)
+
+  updateMine(mine) {
+    mine.updateExtra("mineableGold", MAX_GOLD)
+    mine.addExtra(TURN_TAG, "goldMineTitle", "goldMine", Game.turn)
+  }
+
+  onStart {
+    super.onStart()
+    for mine in allMines() {
+      updateMine(mine)
+    }
+  }
+
+  onTurnStart {
+    if Game.turn % TICK == 0 {
+      # Find mines created in the last batch
+      mines = allMines()
+      latestTurn = mines.maxBy(=> $0.getExtraValue(TURN_TAG)).getExtraValue(TURN_TAG)
+      latestMines = mines.where(=> $0.getExtraValue(TURN_TAG) == latestTurn)
+      for mine in latestMines {
+        # Find an empty influencable cell at the range to place new mine on
+        targetCell = Game.grid.ringAround(mine.coordinates, Math.min(MAX_NEW_MINE_DISTANCE, Game.grid.size // 2))\
+          .where(=> $0.isInfluencable() && isCellVacant($0))\
+          .randomItem()
+        if targetCell != null {
+          newMine = targetCell.summon("goldMine", Game.nature)
+          updateMine(newMine)
+        }
+      }
+
+      # Remove all mines from earlier batches
+      for earlierMine in mines.where(=> $0.getExtraValue(TURN_TAG) != latestTurn) {
+        earlierMine.destroy(earlierMine)
+      }
+    }
+  }
+}
+
+scenario FallFromHeaven is DestroyAll {
+  TICK = 4
+  UPGRADES_LOST = 4
+
+  onStart {
+    super.onStart()
+
+    # research entire upgrade tree for all players
+    for player in Game.players {
+      tree = player.upgradeTree
+      if tree != null {
+        for node in tree.allNodes {
+          node.slot(player, false)
+        }
+      }
+    }
+  }
+
+  onTurnStart {
+    if Game.turn % TICK == 0 {
+      for player in Game.players {
+        tree = player.upgradeTree
+        if tree != null {
+          for node in tree.allNodes.where(=> $0.upgrade != null).shuffled().take(UPGRADES_LOST) {
+            node.unslot()
+          }
+        }
+      }
+    }
+  }
+}
+
+scenario BarbariansAtTheGates is DestroyAll {
+  onStart {
+    super.onStart()
+
+    # research first layer of upgrades and add resources
+    for player in Game.players.where(=> $0.team == 1) {
+      for node in player.upgradeTree.nodes  {
+        node.slot(player, false)
+      }
+      player.addResources([g: 35, u: 10])
+    }
+
+    # triplicate all units
+    for player in Game.players.where(=> $0.team == 2) {
+      for unit in player.ownedUnits.where(=> !$0.isBuilding) {
+        for _ in 2.times {
+          cell = getVacantCellAroundCell(Game.grid.locate(unit), null)
+          if cell != null {
+            cell.summon(unit.type.id, player)
+          }
+        }
+      }
+    }
+  }
+}
+
+scenario RobberBarons is DestroyAll {
+  LAST_TURN = 16
+  SCORE_KEYS = [resources: ["goldGained", "uniqueGained"], tech: ["techtreeComplete"], influence: ["influencedMap"]]
+
+  combineStats(stats, scores, scoreKey) {
+    segmentedScores = []
+    for playerStats in stats {
+      value = SCORE_KEYS.(scoreKey).reduce(0, => $0 + playerStats.stats.($1))
+      segmentedScores.add([playerStats.id, value])
+      scores.(playerStats.id).(scoreKey) = value
+    }
+    return segmentedScores.sortedBy(=> $0.1 - $1.1)
+  }
+
+  onTurnStart {
+    if Game.turn == LAST_TURN {
+      players = Game.players.where(=> $0.id != Game.nature.id)
+      scores = players.mapToObject(=> $0.name, fn (_) => [total: 0])
+      stats = players.map(=> [id: $0.name, stats: $0.currentStats.economy])
+      for scoreKey in SCORE_KEYS.keys {
+        sortedScores = combineStats(stats, scores, scoreKey)
+        currentRank = 1
+        for i in sortedScores.size.times {
+          if i > 0 && sortedScores.(i).1 > sortedScores.(i - 1).1 {
+            currentRank += 1
+          }
+          scores.(sortedScores.(i).0).total += currentRank
+        }
+      }
+      Game.showMessageToAll("Economy scores:\n$(scores)")
+      maxTotal = scores.(scores.keys.maxBy(=> scores.($0).total)).total
+      winnerIds = scores.keys.where(=> scores.($0).total == maxTotal).shuffled()
+      if winnerIds.size > 1 {
+        Game.showMessageToAll("Multiple people have the same score, so we'll pick the winner randomly...")
+      }
+      Server.win(players.first(=> $0.name == winnerIds.0))
+    }
+  }
+}

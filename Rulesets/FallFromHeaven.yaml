@@ -1,0 +1,9 @@
+id: FallFromHeaven
+inherits: Blitzkrieg
+title: fallFromHeavenTitle
+description: fallFromHeavenDescription
+winCondition: FallFromHeaven
+bans:
+  skills:
+    - addMajorUpgrade
+    - addMinorUpgrade

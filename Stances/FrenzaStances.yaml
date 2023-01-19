@@ -1,0 +1,16 @@
+- id: DeployAutoturret
+  title: deployAutoturretTitle
+  image: Frenza/deployAutoturret
+- id: PackAutoturret
+  title: packAutoturretTitle
+  image: Frenza/packAutoturret
+- id: Overtime
+  title: overtimeTitle
+  image: Frenza/overtime
+- id: Snipe
+  title: snipeTitle
+  image: ../Factions/Frenza/Images/sniperSchool
+- id: Howitzer
+  title: howitzerTitle
+  image: Frenza/howitzer
+

@@ -1,0 +1,103 @@
+id: onTheBanksOfDair
+name: onTheBanksOfDairName
+image: Images/onTheBanksOfDair
+playable: false
+units:
+  - id: ironclad
+    title: ironcladTitle
+    description: ironcladDescription
+    image: Images/ironclad
+    sounds:
+      attack: Sounds/Ironclad/attack
+    flavor: ironcladFlavor
+    merit: 600
+    h: 110
+    reg: 2
+    a: 35
+    as: 15
+    rc: 1
+    d: 5
+    r: 5
+    s: 5
+    m: naval
+    stances:
+      - Offense
+      - Defense
+    tags:
+      - mech
+  - id: tonkaa
+    title: tonkaaTitle
+    description: tonkaaDescription
+    image: ../Sanghoy/Images/raider
+    flavor: tonkaaFlavor
+    merit: 160
+    h: 60
+    a: 7
+    as: 3
+    ac: 3
+    rc: 2
+    d: 1
+    s: 4
+    m: riding
+    stances:
+      - Offense
+      - Defense
+    tags:
+      - organic
+    skills:
+      - collectBlood
+  - id: smallGoldMine
+    title: goldMineTitle
+    description: goldMineDescription
+    image: ../Neutral/Images/goldMine
+    flavor: goldMineFlavor
+    h: 1000000000
+    stances:
+      - Ceasefire
+    tags:
+     - invulnerable
+    extras:
+      - id: mineableGold
+        title: mineableGoldTitle
+        image: mineableGold
+        value: !!int 50
+      - id: goldBatch
+        title: goldBatchTitle
+        image: mineableGold
+        value: !!int 5
+  - id: canoe
+    title: canoeTitle
+    description: canoeDescription
+    image: Images/canoe
+    flavor: canoeFlavor
+    merit: 120
+    h: 30
+    d: 0
+    s: 2
+    m: naval
+    loadCapacity: 2
+    stances:
+      - Offense
+    tags:
+      - mech
+    skills:
+      - loadTransport
+      - unloadTransport
+  - id: cyclopsAmalgam
+    title: cyclopsAmalgamTitle
+    description: cyclopsAmalgamDescription
+    image: Images/cyclopsAmalgam
+    flavor: cyclopsFlavor
+    merit: 700
+    h: 200
+    reg: 3
+    a: 40
+    as: 3
+    d: 5
+    s: 3
+    m: walk
+    stances:
+      - Offense
+    skills:
+      - siegeAttack
+      - rockLob

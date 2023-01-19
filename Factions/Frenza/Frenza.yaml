@@ -1,0 +1,1193 @@
+id: frenza
+name: frenzaName
+flavor: frenzaFlavor
+image: Images/frenza
+playable: true
+uniqueResource: favor
+music:
+  - Sounds/musicPaxRomana
+  - Sounds/musicTeutoburg
+units:
+  - id: colonialHall
+    title: colonialHallTitle
+    description: colonialHallDescription
+    image: Images/colonialHall
+    flavor: colonialHallFlavor
+    merit: 350
+    h: 200
+    s: 2
+    m: immovable
+    influence:
+      kind: radial
+      amount: 1
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - trainSettler
+      - buildBarracks
+      - buildFactory
+      - buildAirfield
+      - buildMagistratesCourt
+      - buildMonument
+      - raiseColonialMilitia
+      - sendTribute
+      - addMajorUpgrade
+      - colonialHallGenerateGold
+      - colonialHallExertInfluence
+      - leaveRuin
+  - id: barracks
+    title: barracksTitle
+    description: barracksDescription
+    image: Images/barracks
+    flavor: barracksFlavor
+    merit: 200
+    h: 80
+    s: 2
+    m: immovable
+    sight: 2
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - trainRifleman
+      - trainAssassin
+      - addMinorUpgrade
+      - leaveRuin
+  - id: factory
+    title: factoryTitle
+    description: factoryDescription
+    image: Images/factory
+    flavor: factoryFlavor
+    merit: 250
+    h: 90
+    s: 2
+    m: immovable
+    stances:
+      - Ceasefire
+      - Overtime
+    tags:
+      - building
+    skills:
+      - trainSteamGolem
+      - trainDevilhornTank
+      - trainMEV
+      - trainAutoturret
+      - addMinorUpgrade
+      - leaveRuin
+  - id: airfield
+    title: airfieldTitle
+    description: airfieldDescription
+    image: Images/airfield
+    flavor: airfieldFlavor
+    merit: 250
+    h: 90
+    s: 2
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - trainAssaultAirship
+      - trainCargoDirigible
+      - addParadrop
+      - airlift
+      - leaveRuin
+  - id: magistratesCourt
+    title: magistratesCourtTitle
+    description: magistratesCourtDescription
+    image: Images/magistratesCourt
+    flavor: magistratesCourtFlavor
+    merit: 280
+    h: 80
+    s: 2
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - trainVitarron
+      - trainTofan
+      - trainDenburhin
+      - reviveHero
+      - addReviveHeroToHand
+      - shipEndlessExpansion
+      - shipAirSuperiority
+      - shipEradicateThePest
+      - shipEmperorsFist
+      - leaveRuin
+  - id: monumentToSettlers
+    title: monumentToSettlersTitle
+    description: monumentDescription
+    image: Images/monumentToSettlers
+    flavor: monumentToSettlersFlavor
+    merit: 120
+    h: 50
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - generateFavorMonumentL1
+      - leaveRuin
+  - id: monumentToLegions
+    title: monumentToLegionsTitle
+    description: monumentDescription
+    image: Images/monumentToLegions
+    flavor: monumentToLegionsFlavor
+    merit: 160
+    h: 60
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - generateFavorMonumentL2
+      - leaveRuin
+  - id: monumentToGovernors
+    title: monumentToGovernorsTitle
+    description: monumentDescription
+    image: Images/monumentToGovernors
+    flavor: monumentToGovernorsFlavor
+    merit: 200
+    h: 70
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - generateFavorMonumentL3
+      - leaveRuin
+  - id: monumentToTheEmperor
+    title: monumentToTheEmperorTitle
+    description: monumentDescription
+    image: Images/monumentToTheEmperor
+    flavor: monumentToTheEmperorFlavor
+    merit: 240
+    h: 80
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - generateFavorMonumentL4
+      - leaveRuin
+  - id: monumentToTheSeas
+    title: monumentToTheSeasTitle
+    description: monumentDescription
+    image: Images/monumentToTheSeas
+    flavor: monumentToTheSeasFlavor
+    merit: 280
+    h: 90
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - generateFavorMonumentL5
+      - leaveRuin
+  - id: plantation
+    title: plantationTitle
+    description: plantationDescription
+    image: Images/plantation
+    flavor: plantationFlavor
+    merit: 200
+    h: 60
+    m: immovable
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - plantationGenerateGold
+      - leaveRuin
+  - id: settler
+    title: settlerTitle
+    description: settlerDescription
+    image: Images/settler
+    flavor: settlerFlavor
+    sounds:
+      summon: Sounds/Settler/Summon
+      select: Sounds/Settler/Select
+      cast: Sounds/Settler/Cast
+    merit: 80
+    h: 30
+    d: 1
+    s: 3
+    m: walk
+    stances:
+      - Offense
+      - Camp
+    tags:
+      - organic
+    skills:
+      - mineGold
+      - settlerRepair
+      - foundColony
+      - foundPlantation
+      - buildRoad
+      - leaveCorpse
+  - id: colonialMilitia
+    title: colonialMilitiaTitle
+    description: colonialMilitiaDescription
+    image: Images/colonialMilitia
+    flavor: colonialMilitiaFlavor
+    merit: 80
+    h: 30
+    a: 10
+    as: 4
+    d: 1
+    s: 3
+    m: walk
+    projectile: bullet
+    stances:
+      - Offense
+    tags:
+      - organic
+  - id: rifleman
+    title: riflemanTitle
+    description: riflemanDescription
+    image: Images/rifleman
+    flavor: riflemanFlavor
+    sounds:
+      summon: Sounds/Rifleman/Summon
+      select: Sounds/Rifleman/Select
+      attack: Sounds/Rifleman/Attack
+      die: Sounds/Rifleman/Die
+    canInteract: true
+    merit: 130
+    h: 50
+    a: 8
+    as: 4
+    ac: 2
+    rc: 2
+    d: 1
+    r: 2
+    s: 3
+    m: walk
+    projectile: bullet
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+    skills:
+      - mountToDragoon
+      - turtleFormation
+      - autoinfection
+      - leaveCorpse
+  - id: dragoon
+    title: dragoonTitle
+    description: dragoonDescription
+    image: Images/dragoon
+    flavor: dragoonFlavor
+    sounds:
+      select: Sounds/Dragoon/Select
+      attack: Sounds/Dragoon/Attack
+    canInteract: true
+    merit: 150
+    h: 45
+    a: 10
+    as: 4
+    ac: 2
+    rc: 2
+    d: 2
+    r: 2
+    s: 4
+    m: riding
+    projectile: shell
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+    skills:
+      - dismoutToRifleman
+      - leaveCorpse
+  - id: assassin
+    title: assassinTitle
+    description: assassinDescription
+    image: Images/assassin
+    flavor: assassinFlavor
+    sounds:
+      summon: Sounds/Assassin/Summon
+      select: Sounds/Assassin/Select
+      attack: Sounds/Assassin/Attack
+      cast: Sounds/Assassin/Cast
+    canInteract: true
+    merit: 160
+    h: 40
+    reg: 1
+    a: 10
+    rc: 2
+    d: 1
+    s: 4
+    m: walk
+    projectile: slash
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+      - Snipe
+    tags:
+      - organic
+    skills:
+      - poisonedBlades
+      - sabotage
+      - autoinfection
+      - leaveCorpse
+  - id: steamGolem
+    title: steamGolemTitle
+    description: steamGolemDescription
+    image: Images/steamGolem
+    flavor: steamGolemFlavor
+    merit: 200
+    h: 65
+    a: 9
+    as: 4
+    ac: 2
+    rc: 2
+    d: 1
+    r: 2
+    s: 3
+    m: walk
+    projectile: shell
+    stances:
+      - Offense
+      - Defense
+    tags:
+      - mech
+    skills:
+      - concussiveGrenade
+      - retrofitToVoltWalker
+      - leaveWreck
+  - id: devilhornTank
+    title: devilhornTankTitle
+    description: devilhornTankDescription
+    image: Images/devilhornTank
+    flavor: devilhornTankFlavor
+    sounds:
+      summon: Sounds/DevilhornTank/Select
+      select: Sounds/DevilhornTank/Select
+      attack: Sounds/DevilhornTank/Attack
+    merit: 500
+    h: 90
+    reg: 2
+    a: 25
+    as: 10
+    rc: 1
+    d: 4
+    r: 2
+    s: 3
+    m: tracks
+    projectile: shell
+    stances:
+      - Offense
+      - Defense
+      - Camp
+      - Howitzer
+    tags:
+      - mech
+    skills:
+      - recrew
+      - buildRoadDevilhornTank
+      - retrofitToVoltTank
+      - leaveWreck
+  - id: mev
+    title: mevTitle
+    description: mevDescription
+    image: Images/mev
+    flavor: mevFlavor
+    sounds:
+      summon: Sounds/MEV/Summon
+      select: Sounds/MEV/Select
+      cast: Sounds/MEV/Cast
+    merit: 300
+    h: 65
+    d: 1
+    s: 3
+    m: tracks
+    stances:
+      - Offense
+      - Camp
+    tags:
+      - mech
+    skills:
+      - recrew
+      - combatShields
+      - patchEmUp
+      - cellTech
+      - leaveWreck
+  - id: autoturret
+    title: autoturretTitle
+    description: autoturretDescription
+    image: Images/autoturret
+    flavor: autoturretFlavor
+    merit: 120
+    h: 40
+    a: 15
+    as: 2
+    ac: 1
+    rc: 4
+    d: 3
+    r: 2
+    s: 2
+    m: walk
+    projectile: shell
+    stances:
+      - DeployAutoturret
+      - PackAutoturret
+    tags:
+      - mech
+    skills:
+      - leaveWreck
+  - id: assaultAirship
+    title: assaultAirshipTitle
+    description: assaultAirshipDescription
+    image: Images/assaultAirship
+    flavor: assaultAirshipFlavor
+    sounds:
+      summon: Sounds/AssaultAirship/Summon
+      select: Sounds/AssaultAirship/Select
+      attack: Sounds/AssaultAirship/Attack
+    merit: 300
+    h: 50
+    reg: 1
+    a: 4
+    as: 4
+    ac: 4
+    rc: 1
+    d: 0
+    r: 1
+    s: 2
+    m: fly
+    projectile: bomb
+    stances:
+      - Offense
+      - Defense
+      - Camp
+    tags:
+      - mech
+      - airship
+    skills:
+      - recrew
+      - strafingRun
+      - leaveWreck
+  - id: cargoDirigible
+    title: cargoDirigibleTitle
+    description: cargoDirigibleDescription
+    image: Images/cargoDirigible
+    flavor: cargoDirigibleFlavor
+    sounds:
+      summon: Sounds/CargoDirigible/Summon
+      select: Sounds/CargoDirigible/Select
+      cast: Sounds/CargoDirigible/Cast
+    influence:
+      kind: spiral
+      amount: 1
+    merit: 250
+    h: 60
+    reg: 1
+    d: 1
+    s: 2
+    m: fly
+    loadCapacity: 2
+    stances:
+      - Offense
+      - Camp
+    tags:
+      - mech
+      - airship
+    skills:
+      - recrew
+      - loadTransport
+      - unloadTransport
+      - leaveWreck
+  - id: imperialJuggernaut
+    title: imperialJuggernautTitle
+    description: imperialJuggernautDescription
+    image: Images/imperialJuggernaut
+    flavor: imperialJuggernautFlavor
+    sounds:
+      summon: Sounds/ImperialJuggernaut/Summon
+      select: Sounds/ImperialJuggernaut/Select
+      attack: Sounds/ImperialJuggernaut/Attack
+      cast: Sounds/ImperialJuggernaut/Cast
+    merit: 800
+    h: 95
+    reg: 3
+    a: 15
+    as: 3
+    ac: 2
+    rc: 3
+    d: 3
+    s: 4
+    m: walk
+    projectile: shell
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - mech
+    skills:
+      - championSummon
+      - recrew
+      - beaconOfLight
+      - blazeOfGlory
+      - leaveWreck
+  - id: colossusTank
+    title: colossusTankTitle
+    description: colossusTankDescription
+    image: Images/colossusTank
+    flavor: colossusTankFlavor
+    merit: 800
+    h: 150
+    reg: 4
+    a: 20
+    as: 10
+    ac: 2
+    rc: 2
+    d: 5
+    r: 2
+    s: 2
+    m: tracks
+    projectile: shell
+    stances:
+      - Offense
+      - Defense
+    tags:
+      - mech
+    skills:
+      - recrew
+      - citadelProtocol
+      - disrepairedColossus
+      - leaveWreck
+  - id: citadelWalker
+    title: citadelWalkerTitle
+    description: citadelWalkerDescription
+    image: Images/citadelWalker
+    flavor: citadelWalkerFlavor
+    merit: 400
+    h: 80
+    reg: 1
+    a: 2
+    as: 1
+    ac: 10
+    rc: 10
+    d: 8
+    r: 1
+    s: 2
+    m: walk
+    projectile: bullet
+    stances:
+      - March
+    tags:
+      - mech
+    skills:
+      - leaveWreck
+  - id: voltTank
+    title: voltTankTitle
+    description: voltTankDescription
+    image: Images/voltTank
+    flavor: voltTankFlavor
+    sounds:
+      summon: Sounds/VoltTank/Summon
+      select: Sounds/VoltTank/Summon
+      attack: Sounds/VoltTank/Attack
+    merit: 500
+    h: 100
+    a: 10
+    ac: 3
+    rc: 3
+    d: 3
+    r: 1
+    s: 3
+    m: tracks
+    projectile: electrical
+    stances:
+      - Offense
+      - Defense
+      - Camp
+    tags:
+      - mech
+    skills:
+      - recrew
+      - buildRoadDevilhornTank
+      - lightningArc
+      - leaveWreck
+  - id: voltWalker
+    title: voltWalkerTitle
+    description: voltWalkerDescription
+    image: Images/voltWalker
+    flavor: voltWalkerFlavor
+    merit: 200
+    h: 65
+    a: 8
+    ac: 3
+    rc: 2
+    d: 1
+    r: 1
+    s: 4
+    m: walk
+    projectile: electrical
+    stances:
+      - Offense
+      - Defense
+    tags:
+      - mech
+    skills:
+      - lightningArc
+      - leaveWreck
+heroes:
+  - id: tofan
+    title: tofanTitle
+    description: tofanDescription
+    image: Images/tofan
+    sounds:
+      summon: Sounds/Tofan/Summon
+      select: Sounds/Tofan/Select
+      attack: Sounds/Tofan/Attack
+      cast: Sounds/Tofan/Cast
+    flavor: tofanFlavor
+    canInteract: true
+    merit: 1000
+    h: 50
+    reg: 2
+    a: 8
+    as: 2
+    ac: 2
+    rc: 2
+    d: 1
+    s: 3
+    m: walk
+    projectile: slash
+    v: 1
+    f: 1
+    g: 1
+    p: 2
+    vitalityProgression: 1
+    fortitudeProgression: 2
+    prowessProgression: 1
+    stances:
+      - Offense
+      - Defense
+      - March
+      - Camp
+    tags:
+      - organic
+    skills:
+      - noxiousCloud
+      - tofansKiss
+      - plagueSeeds
+    upgradeTree:
+      nodes:
+        - type: heroStatsL1
+          subnodes:
+            - type: heroStatsL2
+              subnodes:
+                - type: heroStatsL3
+                  subnodes:
+                    - type: heroStatsL4
+        - type: noxiousCloudL1
+          subnodes:
+            - type: noxiousCloudL2
+              subnodes:
+                - type: noxiousCloudL3
+                - type: plagueSeeds
+        - type: tofansKissL1
+          subnodes:
+            - type: tofansKissL2
+              subnodes:
+                - type: tofansKissL3
+                - type: plagueSeeds
+  - id: denburhin
+    title: denburhinTitle
+    description: denburhinDescription
+    image: Images/denburhin
+    sounds:
+      summon: Sounds/Denburhin/Summon
+      select: Sounds/Denburhin/Select
+      attack: Sounds/Denburhin/Attack
+    flavor: denburhinFlavor
+    canInteract: true
+    merit: 1000
+    h: 45
+    reg: 2
+    a: 7
+    as: 2
+    ac: 2
+    rc: 2
+    d: 1
+    s: 2
+    m: fly
+    projectile: bomb
+    v: 1
+    f: 1
+    g: 2
+    p: 1
+    vitalityProgression: 2
+    fortitudeProgression: 2
+    guardProgression: 2
+    stances:
+      - Offense
+      - Defense
+      - Camp
+    tags:
+      - mech
+    skills:
+      - recrewDenburhin
+      - denburhinAttack
+      - theFlagship
+      - fireBrigade
+      - aimForTheSun
+    upgradeTree:
+      nodes:
+        - type: heroStatsL1
+          subnodes:
+            - type: heroStatsL2
+              subnodes:
+                - type: heroStatsL3
+                  subnodes:
+                    - type: heroStatsL4
+        - type: reinforcedHull # increases defense
+          subnodes:
+            - type: repairCrews # increases regeneration
+            - type: fireBrigade # increases regen when on low health
+        - type: improvedOnboarding # improves recrew
+          subnodes:
+            - type: battleStations # higher attack count
+            - type: whereTheEmperorsWillLeadsUs # extra speed while at full health
+        - type: antiAirTurrets # denburhinAttack deals extra damage vs flying units
+          subnodes:
+            - type: bombAutoloader # more dmg to ground units on denburhinAttack
+            - type: incendiaryPayload # more dmg to buildings on denburhinAttack
+        - type: aimForTheSunL1
+          subnodes:
+            - type: aimForTheSunL2
+  - id: vitarron
+    title: vitarronTitle
+    description: vitarronDescription
+    image: Images/vitarron
+    sounds:
+      summon: Sounds/Vitarron/Summon
+      select: Sounds/Vitarron/Select
+      attack: Sounds/Vitarron/Attack
+      cast: Sounds/Vitarron/Cast
+    flavor: vitarronFlavor
+    canInteract: true
+    merit: 1000
+    h: 50
+    reg: 2
+    a: 8
+    as: 2
+    ac: 2
+    rc: 2
+    d: 1
+    s: 3
+    m: walk
+    projectile: shell
+    v: 1
+    f: 1
+    g: 1
+    p: 2
+    vitalityProgression: 1
+    guardProgression: 1
+    prowessProgression: 2
+    stances:
+      - Offense
+      - Defense
+      - Camp
+    tags:
+      - organic
+    skills:
+      - vitarronValiantPromotion
+      - governanceAura
+      - insurrection
+    upgradeTree:
+      nodes:
+        - type: heroStatsL1
+          subnodes:
+            - type: heroStatsL2
+              subnodes:
+                - type: heroStatsL3
+                  subnodes:
+                    - type: heroStatsL4
+        - type: governanceAuraL1
+          subnodes:
+            - type: governanceAuraL2
+              subnodes:
+                - type: governanceAuraL3
+                - type: insurrection
+spells:
+  - id: valiantPromotion
+    title: valiantPromotionTitle
+    description: valiantPromotionDescription
+    image: Images/valiantPromotion
+    flavor: valiantPromotionFlavor
+    playCost:
+      g: 3
+    skill: valiantPromotion
+  - id: paradrop
+    title: paradropTitle
+    description: paradropDescription
+    image: Images/paradrop
+    flavor: paradropFlavor
+    playCost:
+      g: 3
+    skill: paradrop
+  - id: endlessExpansionShipment
+    title: endlessExpansionShipmentTitle
+    description: endlessExpansionShipmentDescription
+    image: Images/endlessExpansionShipment
+    flavor: endlessExpansionShipmentFlavor
+    skill: endlessExpansionShipment
+  - id: airSuperiorityShipment
+    title: airSuperiorityShipmentTitle
+    description: airSuperiorityShipmentDescription
+    image: Images/airSuperiorityShipment
+    flavor: airSuperiorityShipmentFlavor
+    skill: airSuperiorityShipment
+  - id: eradicateThePestShipment
+    title: eradicateThePestShipmentTitle
+    description: eradicateThePestShipmentDescription
+    image: Images/eradicateThePestShipment
+    flavor: eradicateThePestShipmentFlavor
+    skill: eradicateThePestShipment
+  - id: emperorsFistShipment
+    title: emperorsFistShipmentTitle
+    description: emperorsFistShipmentDescription
+    image: Images/imperialJuggernaut
+    flavor: emperorsFistShipmentFlavor
+    skill: emperorsFistShipment
+  - id: theNextGenerationShipment
+    title: theNextGenerationTitle
+    description: theNextGenerationDescription
+    image: Images/theNextGeneration
+    flavor: theNextGenerationFlavor
+    skill: theNextGeneration
+  - id: hardenedVeteransShipment
+    title: hardenedVeteransTitle
+    description: hardenedVeteransDescription
+    image: Images/hardenedVeterans
+    flavor: hardenedVeteransFlavor
+    skill: hardenedVeteransShipment
+  - id: theCulling
+    title: theCullingTitle
+    description: theCullingDescription
+    image: Images/theCulling
+    flavor: deathSquadsFlavor
+    playCost:
+      g: 10
+    skill: theCulling
+  - id: scrapyardColossusShipment
+    title: scrapyardColossusShipmentTitle
+    description: scrapyardColossusDescription
+    image: Images/colossusTank
+    flavor: scrapyardColossusFlavor
+    skill: scrapyardColossusShipment
+upgrades:
+  - id: taxCollectors
+    title: taxCollectorsTitle
+    description: taxCollectorsDescription
+    image: Images/taxCollectors
+    flavor: taxCollectorsFlavor
+    kind: minor
+    skills:
+      - taxCollectors
+  - id: theNextGeneration
+    title: theNextGenerationTitle
+    description: theNextGenerationDescription
+    image: Images/theNextGeneration
+    flavor: theNextGenerationFlavor
+    kind: minor
+    skills:
+      - addTheNextGeneration
+  - id: masterSculptors
+    title: masterSculptorsTitle
+    description: masterSculptorsDescription
+    image: Images/masterSculptors
+    flavor: masterSculptorsFlavor
+    kind: minor
+    skills:
+      - masterSculptors
+  - id: hardenedVeterans
+    title: hardenedVeteransTitle
+    description: hardenedVeteransDescription
+    image: Images/hardenedVeterans
+    flavor: hardenedVeteransFlavor
+    kind: major
+    skills:
+      - hardenedVeterans
+  - id: horsebackTraining
+    title: horsebackTrainingTitle
+    description: horsebackTrainingDescription
+    image: Images/dragoon
+    flavor: horsebackTrainingFlavor
+    kind: minor
+  - id: sniperSchool
+    title: sniperSchoolTitle
+    description: sniperSchoolDescription
+    image: Images/sniperSchool
+    flavor: sniperSchoolFlavor
+    kind: minor
+  - id: viciousVanguard
+    title: viciousVanguardTitle
+    description: viciousVanguardDescription
+    image: Images/airlift
+    flavor: viciousVanguardFlavor
+    kind: major
+    skills:
+      - viciousVanguard
+  - id: heliumPockets
+    title: heliumPocketsTitle
+    description: heliumPocketsDescription
+    image: Images/heliumPockets
+    flavor: heliumPocketsFlavor
+    kind: minor
+    skills:
+      - heliumPockets
+  - id: uncommonValor
+    title: uncommonValorTitle
+    description: uncommonValorDescription
+    image: Images/uncommonValor
+    flavor: uncommonValorFlavor
+    kind: minor
+    skills:
+      - uncommonValorUpgrade
+  - id: deathSquads
+    title: deathSquadsTitle
+    description: deathSquadsDescription
+    image: Images/deathSquads
+    flavor: deathSquadsFlavor
+    kind: major
+    skills:
+      - deathSquads
+  - id: superspread
+    title: superspreadTitle
+    description: superspreadDescription
+    image: Images/superspread
+    flavor: superspreadFlavor
+    kind: minor
+    skills:
+      - superspread
+  - id: infantryFormations
+    title: infantryFormationsTitle
+    description: infantryFormationsDescription
+    image: Images/infantryFormations
+    flavor: infantryFormationsFlavor
+    kind: minor
+  - id: intensiveIndustrialization
+    title: intensiveIndustrializationTitle
+    description: intensiveIndustrializationDescription
+    image: Images/intensiveIndustrialization
+    flavor: intensiveIndustrializationFlavor
+    kind: major
+    skills:
+      - intensiveIndustrialization
+  - id: theThirdShift
+    title: theThirdShiftTitle
+    description: theThirdShiftDescription
+    image: Images/theThirdShift
+    flavor: theThirdShiftFlavor
+    kind: minor
+    skills:
+      - theThirdShift
+  - id: automatedDefenses
+    title: automatedDefensesTitle
+    description: automatedDefensesDescription
+    image: Images/autoturret
+    flavor: automatedDefensesFlavor
+    kind: minor
+    skills:
+      - addAutoturret
+  - id: engineKits
+    title: engineKitsTitle
+    description: engineKitsDescription
+    image: Images/engineKits
+    flavor: engineKitsFlavor
+    kind: major
+  - id: combatEngineers
+    title: combatEngineersTitle
+    description: combatEngineersDescription
+    image: Images/buildRoad
+    flavor: combatEngineersFlavor
+    kind: minor
+  - id: scrapyardColossus
+    title: scrapyardColossusTitle
+    description: scrapyardColossusDescription
+    image: Images/colossusTank
+    flavor: scrapyardColossusFlavor
+    kind: minor
+    skills:
+      - scrapyardColossus
+  - id: harnessingTheLightning
+    title: harnessingTheLightningTitle
+    description: harnessingTheLightningDescription
+    image: Images/harnessingTheLightning
+    flavor: harnessingTheLightningFlavor
+    kind: major
+    skills:
+      - harnessingTheLightning
+  - id: differentialMachines
+    title: differentialMachinesTitle
+    description: differentialMachinesDescription
+    image: Images/differentialMachines
+    flavor: differentialMachinesFlavor
+    kind: minor
+  - id: voltWalkers
+    title: voltWalkersTitle
+    description: voltWalkersDescription
+    image: Images/voltWalker
+    flavor: voltWalkersFlavor
+    kind: minor
+    skills:
+      - convertToVoltWalker
+# Hero upgrades
+  - id: noxiousCloudL1
+    title: noxiousCloudL1Title
+    description: noxiousCloudDescription
+    image: Images/noxiousCloud
+    flavor: noxiousCloudFlavor
+    kind: hero
+  - id: noxiousCloudL2
+    title: noxiousCloudL2Title
+    description: noxiousCloudL2Description
+    image: Images/noxiousCloud
+    flavor: noxiousCloudFlavor
+    kind: hero
+  - id: noxiousCloudL3
+    title: noxiousCloudL3Title
+    description: noxiousCloudL3Description
+    image: Images/noxiousCloud
+    flavor: noxiousCloudFlavor
+    kind: hero
+  - id: tofansKissL1
+    title: tofansKissL1Title
+    description: tofansKissDescription
+    image: Images/tofansKiss
+    flavor: tofansKissFlavor
+    kind: hero
+  - id: tofansKissL2
+    title: tofansKissL2Title
+    description: tofansKissL2Description
+    image: Images/tofansKiss
+    flavor: tofansKissFlavor
+    kind: hero
+  - id: tofansKissL3
+    title: tofansKissL3Title
+    description: tofansKissL3Description
+    image: Images/tofansKiss
+    flavor: tofansKissFlavor
+    kind: hero
+  - id: plagueSeeds
+    title: plagueSeedsTitle
+    description: plagueSeedsDescription
+    image: Images/plagueSeeds
+    flavor: plagueSeedsFlavor
+    kind: hero
+  - id: reinforcedHull
+    title: reinforcedHullTitle
+    description: reinforcedHullDescription
+    image: Images/reinforcedHull
+    flavor: reinforcedHullFlavor
+    kind: hero
+  - id: repairCrews
+    title: repairCrewsTitle
+    description: repairCrewsDescription
+    image: Images/repairCrews
+    flavor: repairCrewsFlavor
+    kind: hero
+  - id: fireBrigade
+    title: fireBrigadeTitle
+    description: fireBrigadeDescription
+    image: Images/fireBrigade
+    flavor: fireBrigadeFlavor
+    kind: hero
+  - id: improvedOnboarding
+    title: improvedOnboardingTitle
+    description: improvedOnboardingDescription
+    image: Images/improvedOnboarding
+    flavor: improvedOnboardingFlavor
+    kind: hero
+  - id: battleStations
+    title: battleStationsTitle
+    description: battleStationsDescription
+    image: Images/battleStations
+    flavor: battleStationsFlavor
+    kind: hero
+  - id: whereTheEmperorsWillLeadsUs
+    title: whereTheEmperorsWillLeadsUsTitle
+    description: whereTheEmperorsWillLeadsUsDescription
+    image: Images/whereTheEmperorsWillLeadsUs
+    flavor: whereTheEmperorsWillLeadsUsFlavor
+    kind: hero
+  - id: antiAirTurrets
+    title: antiAirTurretsTitle
+    description: antiAirTurretsDescription
+    image: Images/antiAirTurrets
+    flavor: antiAirTurretsFlavor
+    kind: hero
+  - id: bombAutoloader
+    title: bombAutoloaderTitle
+    description: bombAutoloaderDescription
+    image: Images/bombAutoloader
+    flavor: bombAutoloaderFlavor
+    kind: hero
+  - id: incendiaryPayload
+    title: incendiaryPayloadTitle
+    description: incendiaryPayloadDescription
+    image: Images/incendiaryPayload
+    flavor: incendiaryPayloadFlavor
+    kind: hero
+  - id: aimForTheSunL1
+    title: aimForTheSunL1Title
+    description: aimForTheSunDescription
+    image: Images/aimForTheSun
+    flavor: aimForTheSunFlavor
+    kind: hero
+  - id: aimForTheSunL2
+    title: aimForTheSunL2Title
+    description: aimForTheSunL2Description
+    image: Images/aimForTheSun
+    flavor: aimForTheSunFlavor
+    kind: hero
+  - id: governanceAuraL1
+    title: governanceAuraL1Title
+    description: governanceAuraDescription
+    image: Images/governanceAura
+    flavor: governanceAuraFlavor
+    kind: hero
+  - id: governanceAuraL2
+    title: governanceAuraL2Title
+    description: governanceAuraL2Description
+    image: Images/governanceAura
+    flavor: governanceAuraFlavor
+    kind: hero
+  - id: governanceAuraL3
+    title: governanceAuraL3Title
+    description: governanceAuraL3Description
+    image: Images/governanceAura
+    flavor: governanceAuraFlavor
+    kind: hero
+  - id: insurrection
+    title: insurrectionTitle
+    description: insurrectionDescription
+    image: Images/insurrection
+    flavor: insurrectionFlavor
+    kind: hero

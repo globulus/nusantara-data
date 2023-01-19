@@ -1,0 +1,894 @@
+# Loading states
+loadingEffects: Loading effects...
+loadingTerrains: Loading terrains...
+loadingMovementTypes: Loading movement types...
+loadingMaps: Loading maps...
+loadingResources: Loading resources...
+loadingProjectiles: Loading projectiles...
+loadingStances: Loading stances...
+loadingTags: Loading tags...
+loadingSkills: Loading skills...
+loadingFactions: Loading factions...
+loadingScenarios: Loading scenarios...
+loadingCampaigns: Loading campaigns...
+compilingScripts: Compiling scripts...
+loadingSprites: Loading sprites...
+loadingSounds: Loading sounds...
+allDone: All done...
+
+# Resources
+goldTitle: Gold
+goldDescription: |
+  The Sanghoy archipelago is rich with the metal that shines like the sun.
+  Work the mines, loot creeps and wreckages and expand your bases to earn more gold and support your armies.
+bloodTitle: Blood
+bloodDescription: |
+  Rogash is the source of all life, and blood is his currency.
+  Engage in battle and perform sacrifices to collect blood and power your sarcomancy and shaping.
+favorTitle: Favor
+favorDescription: |
+  The light of Emperor's grace is full of warmth and safety.
+  Build monuments and pay tribute to expand your colony and receive imperial army shipments.
+
+# Terrains
+grassTitle: Grass
+hillsTitle: Hills
+oceanTitle: Ocean
+forestTitle: Forest
+swampTitle: Swamp
+beachTitle: Beach
+desertTitle: Desert
+riverTitle: River
+seaTitle: Sea
+roadTitle: Road
+
+# MovementTypes
+walkTitle: Walk
+flyTitle: Fly
+ridingTitle: Riding
+tracksTitle: Tracks
+navalTitle: Naval
+amphibiousTitle: Amphibious
+
+# Maps
+basicMapTitle: Basic Tutorial Map
+basicMapDescription: Map for the basic tutorial.
+
+# Stances
+
+## Core
+standGroundTitle: Stand ground
+offenseTitle: Offense
+defenseTitle: Defense
+ceasefireTitle: Ceasefire
+marchTitle: March
+campTitle: Camp
+immovableTitle: Immovable
+
+## Sanghoy
+jungleWalkTitle: Jungle walk
+
+## Frenza
+deployAutoturretTitle: Deploy Autoturret
+packAutoturretTitle: Pack Autoturret
+overtimeTitle: Overtime
+snipeTitle: Snipe
+
+# Tags
+buildingTitle: Building
+mechTitle: Mech
+invulnerableTitle: Invulnerable
+organicTitle: Organic
+beastmanTitle: Beastman
+airshipTitle: Airship
+eldritchTitle: Eldritch
+
+# Rulesets
+deathmatchTitle: Deathmatch
+deathmatchDescription: Destroy all enemies.
+regicideTitle: Regicide
+regicideDescription: Destroy the enemy banner to defeat them!
+quickshotTitle: Quickshot
+quickshotDescription: Deathmatch, but every turn is just 1 min long!
+nothingToHideTitle: Nothing to Hide!
+nothingToHideDescription: Deathmatch without the fog of war.
+fullHandTitle: Full Hand
+fullHandDescription: Deathmatch but with a larger allowed hand size.
+blitzkriegTitle: Blitzkrieg
+blitzkriegDescription: Start with more units and resources in order to expand faster!
+wonderRulesetDescription: Research the Wonder upgrade, play it and hold it to win the game!
+otokWithoutTimeoutsTitle: Otok Minus Timeouts
+otokWithoutTimeoutsDescription: Deatmatch, but Otok rounds don't have timeouts.
+greatFloodTitle: Great Flood
+greatFloodDescription: Blitzkrieg, but every 3 turns, the outermost part of the map floods and becomes uninhabitable.
+rushForGoldTitle: Rush for Gold
+rushForGoldDescription: Blitzkrieg, but every Gold mine has just a bit of gold, although new ones spawn every few turns.
+fallFromHeavenTitle: Fall from Heaven
+fallFromHeavenDescription: Blitzkrieg, but you start with entire upgrade tree researched. Every 4 turns, lose 4 random upgrades. You can't research new upgrades.
+barbariansAtTheGatesTitle: Barbarians at the Gates
+barbariansAtTheGatesDescription: Deathmatch where players in the first team start with more resources and upgrades, while players in the second team start with more units.
+robberBaronsTitle: Robber Barons
+robberBaronsDescription: Deathmatch, but the game only lasts 15 rounds. After that, the player with the highest Economic score wins.
+
+# Skills
+
+## Neutral
+leaveCorpseTitle: Leave corpse
+leaveWreckTitle: Leave wreck
+leaveRuinTitle: Leave ruin
+mineGoldTitle: Mine gold
+mineableGoldTitle: Gold left
+goldBatchTitle: How much gold you get by mining
+addMinorUpgradeTitle: Research minor upgrade
+addMajorUpgradeTitle: Research major upgrade
+siegeAttackTitle: Siege attack
+minorBountyTitle: Minor bounty
+mediumBountyTitle: Medium bounty
+majorBountyTitle: Major bounty
+reviveHeroTitle: Revive hero
+increaseHeroStatsTitle: Boost hero stats
+venomStrikeTitle: Venom strike
+feastOfFleshTitle: Feast of Flesh
+defeatOwnerTitle: Defeat owner
+takeDamageIfNotMovedTitle: Take damage if not moved
+buildWonderTitle: Build Wonder
+turnsTillWinTitle: Turns till win
+swarmTitle: Swarm
+wingedSerpentSarcomancyTitle: Winged Serpent Sarcomancy
+mercilessAssassinationTitle: Merciless Assassination
+mercilessAssassinationDescription: Assassinate the enemy hero.
+mercilessAssassinationFlavor: Not everyone who arrived at the archipelago under the imperial flag abides the will of the Emperor.
+drainAttackTitle: Drain Life
+poisonedTitle: Poisoned
+championExperienceTitle: Champion Experience
+championXpTitle: Champion XP
+corpseTitle: Corpse
+wreckTitle: Wreck
+ruinTitle: Ruin
+airShieldTitle: Air Shield
+speedBoostTitle: Speed Boost
+uncoveredHiddenKnowledge: You uncovered hidden knowledge!
+rescuedPrisoners: You rescued some prisoners!
+
+## Sanghoy
+collectBloodTitle: Collect blood
+sanghoyCampGenerateGoldTitle: Generate gold
+trainThrallTitle: Train Thrall
+trainWarriorTitle: Train Warrior
+trainShadespearTitle: Train Shadespear
+warCouncilAttackTitle: Auto-attack nearby enemy
+trainRaiderTitle: Train Raider
+trainWarchiefTitle: Train Warchief
+trainMantletTitle: Train Mantlet
+trainBloodProwlerTitle: Train Blood Prowler
+trainSarcomancerTitle: Train Sarcomancer
+trainShaperTitle: Train Shaper
+addBloodlustTitle: Create Bloodlust
+tributeToRogashTitle: Tribute to Rogash
+trainKagaaluTitle: Train Kagaalu
+trainPyracmonTitle: Train Pyracmon
+trainMaimtitle: Train Maim
+sacrificeOfBloodTitle: Sacrifice of Blood
+thrallRepairTitle: Repair
+pillageTitle: Pillage
+riseToWarchiefTitle: Rise to Warchief
+buildSanghoyCampTitle: Build Sanghoy Camp
+buildWarCouncilTitle: Build War Council
+buildTotemTitle: Build Totem
+buildRunestoneOfRogashTitle: Build Runestone of Rogash
+buildSacrificialWellTitle: Build Sacrificial Well
+bloodBatDrainAttackTitle: Drain Life
+shapeChironiteTitle: Shape Chironite
+shapeKavourosTitle: Shape Kavouros
+shapeBloodBatTitle: Shape Blood Bat
+shapeCyclopsTitle: Shape Cyclops
+shapeBeastlordTitle: Shape Beastlord
+shapeForehornTitle: Shape Forehorn
+leadershipAuraTitle: Leadership Aura
+bloodFrenzyTitle: Blood Frenzy
+onTheProwlTitle: On the Prowl
+sarcomancerHeal: Healing Rites
+sarcomancyTitle: Sarcomancy
+bloodlustTitle: Bloodlust
+amalgamationTitle: Amalgamation
+trampleTitle: Trample
+leadershipTitle: Leadership
+smittenTitle: Smitten
+ferocityTitle: Ferocity
+inspiredTitle: Inspired
+
+groundSlamTitle: Ground Slam
+bashTitle: Bash
+smiteTitle: Smite
+kagaalusSarcomancyTitle: Kagaalu's Sarcomancy
+sacrificeOfHealthTitle: Sacrifice of Health
+sacrificeOfVigorTitle: Sacrifice of Vigor
+sacrificeOfDeathTitle: Sacrifice of Death
+ferocityAuraTitle: Ferocity Aura
+beastmastersWarcryTitle: Beastmaster's Warcry
+leapAttackTitle: Leap Attack
+
+obsidianWeaponsTitle: Obsidian Weapons
+slaveAuctionsTitle: Slave Auctions
+addSanghoyHordeTitle: Create Sanghoy Horde
+strengthInUnityTitle: Strength in Unity
+sanghoyHordeTitle: Sanghoy Horde
+ironForgingTitle: Iron Forging
+addMantletTitle: Create Mantlet
+increaseWarchiefStatsTitle: Boost Warchiefs
+addKarrishTitle: Create Karrish
+karrishTitle: Karrish
+onslaughtTitle: Onslaught
+clawToClawAuraTitle: Claw to Claw Aura
+tasteOfManfleshTitle: Taste of Manflesh
+addBloodToRogashTitle: Create Blood to Rogash
+bloodToRogashTitle: Blood to Rogash
+theDreamFuelTitle: The Dream Fuel
+harbingersOfChangeTitle: Harbingers of Change
+addHorribleMisshapingTitle: Create Horrible Misshaping
+horribleMisshapingTitle: Horrible Misshaping
+toTheSkiesTitle: To the Skies!
+addCyclopsBaitsTitle: Create Cyclops Baits
+cyclopsBaitTitle: Cyclops Bait
+shapingCorralTitle: Shaping Corral
+
+## Frenza
+trainSettlerTitle: Train Settler
+buildBarracksTitle: Build Barracks
+buildFactoryTitle: Build Factory
+buildAirfieldTitle: Build Airfield
+buildMagistratesCourtTitle: Build Magistrates Court
+buildMonumentTitle: Build Monument
+raiseColonialMilitiaTitle: Raise Colonial Militia
+sendTributeTitle: Send Tribute
+colonialHallGenerateGoldTitle: Generate Gold
+colonialHallExertInfluenceTitle: Expand Influence
+trainRiflemanTitle: Train Rifleman
+trainAssassinTitle: Train Assassin
+trainSteamGolemTitle: Train Steam Golem
+trainDevilhornTankTitle: Train Devilhorn Tank
+trainMEVTitle: Train MEV
+trainAutoturretTitle: Train Autoturret
+trainAssaultAirshipTitle: Train Assasult Airship
+trainCargoDirigibleTitle: Train Cargo Dirigible
+addParadropTitle: Prepare Paradrop
+airliftTitle: Airlift
+trainVitarronTitle: Train Vitarron
+trainDenburhinTitle: Train Deburhin
+trainTofanTitle: Train Tofan
+shipEndlessExpansionTitle: Send Endless Expansion shipment
+shipAirSuperiorityTitle: Send Air Superiority shipment
+shipEradicateThePestTitle: Send Eradicate the Pest shipment
+shipEmperorsFistTitle: Send Emperor's Fist shipment
+generateFavorMonumentTitle: Generate Favor
+plantationGenerateGoldTitle: Generate Gold
+settlerRepairTitle: Repair
+foundColonyTitle: Found Colony
+foundPlantationTitle: Found Plantation
+buildRoadTitle: Build road
+mountToDragoonTitle: Mount up
+turtleFormationTitle: Turtle formation
+autoinfectionTitle: Autoinfection
+dismoutToRiflemanTitle: Dismount
+poisonedBladesTitle: Poisoned blades
+strafingRunTitle: Strafing Run
+concussiveGrenadeTitle: Concussive Grenade
+recrewTitle: Recrew
+citadelProtocolTitle: Citadel Protocol
+combatShieldsTitle: Issue combat shields
+patchEmUpTitle: Patch 'em up!
+cellTechTitle: Issue cell tech
+beaconOfLightTitle: Beacon of light
+blazeOfGloryTitle: Blaze of glory
+payUpkeepTitle: Pay Upkeep
+statusReportTitle: Status Report
+veterancyTitle: Veterancy
+governanceTitle: Governance
+theCullingTitle: The Culling
+
+noxiousCloudTitle: Noxious cloud
+tofansKissTitle: Tofan's Kiss
+plagueSeedsTitle: Plague seeds
+denburhinAttackTitle: Denburhin's strike
+theFlagshipTitle: The Fleet's Flagship
+aimForTheSunTitle: Aim for the Sun
+valiantPromotionTitle: Valiant Promotion
+governanceAuraTitle: Governance aura
+insurrectionTitle: Insurrection
+
+paradropTitle: Paradrop
+endlessExpansionShipmentTitle: Endless Expansion shipment
+airSuperiorityShipmentTitle: Air Superiority shipment
+eradicateThePestShipment: Eradicate the Pest shipment
+emperorsFistShipmentTitle: Emeperor's Fist shipment
+theNextGenerationTitle: The next generation
+taxCollectorsTitle: Tax collectors
+masterSculptorsTitle: Master sculptors
+hardenedVeteransTitle: Hardened veterans
+deathSquadsTitle: Death squads
+superspreadTitle: Superspread
+viciousVanguardTitle: Vicious vanguard
+intensiveIndustrializationTitle: Intensive industrialization
+theThirdShiftTitle: The third shift
+addAutoturretTitle: Create Autoturret
+
+# Factions
+
+## Neutral
+goldMineTitle: Gold Mine
+goldMineDescription: Lots of gold here!
+goldMineFlavor: Crows and people have much in common. For starters, their fondness of shiny objects.
+pandorasBoxTitle: Pandora's Box
+pandorasBoxDescription: Don't open!
+goreillaTitle: Goreilla
+goreillaDescription: A bloodthirsty ape.
+goreillaFlavor: Given enough time, it evolves into a typical Sanghoy.
+kingPythonTitle: King Python
+kingPythonDescription: Large jungle serpent.
+kingPythonFlavor: On top of strangling, this one actually is venomous.
+fangedAmalgamTitle: Fanged Amalgam
+fangedAmalgamDescription: A two headed canine.
+fangedAmalgamFlavor: Few amalgams live more than a couple of days, but canine ones last long enough to even reproduce in the wilds.
+firehornetSwarmTitle: Firehornet Swarm
+firehornetSwarmDescription: A cloud of angry insects.
+firehornetSwarmFlavor: Large swatters are standard-issue equipment for some Frenza regiments.
+rogueWarriorTitle: Rogue Warrior
+rogueShadespearTitle: Rogue Shadespear
+ironBoarTitle: Iron Boar
+ironBoarDescription: Surprisingly resilient hog.
+ironBoarFlavor: ...and after all the trouble, it still tastes terrible!
+carnivoraTitle: Carnivora
+carnivoraDescription: A ravenous plant.
+carnivoraFlavor: If you de-fang it properly, it makes a great stew.
+deserterSquadTitle: Deserter Squad
+deserterSquadDescription: A band of former Imperial riflemen.
+deserterSquadFlavor: Running and gunning.
+raiderWarbandTitle: Raider Warband
+millepedeTitle: Millepede
+millepedeDescription: A truck-sized bug.
+millepedeFlavor: The more legs you cut off, the fewer it has to left to drive through your chest.
+dementedBeastlordTitle: Demented Beastlord
+dementedBeastlordFlavor: Huh? Where am I? Why do I have four legs?
+hermitCyclopsTitle: Hermit Cyclops
+hermitCyclopsFlavor: Leave me the hell alone!
+wingedSerpentTitle: Winged Serpent
+wingedSerpentDescription: A snake, roughly the size of an elephant. It also flies.
+wingedSerpentFlavor: They are the progeny of Rogash, so no Sanghoy may hunt or hurt them. That's the usual excuse.
+vanguardTitle: Vanguard
+vanguardDescription: A confused demon.
+vanguardFlavor: The creature seems equally scared as it is scary.
+regicideBannerTitle: Banner
+regicideBannerDescription: Seems important!
+regicideBannerFlavor: Oh say can you see?
+wonderTitle: Wonder
+wonderDescription: Keep it long enough and you win!
+wonderFlavor: Wouldn't it be Wonderful if this stuck around for 8 turns?
+ruinedWellTitle: Ruined Well
+ruinedWellDescription: What's in the box (or, well, the well)?
+colonialShipwreckTitle: Colonial Shipwreck
+colonialShipwreckDescription: A small gold mine that anyone can mine!
+colonialShipwreckFlavor: Rough seas around the archipelago took nearly as many colonial lives as its treacherous inhabitants.
+lootRemainingTitle: Loot remaining
+crumblingLookoutTitle: Crumbling Lookout
+crumblingLookoutDescription: Provides long-distance vision.
+crumblingLookoutFlavor: Despite its ramshackle state, it's still safer to climb than most Sanghoy jungle trees.
+abandonedArtilleryTitle: Abandoned Artillery
+abandonedArtilleryDescription: Immobile long-range defenses.
+abandonedArtilleryFlavor: Thunder in the clear sky spells certain death.
+dischargedBallistaTitle: Discharged Ballista
+dischargedBallistaDescription: AA defense that served its purpose.
+dischargedBallistaFlavor: The massive Blood Bat crashed on the machine immediately after its deadly load pierced his chest.
+wingedSerpentNestTitle: Winged Serpent Nest
+wingedSerpentNestDescription: You can't really see what's at the summit, so be careful.
+wingedSerpentNestFlavor: None flew over the Winged Serpent nest.
+brokenTotemTitle: Broken Totem
+brokenTotemDescription: Sacred site that fell out of Rogash's grace.
+brokenTotemFlavor: Dark whispers emanate from the indigo flames...
+mercilessRenegadesTitle: Merciless Renegades
+mercilessRenegadesDescription: They're always available, for the right price.
+mercilessRenegadesFlavor: Not everyone who arrived at the archipelago under the imperial flag abides the will of the Emperor.
+titheCollectorTitle: Tithe Collector
+titheCollectorDescription: Give blood, receive blessing - as simple as that.
+titheCollectorFlavor: Rogash gives, Rogash takes away.
+reviveHeroToInfluencedCellDescription: Revive your Hero at any influenced cell.
+reviveHeroToInfluencedCellFlavor: Heroes arise to challenge fate and lead their brethren to battle.
+
+alroodTitle: Alrood
+alroodFlavor: And thus Maalaki's plan ultimately came to fruition; his spirit reborn in the mightly flesh of a chironite chieftain.
+crimsonOutriderTitle: Crimson Outrider
+crimsonOutriderDescription: A fast and furious warrior of the Crimson Horde.
+crimsonOutriderFlavor: Maalaki's gospel of infinite rebirths lures droves of Sanghoy warriors to Alrood's shaping corrals.
+riccFlavor: 'His sole motto: "To leave humanity behind."'
+
+minorUpgradeTitle: Minor Upgrade
+minorUpgradeDescription: Can be put into a Minor slot in the Upgrade Tree.
+minorUpgradeFlavor: Progress is man's ability to complicate simplicity.
+majorUpgradeTitle: Major Upgrade
+majorUpgradeDescription: Can be put into a Major slot in the Upgrade Tree.
+majorUpgradeFlavor: Choose carefully, so that your people aren't steered into dark waters...
+heroUpgradeTitle: Hero Upgrade
+heroUpgradeDescription: Slot it in the Hero's Upgrade Tree to unlock new abilities.
+heroUpgradeFlavor: If we stop growing, we are as good as dead.
+heroStatsTitle: Hero Stats +1
+heroStatsDescription: Increases all Hero stats by 1.
+heroStatsFlavor: Versatility is an extra string to a player's bow.
+buildWonderDescription: Puts a Wonder in your hand.
+buildWonderFlavor: Makes you Wonder what happens when you play it.
+darkWhispersTitle: Dark Whispers
+darkWhispersDescription: Stuns highest merit enemies.
+darkWhispersFlavor: The maddening voices are with you day and night, so much so that you start emanating them across the island...
+eldritchBlastTitle: Eldritch Blast
+eldritchBlastDescription: Allows your Hero to use the Eldritch Blast skill.
+eldritchBlastFlavor: The whishpers are now a part of your very being; they teach and guide you how to dismantle the barriers between worlds. Soon enough, you're able to manifest limbs of some strange creature to strike at your foes...
+summoningRiftTitle: Summoning Rift
+summoningRiftDescription: Adds a Vanguard to your hand.
+summoningRiftFlavor: With time, you feel empowered to bring forth into this world more than just slices of its infinite matter. Indigo flames burst from your body as a vanguard approaches...
+pathOfMaalakiFlavor: "All life must flow into other life, such is the way of Rogash. But Maalaki sought more: his own existence to emerge again and again in the ebbs and tides of the bloody dream."
+crimsonSkullFlailFlavor: After Maalaki was slain, his skull, crimson in color as it were made of living flesh, was turned into a sacrificial flail. It wasn't long before it started whispering dark things to its bearer...
+steelGraftingFlavor: Ricc's initial attempts at merging man and machine were a failure, with only 5% of candidates surviving the surgeries.
+
+## Sanghoy
+sanghoyName: Sanghoy
+sanghoyFlavor: Rogash dreams, and his dream is Nusantara
+
+sanghoyCampTitle: Sanghoy Camp
+sanghoyCampDescription: Base center. Generates gold, trains Thralls and Warriors and researches major upgrades. Exerts influence.
+sanghoyCampFlavor: Due to the perilous nature of the islands, these settlements are rarely permanent.
+warCouncilTitle: War Council
+warCouncilDescription: Trains Shadespears, Raiders, Mantlets and Blood Prowlers. Auto-attacks nearby enemies. Researches minor upgrades. Exerts influence.
+warCouncilFlavor: We're off to war again, right babe? Yep!
+totemTitle: Totem
+totemDescription: Trains Sarcomancers and Shapers. Produces Bloodlust. Researches minor upgrades. Exerts influence.
+totemFlavor: Even though it's dubious if Rogash channels His powers through totems, they do provide a source of inspiration to his discliples.
+runestoneOfRogashTitle: Runestone of Rogash
+runestoneOfRogashDescription: Trains and revives heroes.
+runestoneOfRogashFlavor: It is under this megalyth that greatest of Rogash's warriors rise.
+sacrificialWellTitle: Sacrificial Well
+sacrificialWellDescription: Allows for shaping of Cyclops and Forehorns. Can sacrifice friendly units for Blood.
+sacrificialWellFlavor: The putrid pit brims with flesh to power new life.
+thrallTitle: Thrall
+thrallDescription: Mines gold, builds and repairs all structures. Also good for sacrificing.
+thrallFlavor: Those that can't stand the ruthless routine of a Sanghoy slave are swiftly sent to fuel the dream.
+warriorTitle: Warrior
+warriorDescription: Basic warrior, good in large numbers. Great shaping target.
+warriorFlavor: While their armaments are crude, their numbers measure in tens of millions.
+shadespearTitle: Shadespear
+shadespearDescription: Ranged warrior that can quickly move through dense jungles.
+shadespearFlavor: A whisper among the leaves. A silence of birds.
+raiderTitle: Raider
+raiderDescription: Swift cavalry that gathers gold while attacking enemy structures. Can be promoted to Warchief.
+raiderFlavor: It didn't take long before raider hordes drove all the tribes back into the safety of forests and mountains.
+warchiefTitle: Warchief
+warchiefDescription: Powerful rider that increases the attack of nearby allies.
+warchiefFlavor: Only the most savage of raiders rise to lead their brethren to battle.
+mantletTitle: Mantlet
+mantletDescription: Slow siege weapon that does extra damage to buildings.
+mantletFlavor: Tear down their palisades! Burn their homes!
+bloodProwlerTitle: Blood Prowler
+bloodProwlerDescription: Heavy cavalry that gains speed and attack against damaged enemies.
+bloodProwlerFlavor: I've got the scent...
+sarcomancerTitle: Sarcomancer
+sarcomancerDescription: Supporting caster. Can heal, boost allies or curse enemies. Shapes amalgamations.
+sarcomancerFlavor: The Frenza estimated it would take them less than 20 years to colonize the Sanghoy archipelago. They didn't know about sarcomancers.
+shaperTitle: Shaper
+shaperDescription: Essential caster, shapes basic units into Beastmen.
+shaperFlavor: The shaping discipline is as arcane as it is terrifying.
+chironiteTitle: Chironite
+chironiteDescription: Powerful horseman (literally) with a ranged attack.
+chironiteFlavor: Raider tribes lived in such a tight communion with their horses that it was only a matter of time before a shaper decided to vow them even tighter.
+kavourosTitle: Kavouros
+kavourosDescription: Amphibious warrior that can be upgraded to carry troops.
+kavourosFlavor: When one of these horrors is captured, the Frenza usually boil it alive.
+bloodBatTitle: Blood bat
+bloodBatDescription: Medium flyer that regenerates when attacking.
+bloodBatFlavor: Giant jungle bats did have a taste for birds and smaller animals, but shaping turned their lust towards manflesh.
+cyclopsTitle: Cyclops
+cyclopsDescription: Mighty giant that does extra damage to buildings.
+cyclopsFlavor: A mountain of flesh; a sarcomancy gone wrong.
+beastlordTitle: Beastlord
+beastlordDescription: Beastman warchief, stronger and faster than its human variant.
+beastlordFlavor: Once leader of men, now alpha of the pack.
+amalgamTitle: Amalgam
+amalgamDescription: Strong attacker that loses health over time.
+amalgamFlavor: Have you ever heard the maddening shrieks of two wills in one body?
+cyclopsBaitDescription: Quite useless, except it summons a Cyclops when it dies.
+cyclopsBaitFlavor: He ate 20 people so far, why wouldn't he come out now?
+forehornTitle: Forehorn
+forehornDescription: Impenetrable beastman that can trample enemies.
+forehornFlavor: The charging Forehorns are notorious for turning on their tamers.
+
+pyracmonTitle: Pyracmon, the Unshackled
+pyracmonDescription: Offensive hero, great at dealing and absorbing punishment.
+pyracmonFlavor: Shapers usually retain control over their creations. Pyracmon crushed his shaper.
+kagaaluTitle: Kagaalu, the Devout
+kagaaluDescription: Supporting hero, boosts allies and sacrifices them for powerful effects.
+kagaaluFlavor: It is known that Rogash's will empowers some sarcomancers more than others, and Kagaalu is his favorite.
+maimTitle: Maim, the Beastmaster
+maimDescription: Defensive hero, adept at boosting allies through auras and warcries.
+maimFlavor: Rarely does a beastmorph have such a profound effect at transforming a previously weak warrior and weak chieftain.
+
+bloodlustDescription: Restores action points to friendly units.
+bloodlustFlavor: Rend and tear!
+sanghoyHordeDescription: Summon Warriors at the target location that die at the end of the turn.
+sanghoyHordeFlavor: Though normally extremely divided, a few Sanghoy tribes might come together to form relentless wave of violence.
+karrishSpellDescription: Massively increase the attack capabilities of target Warchief or Beastlord, and make them attack nearest enemy.
+karrishFlavor: In a world where the weak perish, only the strongest are called to lead.
+bloodToRogashDescription: Deal damage to lowest health units on the explored maps and gain Blood for each damaged.
+bloodToRogashFlavor: The wheel of life must spin.
+horribleMisshapingDescription: Discard units from hand and attach their attack and defense to the target.
+horribleMisshapingFlavor: A man with three torsos and six arms fights better. Supposedly.
+
+obsidianWeaponsDescription: Increases attack of your Camp and War Council units.
+obsidianWeaponsFlavor: A sharper weapon delivers a thousand cuts faster.
+slaveAuctionsDescription: Camps produce extra gold every turn.
+slaveAuctionsFlavor: Frenza scholars estimated that every fifth Sanghoy was enthralled at some point.
+strengthInUnityDescription: For each War Council you control, add a Warrior to your hand. Add Sanghoy Horde spell to your hand.
+strengthInUnityFlavor: Though normally extremely divided, a few Sanghoy tribes might come together to form relentless wave of violence.
+ironForgingDescription: Increases attack and defense of your Camp and War Council units.
+ironForgingFlavor: The few great tribes whose empires spanned entire islands had this knowledge in common.
+ransackersTitle: Ransackers
+ransackersDescription: Enables production of Mantlets. Add a Mantlet to your hand.
+ransackersFlavor: Did you hear the horses neighing? Did you see the villages set ablaze?
+karrishUpgradeDescription: Increases combat of your Warchiefs. Add Karrish spell to your hand.
+thunderousHoovesTitle: Thunderous Hooves
+thunderousHoovesDescription: Enables producton of Blood Prowlers.
+thunderousHoovesFlavor: Once you hear the thunder, they've already got the scent.
+onslaughtDescription: Increases speed and sight of your Camp, War Council and Totem units.
+onslaughtFlavor: Charge forward! Let none survive!
+reignOfBeastlordsTitle: Reign of Beastlords
+reignOfBeastlordsDescription: Allows Warchiefs to be shaped into Beastlords. Automatically shapes one Raider or Warchief into a Beastlord.
+reignOfBeastlordsFlavor: Some argue that the natural law of beastmen societies makes them more just.
+eyeToEyeClawToClawTitle: Eye to Eye, Claw to Claw
+eyeToEyeClawToClawDescription: Adds Claw to Claw Aura to Beastlords, that increases speed and regeneration of nearby Beastmen.
+eyeToEyeClawToClawFlavor: The tacit understanding between beastmen is what makes them so efficient in combat.
+tasteOfManfleshDescription: Adds life draining attack to all Beastmen.
+tasteOfManfleshFlavor: The man is the pinnacle of Rogash's creation, and through his body, other life can ascend.
+ritesOfRogashTitle: Rites of Rogash
+ritesOfRogashDescription: Reduces cost of Sarcomancy. Add Blood to Rogash spell to your hand.
+ritesOfRogashFlavor: Life emerges from the dream, and life goes back to it to emerge again, changed...
+theDreamFuelDescription: Provides infinite source of Blood that damages friendly units at the start of each turn.
+theDreamFuelFlavor: Blood fuels Rogash's dream, so blood must flow.
+harbingersOfChangeDescription: Increases speed of Shapers.
+harbingersOfChangeFlavor: The beauty of Rogash's creations is best appreciated when they're mixed together.
+excrescenceTitle: Excrescence
+excrescenceDescription: Reduces Blood cost of all shapings. Add Horrible Misshaping spell to your hand.
+excrescenceFlavor: Feel the flow of life, feel the flow of flesh...
+ePluribusUnumTitle: E pluribus unum
+ePluribusUnumDescription: Allows Sarcomancers to create Amalgams. Add Amalgam to hand.
+ePluribusUnumFlavor: Sometimes, it's the simplest of ideas that turn out the most terrifying.
+toTheSkiesDescription: Allows Warriors && Shadespears to fly, but prevents them from retaliating.
+thickShellTitle: Thick Shell
+thickShellDescription: Allows Kavouri to load units and increases their defense.
+thickShellFlavor: The shell might be thick, but the limbs are still thin. Loading a Cyclops requires a 'Gym Session' upgrade.
+toTheSkiesFlavor: Onward and upward!
+beastmasteryTitle: Beastmastery
+beastmasteryDescription: Add 2 Cyclops Baits to your hand.
+beastmasteryFlavor: It is said that all men seek purpose, but only some find it in savagery.
+shapingCorralDescription: At the start of each turn, cheaply shape a Raider to a Chironite.
+shapingCorralFlavor: After shaping is done, it's the animal part that governs the behavior of a beastman.
+daringTamersTitle: Daring tamers
+daringTamersDescription: Allows Shapers to produce Forehorns. If you have 4 Blood, automatically shape a Warrior into a Forehorn.
+daringTamersFlavor: The will of the shaper often isn't enough to restrain the newly-created brute.
+
+groundSlamL1Title: Ground Slam L1
+groundSlamDescription: Deals damage to nearby enemies.
+groundSlamFlavor: Aaaaargh! -Ground
+groundSlamL2Title: Ground Slam L2
+groundSlamL2Description: Increases damage and radius.
+bashL1Title: Bash L1
+bashDescription: Deals heavy damage to a single target and stuns it.
+bashFlavor: When that club flies high, you really don't want to be around.
+bashL2Title: Bash L2
+bashL2Description: Increases damage dealt.
+smiteDescription: Cripples the attacked enemy by reducing speed, defense and inflicting damage over time.
+smiteFlavor: One good hit and you're out. Unless you're a Forehorn.
+kagaalusSarcomancyL2Title: Kagaalu's Sarcomancy L2
+kagaalusSarcomancyL2Description: Increases attack and defense (de)buff.
+kagaalusSarcomancyFlavor: The secret ingredient is mint, mixed with some garlic.
+kagaalusSarcomancyL3Title: Kagaalu's Sarcomancy L3
+kagaalusSarcomancyL3Description: Further increases attack and defense (de)buff.
+sacrificeOfHealthDescription: Destroy a friendly unit to heal nearby allies.
+sacrificeOfHealthFlavor: Might as well call it transfusion.
+sacrificeOfVigorDescription: Destroy a friendly unit to restore action points of nearby allies.
+sacrificeOfVigorFlavor: Are they running because of the spell or because their friend just got sliced?
+sacrificeOfDeathDescription: Destroy a friendly unit to deal damage to all nearby enemies.
+sacrificeOfDeathFlavor: Once the wheel start spinning, it's difficult to stop it.
+ferocityAuraL1Title: Ferocity Aura L1
+ferocityAuraDescription: Increases defense capabilities of nearby allies.
+ferocityAuraFlavor: A beast doesn't go down without a fight.
+ferocityAuraL2Title: Ferocity Aura L2
+ferocityAuraL2Description: Further increases the defense and retaliation of allies unity.
+beastmastersWarcryL1Title: Beastmaster's Warcry L1
+beastmastersWarcryDescription: Temporarily increases attack capabilities of nearby allies.
+beastmastersWarcryFlavor: Not to be confused with Beastmaster's Matingcry.
+beastmastersWarcryL2Title: Beastmaster's Warcry L2
+beastmastersWarcryL2Description: Further increases attack capabilities of affected allies.
+leapAttackL1Title: Leap Attack L1
+leapAttackDescription: Jump to a vacant cell next to the target and deal damage to it.
+leapAttackFlavor: By fang and claw!
+leapAttackL2Title: Leap Attack L2
+leapAttackL2Description: Increases range and damage of the strike.
+
+## Frenza
+frenzaName: Frenza
+frenzaFlavor: One realm, from sunrise to sunset
+
+colonialHallTitle: Colonial Hall
+colonialHallDescription: |
+  Center of a Frenza colony. Produces settlers and constructs buildings, pays tribute and researches upgrades.
+  Generates gold based on number of nearby buildings. Can raise Colonial Militia.
+colonialHallFlavor: Organized community alleviates hardships of everyday life.
+barracksTitle: Barracks
+barracksDescription: Produces infantry units. Boosts Colonial Militia in nearby colony.
+barracksFlavor: What's on the menu today? Owl shit, what did you think?
+factoryTitle: Factory
+factoryDescription: Produces mechanized walkers and vehicles. Boosts gold generation of nearby colony.
+factoryFlavor: Industry feeds war. War feeds industry.
+airfieldTitle: Airfield
+airfieldDescription: Produces flying airships and paradrop operations. Boosts gold genration of nearby colony.
+airfieldFlavor: Frenza thalassotheology teaches that the skies are just the other half of the seas, equally worth sailing and exploring.
+magistratesCourtTitle: Magistrates Court
+magistratesCourtDescription: Trains and revives Heroes. Requisitions Imperial shipments.
+magistratesCourtFlavor: The shipments aren't expensive by themselves, but Frenza Empire has a flat 30% VAT on everything.
+monumentToSettlersTitle: Monument to settlers
+monumentDescription: Produces Favor each turn depending on its size.
+monumentToSettlersFlavor: Normally, settlers wouldn't erect monuments to themselves, but that's how the governors have decided to spend their taxpayer coins.
+monumentToLegionsTitle: Monument to legions
+monumentToLegionsFlavor: Those few soldiers that reached retirement age usually spend their days near these statues, drinking and demanding higher pensions.
+monumentToGovernorsTitle: Monument to governors
+monumentToGovernorsFlavor: In almost all instances, this is a Monument to a governor.
+monumentToTheEmperorTitle: Monument to the Emperor
+monumentToTheEmperorFlavor: This one basically generates Favor by itself.
+monumentToTheSeasTitle: Monument to the Seas
+monumentToTheSeasFlavor: By the law, no edifice in the colony can be taller than this.
+plantationTitle: Plantation
+plantationDescription: Generates a small amount of Gold each turn.
+plantationFlavor: Most colonial settlers perish from ilnesses trying to cultivate the wild land.
+settlerTitle: Settler
+settlerDescription: Mines gold and repairs buildings. Can found Colonies and Plantations.
+settlerFlavor: Most colonists have volunteered to move to the distant archipelago to escape the widespread poverty.
+colonialMilitiaTitle: Colonial militia
+colonialMilitiaDescription: Can fight, I guess.
+colonialMilitiaFlavor: In reality, the colonists can rarely rely on the Imperial Army to protect them in times of need.
+riflemanTitle: Rifleman
+riflemanDescription: Durable ranged infantry. Can be upgraded to form the backbone of the army even in the late game.
+riflemanFlavor: Countless legions of Frenza Riflemen form the backbone of the Endless Expansion.
+dragoonTitle: Dragoon
+dragoonDescription: Mounted Rifleman. Can dismount.
+dragoonFlavor: C'mon, Roach!
+assassinTitle: Assassin
+assassinDescription: Fragile infantry with a strong, poisonous attack. Can sabotage enemy buildings.
+assassinFlavor: It is said that a single Assassin can do more for the Empire than a legion of riflemen.
+steamGolemTitle: Steam golem
+steamGolemDescription: Mechanical walker that can stun enemies.
+steamGolemFlavor: A fairly crude and weak contraption, but well suited for the rough terrain of the Archipelago.
+devilhornTankTitle: Devilhorn tank
+devilhornTankDescription: Powerful mechanized unit.
+devilhornTankFlavor: The fabled Imperial Armored Divisions are yet to crack the densely-forested islands and prove their worth.
+mevTitle: M.E.V.
+mevDescription: Support vehicle, heals and improves nearby infantry.
+mevFlavor: 'Can a Sarcomancer stitch you up?'
+autoturretTitle: Autoturret
+autoturretDescription: Defense structure that can relocate when necessary.
+autoturretFlavor: The Enkio Heavy Industries were so confident in the quality of their turrets that they offered a 5 year full replacement warranty on all of them.
+assaultAirshipTitle: Assault airship
+assaultAirshipDescription: Flying melee unit with multiple attacks.
+assaultAirshipFlavor: While their ordnance is deadly, they aren't fast enough to outrun a swarm of Bloodbats.
+cargoDirigibleTitle: Cargo dirigible
+cargoDirigibleDescription: Airborne transport that exerts a small influence zone.
+cargoDirigibleFlavor: Instead of firepower, manpower.
+imperialJuggernautTitle: Imperial juggernaut
+imperialJuggernautDescription: Powerful champion that can generate Favor and perform a deadly self-destruct sequence.
+imperialJuggernautFlavor: A walking tank, crewed by fanatics.
+colossusTankTitle: Colossus Tank
+colossusTankDescription: Powerful vehicle that becomes useless when damaged.
+colossusTankFlavor: The difficult logistics of the Sanghoy conquest rendered powering these land fortresses nigh impossible.
+citadelWalkerTitle: Citadel Walker
+citadelWalkerDescription: High-defense walker with a high-frequency-low-yield attack.
+citadelWalkerFlavor: While the primary purpose of this vehicle is to transport Colossus Tank's brass to safety, its numerous rifle slits make it great for safaris as well.
+voltTankTitle: Volt Tank
+voltTankDescription: Close-range tank whose attack jumps to nearby enemies and damages them.
+voltTankFlavor: Twin coils were a popular execution method long before someone decided to put them on a tank chasis.
+voltWalkerTitle: Volt Walker
+voltWalkerDescription: Faster than Steam Golem and with a close-range attack that jumps from one enemy to another for extra damage.
+voltWalkerFlavor: Deadly dicharges were just a fortunate side-effect of trying to improve Steam Golems with novel lightning-powered motors.
+
+tofanTitle: Tofan, the Plaguebringer
+tofanDescription: Deadly hero that can poison masses of enemies.
+tofanFlavor: Tofan hopes to hit a seven digit death toll in the next five years.
+denburhinTitle: Denburhin, the Flagship
+denburhinDescription: Lazy man's hero that grows more powerful with a swathe of passive upgrades.
+denburhinFlavor: The ship itself may not be much, but its crew is said to be the finest in all of Skyfleet.
+vitarronTitle: Vitarron, the Viceroy
+vitarronDescription: Economic hero that provides Valiant Promotion and can improve productivity.
+vitarronFlavor: His is perfectly qualified for his job by the virtue of being the Emperor's second cousin.
+
+valiantPromotionDescription: At the end of each turn, restore Health and gain Favor.
+valiantPromotionFlavor: The Empire is proud of recognizing the vliant efforts of its servants and rewarding them accordingly.
+paradropDescription: Summon a Rifleman on any revealed cell.
+paradropFlavor: The first time paratroopers were deployed in the colonization effort, several tribes immediatelz surrendered to the might of the flying men.
+endlessExpansionShipmentDescription: Summon a Colonial Hall and some Settlers.
+endlessExpansionShipmentFlavor: '"Every shore touched by the great sea is yours for the taking."'
+eradicateThePestShipmentDescription: Summon several Assassins.
+eradicateThePestShipmentFlavor: When rat infestation becomes rampant, experts are called to take care of the matter.
+airSuperiorityShipmentDescription: Summon a Cargo Dirigible and some Assault Airships.
+airSuperiorityShipmentFlavor: This used to mean something, back in the day when nobody knew of Bloodbats.
+emperorsFistShipmentDescription: Summon an Imperial Juggernaut.
+emperorsFistShipmentFlavor: '"I am the hammer of Mankind! I am the fury of a thousand years! Cower now, mongrels, and despair, as my might cannot be matched!"'
+theCullingDescription: For the next 2 turns, whenever your units kill an enemy, they gain Favor.
+scrapyardColossusShipmentTitle: Scrapyard colossus shipment
+
+theNextGenerationDescription: Send a shipment that summons a Settler for every 3 owned Settlers.
+theNextGenerationFlavor: To boldly go where thousands have gone before.
+taxCollectorsDescription: Gain gold for every influenced cell. Pay 30% more upkeep.
+taxCollectorsFlavor: Tyranny is never cheap.
+masterSculptorsDescription: Gain Favor and half the cost of your first two monuments.
+masterSculptorsFlavor: A testament to their craft is that Sanghoy conquerors usually transport the monuments to their camps to serve as Rogash's totems.
+hardenedVeteransDescription: Give Veterancy to all your wounded Riflemen. Send a shipment of Veteran Riflemen.
+hardenedVeteransFlavor: Just a few months in the Sanghoy threater provides a lifetime of horrors.
+horsebackTrainingTitle: Horseback training
+horsebackTrainingDescription: Riflemens can morph to Dragoons (and vice-versa) without paying AP. Morphed dragoons/riflemen retain APs.
+horsebackTrainingFlavor: I fear no enemy! For the Empire is my strength! I fear not death. For our strength is eternal.
+sniperSchoolTitle: Sniper school
+sniperSchoolDescription: Allows assassins to use the Sniper stance.
+sniperSchoolFlavor: One man can change the world with a bullet in the right place.
+deathSquadsDescription: Add the culling spell to your hand. Promote your Riflemen and Dragoons to Veterancy.
+deathSquadsFlavor: More often than not, it's better to just burn the village down than to maintain an occupational force.
+superspreadDescription: Infect all your current and future Riflemen, Dragoons and Assassins with Plague Seeds. Your units take 10 times less damage per turn from plague.
+superspreadFlavor: Tofan quickly realized that the plague spreads faster if its hosts live longer.
+infantryFormationsTitle: Infantry formations
+infantryFormationsDescription: Allows Rifleman to use advanced formations.
+infantryFormationsFlavor: There stands a Rifleman next to a Rifleman, all brethren.
+viciousVanguardDescription: Enables you to transport your Rifleman via Airlifts. Add a Paradrop to hand.
+viciousVanguardFlavor: Great is the honor of those who pave the way of the Endless Expansion.
+heliumPocketsTitle: Helium pockets
+heliumPocketsDescription: Increases speed and sight of Cargo Dirigibles.
+heliumPocketsFlavor: The sun gas is precious, but so moving troops around.
+uncommonValorTitle: Uncommon valor
+uncommonValorDescription: Give Veterancy to wounded units at the start of each turn. Hand out some Valiant Promotions.
+uncommonValorFlavor: The Emperor inspires such devotion in his servants that it's only a matter of time before one of them does a great deed.
+intensiveIndustrializationDescription: Restores actions of your factories and airfields. Allows factories to use Overtime stance.
+intensiveIndustrializationFlavor: |
+  Fiery dawns wake me from my sleep.
+  Factory mornings, the smoke from chimneys.
+theThirdShiftDescription: Adds more action points to Factories, but prevents Colonial Halls from gaining gold for them.
+theThirdShiftFlavor: When the warcries sound in the jungle, profit becomes secondary.
+automatedDefensesTitle: Automated defenses
+automatedDefensesDescription: Enables production of Autoturrets. Add an Autoturret to your hand.
+automatedDefensesFlavor: Enkio Heavy Industries were so confident in their product that they offered a two-year replacement guarantee on all of their defense turret units.
+engineKitsTitle: Engine kits
+engineKitsDescription: Redues production times of Steam Golems, MEVs and Devilhorn Tanks.
+engineKitsFlavor: While the idea was initially met with some resistance, shifting production directly to the front-line colonies helps ensure their survival and continous Expansion.
+combatEngineersTitle: Combat engineers
+combatEngineersDescription: Greatly reduces cost of building roads. Allows Devilhorn and Volt Tanks to build Roads.
+combatEngineersFlavor: Even though their service isn't seen as equally worthy, soldiers from the engineering regiments are the true vanguard of the Endless Expansion.
+scrapyardColossusTitle: Scrapyard colossus
+scrapyardColossusDescription: Add a damaged Colossus Tank to your hand.
+scrapyardColossusFlavor: The deprecation on these is quite high since they're a never-ending cesspool of repairs.
+harnessingTheLightningTitle: Harnessing the lightning
+harnessingTheLightningDescription: Doubles the gold Colonial Halls gain from Factories. Allows Devilhorn Tanks to retrofit to Volt Tanks. Cheaply adds a Volt Tank to your hand.
+harnessingTheLightningFlavor: 'Every man can create fire, but wielding lightning is truly god-like!'
+differentialMachinesTitle: Differential machines
+differentialMachinesDescription: Allows Devilhorn Tanks to use long-range Howitzer stance.
+differentialMachinesFlavor: They're surely handy for computing shell trajetories, who knows what else they might be useful for.
+voltWalkersTitle: Volt Walkers
+voltWalkersDescription: Allows Steam Golems to retrofit to Volt Walkers. Automatically morphs one Steam Golem into Volt Walker.
+voltWalkersFlavor: Refueling coal is still a lot faster than recharging.
+
+noxiousCloudL1Title: Noxious Cloud L1
+noxiousCloudDescription: Deals damage to all organic units in area, with extra poisonous damage over time.
+noxiousCloudFlavor: Breathe in...
+noxiousCloudL2Title: Noxious Cloud L2
+noxiousCloudL2Description: Increases base damage and poison damage duration.
+noxiousCloudL3Title: Noxious Cloud L3
+noxiousCloudL3Description: Furhter increases base damage and poison damage duration.
+tofansKissL1Title: Tofan's kiss L1
+tofansKissDescription: Poison a unit to take heavy damage over time.
+tofansKissFlavor: In his defense, he does say 'No homo' after each cast.
+tofansKissL2Title: Tofan's kiss L2
+tofansKissL2Description: Increases damage and duration.
+tofansKissL3Title: Tofan's Kiss L3
+tofansKissL3Description: Further increases damage and duration.
+plagueSeedsDescription: Infect a unit to take heavy damage over time. Each turn, it infects all nearby organic units who aren't already infected.
+plagueSeedsFlavor: Even if the tribe survives, it ends up spread so thin that hunting it down becomes a child's play.
+reinforcedHullTitle: Reinforced hull
+reinforcedHullDescription: Increases defense.
+reinforcedHullFlavor: At least Bloodbats can't tear through the fabric anymore.
+repairCrewsTitle: Repair crews
+repairCrewsDescription: Increases regeneration.
+repairCrewsFlavor: It takes a true daredevil to fix a hull breach from the outside at 30 thousand feet.
+fireBrigadeTitle: Fire brigade
+fireBrigadeDescription: Significantly increases regeneration while at low health.
+fireBrigadeFlavor: They had more work back when the baloon was filled with hydrogen.
+improvedOnboardingTitle: Improved onboarding
+improvedOnboardingDescription: Increases Recrew effect.
+improvedOnboardingFlavor: Basically, they don't send freshly recruited farmers to do in-flight repairs, like they used to.
+battleStationsTitle: Battle stations
+battleStationsDescription: Increases attack count.
+battleStationsFlavor: Red alert! Crew to battle stations!
+whereTheEmperorsWillLeadsUsTitle: Where the Emperor's will leads us
+whereTheEmperorsWillLeadsUsDescription: Increases speed.
+whereTheEmperorsWillLeadsUsFlavor: Watch the horizon at dawnbreak...
+antiAirTurrets: Anti-air turrets
+antiAirTurretsDescription: Extra damage to flying units.
+antiAirTurretsFlavor: Air marshalls didn't deem this feature necessary as nobody but the Frenza Empire has a sky fleet. Bloodbats and Harpies disagreed...
+bombAutoloaderTitle: Bomb autoloader
+bombAutoloaderDescription: Extra damage to ground units.
+bombAutoloaderFlavor: It also assures that fewer crewmen are accidentaly dropped alongside the deadly payload.
+incendiaryPayloadTitle: Incendiary payload
+incendiaryPayloadDescription: Extra damage to buildings.
+incendiaryPayloadFlavor: The Sanghoy were terrified of the fire that burns despite heavy wind and rain.
+aimForTheSunL1Title: Aim for the Sun L1
+aimForTheSunDescription: Long-range jump to an empty cell that damages the ship.
+aimForTheSunFlavor: ...if you miss, you'll still end up far from danger.
+aimForTheSunL2Title: Aim for the Sun L2
+aimForTheSunL2Description: Increases jump range and decreases damage taken.
+governanceAuraL1Title: Governance aura L1
+governanceAuraDescription: Increases speed of nearby workers and production buildings.
+governanceAuraFlavor: "'Servitude is both duty and honor.'"
+governanceAuraL2Title: Governance aura L2
+governanceAuraL2Description: Increases aura range and speed gain.
+governanceAuraL3Title: Governance aura L3
+governanceAuraL3Description: Furhter increases aura range and speed gain.
+insurrectionDescription: Rebel against the Empire to destroy your production capacities in favor of a stronger military.
+insurrectionFlavor: The dice is cast...
+
+# Scenarios
+testScenarioTitle: Test Scenario
+testScenarioDescription: Some test scenario
+basicTutorialTitle: Basic Tutorial
+basicTutorialDescription: Learn basics of playing the game!
+
+# Bots
+easyAiTitle: Easy AI
+normalAiTitle: Normal AI
+hardAiTitle: Hard AI
+
+# Otok
+
+kanboorTheDevourerTitle: Kanboor, the Devourer
+kanboorFlavor: She started out as a promising sarcomancer, but her cannibalistic ways were soon shunned by all the tribes on the island.
+nepentaTheCarnivoraTitle: Nepenta, the Carnivora
+nepentaFlavor: In the Sanghoy archipelago, even plants have developed a taste for manflesh.
+nubvaatTheExiledProphetTitle: Nubvaat, the Exiled Prophet
+nubvaatFlavor: Her desire to prevent events from her visions from unfolding ultimately drew her to madness.
+calamityOnTheHorizonTitle: Calamity on the Horizon
+calamityOnTheHorizonFlavor: Some chieftains advised against open war, and called for the tribes to unite and retreat to the safety of mountain ranges.
+monsoonTitle: Monsoon
+monsoonFlavor: It'll soon shake your windows and rattle your walls...
+unclaimedIslandTitle: Unclaimed Island
+unclaimedIslandFlavor: Not many of those are left, I'm affraid.
+
+pyracmonTheSlammerTitle: Pyracmon, the Slammer
+pyracmonTheBasherTitle: Pyracmon, the Basher
+pyracmonTheBrawlerTitle: Pyracmon, the Brawler
+kagaaluTheSarcomancerTitle: Kagaalu, the Sarcomancer
+kagaaluTheSacrificerTitle: Kagaalu, the Sacrificer
+maimTheChieftainTitle: Maim, the Chieftain
+maimTheBeastmasterTitle: Maim, the Beastmaster
+warchiefTonkaaTitle: Warchief Tonkaa
+warchiefTonkaaFlavor: If this brave fool didn't go to the beach to investigate the thunder, who knows how would the events at the Mouth of Dair unfold?
+sharzTheRagerTitle: Sharz, the Rager
+sharzTheRagerFlavor: To some cannibalistic Sanghoy, beastshaping is a god-sent gift.
+bloodGorgerTitle: Blood Gorger
+bloodGorgerFlavor: Their shrieks tear through the night sky...
+bloodBatAnatomistTitle: Bloodbat Anatomist
+bloodBatAnatomistFlavor: Bloodbats don't like to be studied.
+
+denburhinTheFlagshipTitle: Denburhin, the Flagship
+denburhinBattleHardenedTitle: Denburhin, Battle Hardened
+tofanThePlaguebringerTitle: Tofan, the Plaguebringer
+tofanThePoisonmasterTitle: Tofan, the Poisonmaster
+vitarronTheViceroyTitle: Vitarron, the Viceroy
+vitarronTheUsurperTitle: Vitarron, the Usurper
+vitarronPowerHungyTitle: Vitarron, Power Hungry
+elleoTheSniperTitle: Elleo, the Sniper
+elleoTheSniperFlavor: Taking the usurper's head was a fitting reward for his prodigious service.
+anatteaCorpsOfficerTitle: Anattea Corps Officer
+anatteaCorpsOfficerFlavor: In the Frenza military, same people run sanatories and scrapyards.
+imperialCommissarTitle: Imperial Commissar
+imperialCommissarFlavor: Some men enjoy being loathed by their subordinates.
+platingExpertTitle: Plating Expert
+platingExpertFlavor: Sounds way better and cooler than just 'blacksmith'!
+airshipCarrierTitle: Airship Carrier
+airshipCarrierFlavor: More than a few Sanghoy mistook these floating cities for newly-formed islands.

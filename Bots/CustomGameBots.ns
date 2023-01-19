@@ -1,0 +1,1350 @@
+import "CommonBots"
+import "../Effects/CommonEffects"
+
+FACTION_PARAMS = [
+  sanghoy: [
+    miner: "thrall",
+    builders: ["thrall"],
+    minerProducer: "sanghoyCamp",
+    buildMinerProducerSkill: "buildSanghoyCamp",
+    minerProduceSkill: "trainThrall",
+    collectGoldConsiderations: [
+        [condition: => Game.currentPlayer.resources.g < 10, score: 0.4],
+        [condition: => Game.currentPlayer.resources.g < 20, score: 0.4],
+        [condition: => Game.currentPlayer.resources.g > 20, score: 0.3]
+    ],
+    builderProducer: "sanghoyCamp",
+    builderProduceSkill: "trainThrall",
+    heroProducer: "runestoneOfRogash",
+    buildHeroProducerSkill: "buildRunestoneOfRogash",
+    heroProduceSkills: ["trainKagaalu", "trainPyracmon", "trainMaim"],
+    minorUpgradeProducers: ["warCouncil", "totem"],
+    majorUpgradeProducers: ["sanghoyCamp"],
+    unitProducers: [sanghoyCamp: 0.2, warCouncil: 0.45, totem: 0.35],
+    buildUnitProducerSkills: [sanghoyCamp: "buildSanghoyCamp", warCouncil: "buildWarCouncil", totem: "buildTotem"],
+    trainUnitSkills: [
+      sanghoyCamp: [
+        trainWarrior: ["warrior", 10]
+      ],
+      warCouncil: [
+        trainShadespear: ["shadespear", 10],
+        trainRaider: ["raider", 10],
+        trainMantlet: ["mantlet", 3],
+        trainBloodProwler: ["bloodProwler", 10]
+      ],
+      totem: [
+        trainSarcomancer: ["sarcomancer", 3],
+        trainShaper: ["shaper", 3]
+      ]
+    ],
+    nonHeroCasters: ["shaper", "sarcomancer", "raider", "thrall", "sacrificialWell", "totem"],
+    spells: ["bloodlust", "sanghoyHorde", "karrish", "bloodToRogash", "horribleMisshaping"]
+  ],
+  frenza: [
+    miner: "settler",
+    builders: ["settler", "colonialHall"],
+    minerProducer: "colonialHall",
+    buildMinerProducerSkill: "foundColony",
+    minerProduceSkill: "trainSettler",
+    collectGoldConsiderations: [
+        [condition: => Game.currentPlayer.resources.g < 10, score: 0.4],
+        [condition: => Game.currentPlayer.resources.g < 20, score: 0.3],
+        [condition: => Game.currentPlayer.resources.g < 30, score: 0.2],
+        [condition: => Game.currentPlayer.resources.g > 30, score: 0.3]
+    ],
+    builderProducer: "settler",
+    builderProduceSkill: "foundColony",
+    heroProducer: "magistratesCourt",
+    buildHeroProducerSkill: "buildMagistratesCourt",
+    heroProduceSkills: [#*"trainVitarron",*# "trainTofan", "trainDenburhin"],
+    minorUpgradeProducers: ["factory", "barracks"],
+    majorUpgradeProducers: ["colonialHall"],
+    unitProducers: [barracks: 0.25, factory: 0.375, airfield: 0.375],
+    buildUnitProducerSkills: [barracks: "buildBarracks", factory: "buildFactory", airfield: "buildAirfield"],
+    trainUnitSkills: [
+      barracks: [
+        trainRiflman: ["rifleman", 10],
+        trainAssassin: ["assassin", 3]
+      ],
+      factory: [
+        trainSteamGolem: ["steamGolem", 5],
+        trainDevilhornTank: ["devilhornTank", 5],
+        trainMEV: ["mev", 1],
+        traiAutoturret: ["autoturret", 2]
+      ],
+      airfield: [
+        trainAssaultAirship: ["assaultAirship", 5],
+        trainCargoDirigible: ["cargoDirigible", 1]
+      ]
+    ],
+    nonHeroCasters: ["settler", "rifleman", "assassin", "dragoon", "steamGolem", "devilhornTank", "voltTank", "mev", "assaultAirship",
+      "colonialHall", "airfield", "magistratesCourt"],
+    spells: ["valiantPromotion", "paradrop", "endlessExpansionShipment", "airSuperiorityShipment", "eradicateThePestShipment",
+      "emperorsFistShipment", "theNextGenerationShipment", "hardenedVeteransShipment", "theCulling", "scrapyardColossusShipment"]
+  ]
+]
+
+ADD_MAJOR_UPGRADE = "addMajorUpgrade"
+ADD_MINOR_UPGRADE = "addMinorUpgrade"
+
+MAX_SKILL_CASTERS_TO_ANALYZE = 4
+MAX_STANCE_CHANGES_TO_ANALYZE = 4
+MAX_INTERACTORS_TO_ANALYZE = 2
+
+ai MeleeAi is ValueAi {
+  approachScoreForEnemy => 0.58
+  approachScoreForCreep => 0.52
+
+  computeActions => @commonActions(FACTION_PARAMS.(Game.currentPlayer.faction))
+
+  commonActions(params) {
+    player = Game.currentPlayer
+    playableCards = player.hand.where(=> $0.downtime == 0)
+    playableUnits = playableCards.where( => $0.type.type == "unit")
+    influencedCells = Game.grid.visibleCells(player).where(=> $0.influencer == player.id)
+    emptyInfluencedCells = influencedCells.where(=> $0.content == null)
+    knownGoldSources = Game.grid.visibleCells(player).where(fn (cell) => cell.content?.extras?.first(=> $0.id == "mineableGold")?.value ?? 0 > 0)
+
+    miners = player.ownedUnits.where(=> $0.type.id == params.miner)
+    minersThatCanMove = miners.where(=> !$0.movementRange.isEmpty)
+    minersAtGoldSource = miners.where(fn (miner) => knownGoldSources.any(fn (source) => source.distance(miner.coordinates) == 1))
+    minerProducers = player.ownedUnits.where(=> $0.type.id == params.minerProducer)
+
+    builders = player.ownedUnits.where(=> $0.type.id in params.builders)
+    buildersWithAp = builders.where(=> $0.ap > 0)
+    builderProducers = player.ownedUnits.where(=> $0.type.id == params.builderProducer)
+
+    heroProducer = player.ownedUnits.first(=> $0.type.id == params.heroProducer)
+    heroProducerCard = player.hand.first(=> $0.type.id == params.heroProducer)
+    hero = player.hero
+
+    unitProducers = player.ownedUnits.where(=> $0.type.id in params.unitProducers.keys)
+
+    soldiers = player.ownedUnits.where(=> $0.ap > 0 && $0.type.a > 0)
+    creeps = Game.grid.visibleCells(player).where(=> $0.content != null && $0.content.owner.id == Game.nature.id \
+      && $0.content.type.a > 0 && $0.content.type?.interactionEffect == null)
+    enemies = Game.grid.visibleCells(player).where(=> $0.content != null && $0.content.owner.id != Game.nature.id && !player.isAllyOf($0.content))
+
+    return [
+      @collectGold(minersAtGoldSource, knownGoldSources, params.collectGoldConsiderations),
+      @buildMinerProducer(builders, minerProducers, params.buildMinerProducerSkill),
+      @buildMiner(miners, minerProducers, params.miner, params.minerProduceSkill),
+      @moveToGold(miners, minersThatCanMove, knownGoldSources),
+
+      @researchUpgrade(params.majorUpgradeProducers, params.minorUpgradeProducers),
+      @playUpgrade(playableCards),
+
+      @buildHeroProducer(hero, heroProducer, heroProducerCard, buildersWithAp, params.buildHeroProducerSkill),
+      @playHeroProducerCard(heroProducerCard, emptyInfluencedCells),
+      @trainHero(hero, heroProducer, params.heroProduceSkills.randomItem),
+      @reviveHero(hero, heroProducer),
+      @upgradeHero(hero, playableCards),
+
+      @buildUnitProducer(builders, unitProducers, params.unitProducers, params.buildUnitProducerSkills),
+      @trainUnit(unitProducers, params.trainUnitSkills, hero, heroProducer),
+      @playUnit(playableUnits, emptyInfluencedCells, knownGoldSources, params),
+
+      @explore(player),
+      @attack(hero, soldiers, enemies, needsHero: false, attackScore: 0.7, approachScoreForEnemy(), type: "enemy"),
+      @attack(hero, soldiers, creeps, needsHero: true, attackScore: 0.6, approachScoreForCreep(), type: "creep"),
+      @castSkill(player, params.nonHeroCasters),
+      @castSpell(player, playableCards, params.spells, enemies),
+      @changeStance(hero, soldiers, enemies),
+      @interact(player),
+
+      @concede(player, playableCards, miners, hero, heroProducer, unitProducers, soldiers)
+    ]
+  }
+
+  collectGold(minersAtGoldSource, knownGoldSources, goldConsiderations) {
+    if minersAtGoldSource.isEmpty {
+      return REJECTED_ACTION
+    }
+    minersThatCanMine = minersAtGoldSource.where(=> $0.ap >= 2) # TODO change to read skill effect cost
+    if minersThatCanMine.isEmpty {
+      return REJECTED_ACTION
+    }
+    randomMiner = minersThatCanMine.randomItem
+    adjacentMine = knownGoldSources.first(=> $0.distance(randomMiner.coordinates) == 1)
+    return [
+      considerations: goldConsiderations,
+      run: fn {
+        Console.println("Mining")
+        Server.cast(randomMiner, adjacentMine.coordinates, "mineGold")
+      }
+    ]
+  }
+
+  buildMinerProducer(builders, minerProducers, skillId) {
+    builder = builders.first(=> skillCanBeCast(Game.currentPlayer, $0, skillId))
+    return if builder == null {
+      REJECTED_ACTION
+    } else {
+      [
+        considerations: [
+          [condition: true, score: 1 - 0.9 * minerProducers.size]
+        ],
+        run: fn {
+          Console.println("Building miner producer")
+          Server.cast(builder, null, skillId)
+        }
+      ]
+    }
+  }
+
+  buildMiner(miners, minerProducers, minerId, skillId) {
+    producer = minerProducers.first(=> skillCanBeCast(Game.currentPlayer, $0, skillId))
+    if producer == null {
+      return REJECTED_ACTION
+    }
+    minersCount = miners.size + Game.currentPlayer.hand.count(=> $0.type.id == minerId)
+    return [
+      considerations: [
+        [condition: true, score: 1 - 0.2 * minersCount]
+      ],
+      run: fn {
+        Console.println("Training miner")
+        Server.cast(producer, null, skillId)
+      }
+    ]
+  }
+
+  moveToGold(allMiners, minersThatCanMove, knownGoldSources) {
+    if knownGoldSources.isEmpty || minersThatCanMove.isEmpty {
+      return REJECTED_ACTION
+    }
+    minersNotAtGoldSource = minersThatCanMove.where(fn (miner) => !knownGoldSources.any(fn (source) => source.distance(miner.coordinates) == 1))
+    if minersNotAtGoldSource.isEmpty {
+      return REJECTED_ACTION
+    }
+
+    randomMiner = minersThatCanMove.randomItem
+    minerRange = randomMiner.movementRange
+    minerLocation = randomMiner.coordinates
+    nearestGold = knownGoldSources.minBy(=> $0.distance(minerLocation)).coordinates
+    target = minerRange.minBy(=> $0.distance(nearestGold)).coordinates
+    return [
+      considerations: [
+        [condition: Game.currentPlayer.resources.g < 10, score: 0.6],
+        [condition: Game.currentPlayer.resources.g < 20, score: 0.3],
+        [condition: Game.currentPlayer.resources.g > 20, score: 0.1],
+        [condition: true, score: -0.2 * (allMiners.size - minersNotAtGoldSource.size)]
+      ],
+      run: fn {
+        Console.println("Moving towards mine")
+        Server.move(minerLocation, target, randomMiner.movementCost(target))
+      }
+    ]
+  }
+
+  researchUpgrade(majorProducerIds, minorProducerIds) {
+    units = Game.currentPlayer.ownedUnits
+    majorUpgradeProducer = units.first(=> $0.type.id in majorProducerIds && skillCanBeCast(Game.currentPlayer, $0, ADD_MAJOR_UPGRADE))
+    if majorUpgradeProducer != null {
+      return [
+        considerations: [
+          [condition: true, score: 0.7 - 0.2 * totalCountForUpgradeKind("major")]
+        ],
+        run: fn {
+          Console.println("Producing major upgrade")
+          Server.cast(majorUpgradeProducer, null, ADD_MAJOR_UPGRADE)
+        }
+      ]
+    } else {
+      minorUpgradeProducer = units.first(=> $0.type.id in minorProducerIds && skillCanBeCast(Game.currentPlayer, $0, ADD_MINOR_UPGRADE))
+      return if minorUpgradeProducer == null {
+        REJECTED_ACTION
+      } else {
+        [
+          considerations: [
+            [condition: true, score: 0.66 - 0.1 * totalCountForUpgradeKind("minor")]
+          ],
+          run: fn {
+            Console.println("Producing minor upgrade")
+            Server.cast(minorUpgradeProducer, null, ADD_MINOR_UPGRADE)
+          }
+        ]
+      }
+    }
+  }
+
+  playUpgrade(playableCards) {
+    upgradeCard = null
+    majorUpgrade = playableCards.first(=> $0.type.id == "majorUpgrade")
+    if majorUpgrade != null {
+      upgradeCard = majorUpgrade
+    } else {
+      minorUpgrade = playableCards.first(=> $0.type.id == "minorUpgrade")
+      if minorUpgrade != null {
+        upgradeCard = minorUpgrade
+      } else {
+        return REJECTED_ACTION
+      }
+    }
+    availableNodes = Game.currentPlayer.upgradeTree.emptyNodesForKind(upgradeCard.type.kind)
+    if availableNodes.isEmpty {
+      return REJECTED_ACTION
+    }
+    # presently, just play to a random available slot
+    node = availableNodes.randomItem
+    return [
+      considerations: [
+        [condition: true, score: 0.8]
+      ],
+      run: fn {
+        Console.println("Playing upgrade: $(node.type)")
+        Server.play(upgradeCard, null, node.id)
+      }
+    ]
+  }
+
+  buildHeroProducer(hero, heroProducer, heroProducerCard, buildersWithAp, skillId) {
+    if hero != null || heroProducer != null || heroProducerCard != null || buildersWithAp.isEmpty {
+      return REJECTED_ACTION
+    }
+    randomBuilder = buildersWithAp.randomItem
+    if !skillCanBeCast(Game.currentPlayer, randomBuilder, skillId) {
+      return REJECTED_ACTION
+    }
+    return [
+      considerations: [
+        [condition: true, score: 0.8]
+      ],
+      run: fn {
+        Console.println("Building hero producer")
+        Server.cast(randomBuilder, null, skillId)
+      }
+    ]
+  }
+
+  playHeroProducerCard(heroProducerCard, emptyInfluencedCells) {
+    if heroProducerCard == null || heroProducerCard.downtime > 0 || emptyInfluencedCells.isEmpty {
+      # Console.println("Rejecting play hero producer card, $heroProducerCard, $emptyInfluencedCells")
+      return REJECTED_ACTION
+    }
+    randomCell = emptyInfluencedCells.randomItem
+    return [
+      considerations: [
+        [condition: true, score: 0.5]
+      ],
+      run: fn {
+        Console.println("Playing hero producer")
+        Server.play(heroProducerCard, randomCell.coordinates, null)
+      }
+    ]
+  }
+
+  trainHero(hero, heroProducer, skillId) {
+    if hero != null || heroProducer == null {
+      return REJECTED_ACTION
+    }
+    if !skillCanBeCast(Game.currentPlayer, heroProducer, skillId) {
+      return REJECTED_ACTION
+    }
+    return [
+      considerations: [
+        [condition: true, score: 0.78]
+      ],
+      run: fn {
+        Console.println("Training hero")
+        Server.cast(heroProducer, null, skillId)
+      }
+    ]
+  }
+
+  reviveHero(hero, heroProducer) {
+    if hero == null || hero.coordinates != null || heroProducer == null {
+      return REJECTED_ACTION
+    }
+    skillId = "reviveHero"
+    if !skillCanBeCast(Game.currentPlayer, heroProducer, skillId) {
+      return REJECTED_ACTION
+    }
+    return [
+      considerations: [
+        [condition: true, score: 0.7]
+      ],
+      run: fn {
+        Console.println("Reviving hero")
+        Server.cast(heroProducer, null, skillId)
+      }
+    ]
+  }
+
+  upgradeHero(hero, playableCards) {
+    upgrade = playableCards.first(=> $0.type.id == "heroUpgrade")
+    if hero == null || upgrade == null {
+      return REJECTED_ACTION
+    }
+    upgradeType = null
+    when hero.type.id {
+      "pyracmon" {
+        upgradeType = when hero.level {
+          1 => "groundSlamL1"
+          2 => "groundSlamL2"
+          3 => "heroStatsL1"
+          4 => "smite"
+          5 => "heroStatsL2"
+          6 => "bashL1"
+          7 => "heroStatsL3"
+          else => "heroStatsL4"
+        }
+      }
+      "kagaalu" {
+        upgradeType = when hero.level {
+          1 => "kagaalusSarcomancyL2"
+          2 => "heroStatsL1"
+          3 => "sacrificeOfHealth"
+          4 => "sacrificeOfVigor"
+          5 => "sacrificeOfDeath"
+          6 => "heroStatsL2"
+          7 => "heroStatsL3"
+          else => "heroStatsL4"
+        }
+      }
+      "maim" {
+        upgradeType = when hero.level {
+          1 => "beastmastersWarcryL1"
+          2 => "heroStatsL1"
+          3 => "leapAttackL1"
+          4 => "beastmastersWarcryL2"
+          5 => "ferocityAuraL1"
+          6 => "leapAttackL2"
+          7 => "heroStatsL2"
+          else => "heroStatsL3"
+        }
+      }
+
+      "vitarron" {
+        upgradeType = when hero.level {
+          1 => "governanceAuraL1"
+          2 => "governanceAuraL2"
+          3 => "heroStatsL1"
+          4 => "governanceAuraL3"
+          5 => "heroStatsL2"
+          6 => "heroStatsL3"
+          7 => "heroStatsL4"
+          else => "insurrection"
+        }
+      }
+      "tofan" {
+        upgradeType = when hero.level {
+          1 => "noxiousCloudL1"
+          2 => "noxiousCloudL2"
+          3 => "tofansKissL1"
+          4 => "noxiousCloudL3"
+          5 => "plagueSeeds"
+          6 => "tofansKissL2"
+          7 => "heroStatsL1"
+          else => "heroStatsL2"
+        }
+      }
+      "denburhin" {
+        upgradeType = when hero.level {
+          1 => "reinforcedHull"
+          2 => "repairCrews"
+          3 => "improvedOnboarding"
+          4 => "battleStations"
+          5 => "antiAirTurrets"
+          6 => "bombAutoloader"
+          7 => "heroStatsL1"
+          else => "heroStatsL2"
+        }
+      }
+    }
+    nodeId = hero.upgradeTree.allNodes.first(=> $0.type == upgradeType).id
+    if nodeId == null {
+      Console.println("Can't find node id for $upgradeType, all nodes are $(hero.upgradeTree.allNodes)")
+      return REJECTED_ACTION
+    }
+    return [
+      considerations: [
+        [condition: true, score: 0.8]
+      ],
+      run: fn {
+        Console.println("Playing hero upgrade: $upgradeType")
+        Server.play(upgrade, null, nodeId)
+      }
+    ]
+  }
+
+  buildUnitProducer(builders, unitProducers, producerWeights, buildSkills) {
+    # first, figure out which unit producer are we missing by examining weights
+    producersWithCounts = producerWeights.keys.mapToObject(=> $0, fn (type) => totalCountForUnitType(type) * 1.0 / unitProducers.size)
+    # Console.println("Producers with counts: $producersWithCounts")
+    sortedProducerWeightKeys = producerWeights.keys.sortedBy(=> producerWeights.($0) - producerWeights.($1))
+    typeToProduce = null
+    builder = null
+    for producer in sortedProducerWeightKeys {
+      typeToProduce = producer
+      builder = builders.first(=> skillCanBeCast(Game.currentPlayer, $0, buildSkills.(producer)))
+      if builder == null {
+        continue # if nobody can build, skip
+      }
+      if producersWithCounts.(producer) < producerWeights.(producer) {
+        break # if there are fewer of this building than expected, select it
+      }
+    }
+    if builder == null {
+      # Console.println("Don't have builder!")
+      return REJECTED_ACTION
+    }
+    score = 0.7 - 0.33 * totalCountForUnitType(typeToProduce)
+    Console.println("Build score: $score")
+    return [
+      considerations: [
+        [condition: true, score: score]
+      ],
+      run: fn {
+        Console.println("Building unit producer: $typeToProduce")
+        Server.cast(builder, null, buildSkills.(typeToProduce))
+      }
+    ]
+  }
+
+  trainUnit(unitProducers, trainUnitSkills, hero, heroProducer) {
+    availableProducers = []
+    for producerType in trainUnitSkills.keys {
+      producers = unitProducers.where(=> $0.type.id == producerType)
+      skillsForProducerType = trainUnitSkills.(producerType)
+      for skill in skillsForProducerType.keys {
+        producersThatCanCast = producers.where(=> skillCanBeCast(Game.currentPlayer, $0, skill))
+        unitWithMaxCount = skillsForProducerType.(skill)
+        unitThatSkillProduces = unitWithMaxCount.0
+        maxCount = unitWithMaxCount.1
+        unitCount = totalCountForUnitType(unitThatSkillProduces)
+        factor = if (unitCount > maxCount) 300 else 50
+        merit = Game.data.find(unitThatSkillProduces).merit - factor * unitCount
+        availableProducers.addAll(producersThatCanCast.map(=> [producer: $0, skillId: skill, merit: merit]))
+      }
+    }
+    # Console.println("Available producers: " + availableProducers)
+    if availableProducers.isEmpty {
+      return REJECTED_ACTION
+    }
+    choice = availableProducers.maxBy(=> $0.merit)
+    return [
+      considerations: [
+        [condition: true, score: 0.5 + choice.merit / 1000.0],
+        [condition: hero == null || heroProducer == null, score: -1], # prioritize producing a hero
+        [condition: unitProducers.size < 3, score: -0.25 * (3 - unitProducers.size)] # need to save up for more unit producers
+      ],
+      run: fn {
+        Console.println("Training unit with " + choice.skillId)
+        Server.cast(choice.producer, null, choice.skillId)
+      }
+    ]
+  }
+
+  playUnit(playableUnits, emptyInfluencedCells, knownGoldSources, params) {
+    if playableUnits.isEmpty || emptyInfluencedCells.isEmpty {
+      # Console.println("Rejecting play unit, $playableUnits, $emptyInfluencedCells")
+      return REJECTED_ACTION
+    }
+    card = playableUnits.randomItem
+    targetCell = null
+    if card.type.id == params.miner && !knownGoldSources.isEmpty {
+      targetCell = emptyInfluencedCells.minBy(fn (cell) => average(knownGoldSources.map(fn (gold) => gold.distance(cell.coordinates))))
+    } else {
+      targetCell = emptyInfluencedCells.randomItem
+    }
+    return [
+      considerations: [
+        [condition: true, score: 0.5]
+      ],
+      run: fn {
+        Console.println("Playing unit")
+        Server.play(card, targetCell.coordinates, null)
+      }
+    ]
+  }
+
+  attack(hero, soldiers, potentialTargets, needsHero, scoreForAttack, scoreForApproach, message) {
+    if needsHero && hero == null {  # no point in creeping if no XP is to be gained
+      return REJECTED_ACTION
+    }
+    if soldiers.isEmpty || potentialTargets.isEmpty {
+      return REJECTED_ACTION
+    }
+
+    healthySolders = soldiers.where(=> $0.hp >= $0.health * 0.2)
+
+    soldiersWithAttackRanges = healthySolders.map(=> [unit: $0, attackRange: $0.attackRange])
+    # Check if any soldier can attack any creep immediately
+    for soldier in soldiersWithAttackRanges {
+      for target in soldier.attackRange {
+        attackableTarget = potentialTargets.first(=> $0.equals(target.targetCell))
+        if attackableTarget != null {
+          return [
+            considerations: [
+              [condition: true, score: scoreForAttack]
+            ],
+            run: fn {
+              Console.println("Attacking $message")
+              Server.attack(soldier.unit.coordinates, attackableTarget.coordinates, target.viaCell.coordinates, target.movementCost)
+            }
+          ]
+        }
+      }
+    }
+
+    # Otherwise, pick a soldier closest to a creep and move towards them
+    minDistance = Float.max
+    closestSoldier = null
+    attackableTarget = null
+    soldiersThatCanMove = healthySolders.where(=> !$0.movementRange.isEmpty)
+    if soldiersThatCanMove.isEmpty {
+      return REJECTED_ACTION
+    }
+    for soldier in soldiersThatCanMove {
+      location = soldier.coordinates
+      nearestTarget = potentialTargets.minBy(=> $0.distance(location))
+      distance = nearestTarget.distance(location)
+      if distance < minDistance {
+        minDistance = distance
+        closestSoldier = soldier
+        attackableTarget = nearestTarget
+      }
+    }
+    target = closestSoldier.movementRange.minBy(=> $0.distance(attackableTarget.coordinates)).coordinates
+    return [
+      considerations: [
+        [condition: true, score: scoreForApproach] # less score than attacking outright
+      ],
+      run: fn {
+        Console.println("Moving to attack $message")
+        Server.move(closestSoldier.coordinates, target, closestSoldier.movementCost(target))
+      }
+    ]
+  }
+
+  castSkill(player, casterIds) {
+    casters = []
+    if player.hero != null && player.hero.coordinates != null {
+      casters.add(player.hero)
+    }
+    nonHeroCasters = player.ownedUnits.where(=> $0.ap > 0 && $0.type.id in casterIds)
+    if nonHeroCasters.size > MAX_SKILL_CASTERS_TO_ANALYZE {
+      casters.addAll(nonHeroCasters.shuffled().take(MAX_SKILL_CASTERS_TO_ANALYZE))
+    } else {
+      casters.addAll(nonHeroCasters)
+    }
+    if casters.isEmpty {
+      return REJECTED_ACTION
+    }
+    for caster in casters {
+      casterLocation = caster.coordinates
+      when caster.type.id {
+        # Sanghoy
+        "pyracmon" {
+          groundSlamScore = 0
+          bashScore = 0
+          target = null
+          if skillCanBeCast(player, caster, "groundSlam") {
+            groundSlamScore = Game.unitsInRange(casterLocation, 1).count(=> !caster.owner.isAllyOf($0.owner)) * 0.15
+          }
+          if skillCanBeCast(player, caster, "bash") {
+            targets = Game.castTargets(casterLocation, caster, "bash")
+            bashScore = targets.size * 0.3
+            if bashScore > 0 {
+              target = targets.maxBy(=> $0.content.type.merit ?? 0)
+            }
+          }
+          if groundSlamScore > 0 && groundSlamScore > bashScore {
+            return [
+              considerations: [
+                [condition: true, score: groundSlamScore]
+              ],
+              run: fn {
+                Console.println("Casting ground slam")
+                Server.cast(caster, null, "groundSlam")
+              }
+            ]
+          } else if bashScore > 0 {
+            return [
+              considerations: [
+                [condition: true, score: bashScore]
+              ],
+              run: fn {
+                Console.println("Casting bash")
+                Server.cast(caster, target.coordinates, "bash")
+              }
+            ]
+          }
+        }
+
+        "maim" {
+          warcryScore = 0
+          leapAttackScore = 0
+          target = null
+          if skillCanBeCast(player, caster, "beastmastersWarcry") {
+            warcryScore = Game.unitsInRange(casterLocation, 2).count(=> caster.owner.isAllyOf($0.owner)) * 0.2
+          }
+          if skillCanBeCast(player, caster, "leapAttack") {
+            targets = Game.castTargets(casterLocation, caster, "leapAttack")
+            leapAttackScore = targets.size * 0.3
+            if leapAttackScore > 0 {
+              target = targets.maxBy(=> $0.content.type.merit ?? 0)
+            }
+          }
+          if warcryScore > 0 && warcryScore > leapAttackScore {
+            return [
+              considerations: [
+                [condition: true, score: warcryScore]
+              ],
+              run: fn {
+                Console.println("Casting beastmasters Warcry")
+                Server.cast(caster, null, "beastmastersWarcry")
+              }
+            ]
+          } else if leapAttackScore > 0 {
+            return [
+              considerations: [
+                [condition: true, score: leapAttackScore]
+              ],
+              run: fn {
+                Console.println("Casting leap attack")
+                Server.cast(caster, target.coordinates, "leapAttack")
+              }
+            ]
+          }
+        }
+
+        "kagaalu" {
+          unitsAround = Game.unitsInRange(casterLocation, 2)
+          allies = unitsAround.where(=> caster.owner.isAllyOf($0.owner))
+          enemiesCount = unitsAround.size - allies.size
+          castable = castFirstTargetableSkill(player, caster, [
+            "sacrificeOfDeath": enemiesCount * 0.2,
+            "sacrificeOfVigor": allies.size * 0.1,
+            "sacrificeOfHealth": allies.count(=> $0.hp < $0.health) * 0.1,
+            "kagaalusSarcomancy": 0.2
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+
+        "thrall" {
+          if totalCountForUnitType("sacrificialWell") == 0 \
+            && totalCountForUnitType("totem") > 0 \
+            && totalCountForUnitType("shaper") > 0 \
+            && skillCanBeCast(player, caster, "buildSacrificialWell") {
+            return [
+              considerations: [
+                [condition: true, score: 0.9]
+              ],
+              run: fn {
+                Console.println("Casting build sac well")
+                Server.cast(caster, null, "buildSacrificialWell")
+              }
+            ] 
+          }
+          castable = castFirstTargetableSkill(player, caster, [
+            "thrallRepair": 0.4
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+
+        "sarcomancer" {
+          castable = castFirstTargetableSkill(player, caster, [
+            "sarcomancy": 0.6, 
+            "amalgamation": 0.80,
+            "sarcomancerHeal": Game.unitsInRange(casterLocation, 1).count(=> $0.hp < $0.health) * 0.15
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+
+        "shaper" {
+          castable = castFirstTargetableSkill(player, caster, [
+            "shapeCyclops": 0.85, 
+            "shapeForehorn": 0.85,
+            "shapeBeastlord": 0.85,
+            "shapeChironite": 0.80,
+            "shapeBloodBat": 0.80,
+            "shapeKavouros": 0.75
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+
+        "raider" {
+          castable = castFirstTargetableSkill(player, caster, [
+            "riseToWarchief": 0.6 - 0.05 * player.ownedUnits.count(=> $0.type.id == "warchief")
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+
+        "sacrificialWell" {
+          if player.resources.u < 5 && skillCanBeCast(player, caster, "sacrificeOfBlood") {
+            target = Game.castTargets(casterLocation, caster, "sacrificeOfBlood").minBy(=> $0.content.type.merit ?? 0)
+            if target != null {
+              return [
+                considerations: [
+                  [condition: true, score: 0.75]
+                ],
+                run: fn {
+                  Console.println("Casting sacrificeOfBlood")
+                  Server.cast(caster, target.coordinates, "sacrificeOfBlood")
+                }
+              ]
+            }
+          }
+        }
+
+        "totem" {
+          if totalCountForSpellType("bloodlust") < 1 && skillCanBeCast(player, caster, "addBloodlust") {
+            return [
+              considerations: [
+                [condition: true, score: 0.3]
+              ],
+              run: fn {
+                Console.println("Casting addBloodlust")
+                Server.cast(caster, null, "addBloodlust")
+              }
+            ]
+          }
+        }
+
+        # Frenza
+        # "vitarron" {
+        #   groundSlamScore = 0
+        #   bashScore = 0
+        #   target = null
+        #   if skillCanBeCast(player, caster, "groundSlam") {
+        #     groundSlamScore = Game.unitsInRange(casterLocation, 1).count(=> !caster.owner.isAllyOf($0.owner)) * 0.15
+        #   }
+        #   if skillCanBeCast(player, caster, "bash") {
+        #     targets = Game.castTargets(casterLocation, caster, "bash")
+        #     bashScore = targets.size * 0.3
+        #     if bashScore > 0 {
+        #       target = targets.maxBy(=> $0.content.type.merit ?? 0)
+        #     }
+        #   }
+        #   if groundSlamScore > 0 && groundSlamScore > bashScore {
+        #     return [
+        #       considerations: [
+        #         [condition: true, score: groundSlamScore]
+        #       ],
+        #       run: fn {
+        #         Console.println("Casting ground slam")
+        #         Server.cast(caster, null, "groundSlam")
+        #       }
+        #     ]
+        #   } else if bashScore > 0 {
+        #     return [
+        #       considerations: [
+        #         [condition: true, score: bashScore]
+        #       ],
+        #       run: fn {
+        #         Console.println("Casting bash")
+        #         Server.cast(caster, target.coordinates, "bash")
+        #       }
+        #     ]
+        #   }
+        # }
+
+        "denburhin" {
+          recrewScore = 0
+          aimForTheSunScore = 0
+          target = null
+          if skillCanBeCast(player, caster, "recrewDenburhin") {
+            targets = Game.castTargets(casterLocation, caster, "recrewDenburhin")
+            if !targets.isEmpty {
+              recrewScore = 0.75 - caster.hp / caster.health
+              target = targets.minBy(=> $0.content.type.merit)
+            }
+          }
+          if skillCanBeCast(player, caster, "aimForTheSun") {
+            targets = Game.castTargets(casterLocation, caster, "aimForTheSun")
+            if !targets.isEmpty && caster.hp / caster.health <= 0.5 {
+              aimForTheSunScore = 0.3 + Game.unitsInRange(casterLocation, 1).count(=> !areAllies(caster, $0)) * 0.1
+              target = targets.randomItem
+            }
+          }
+          if recrewScore > 0 && recrewScore > aimForTheSunScore {
+            return [
+              considerations: [
+                [condition: true, score: recrewScore]
+              ],
+              run: fn {
+                Console.println("Casting Denburhin recrew")
+                Server.cast(caster, null, "recrewDenburhin")
+              }
+            ]
+          } else if aimForTheSunScore > 0 {
+            return [
+              considerations: [
+                [condition: true, score: aimForTheSunScore]
+              ],
+              run: fn {
+                Console.println("Casting aim for the sun")
+                Server.cast(caster, target.coordinates, "aimForTheSun")
+              }
+            ]
+          }
+        }
+
+        "tofan" {
+          noxiousCloudScore = 0
+          tofansKissScore = 0
+          plagueSeedsScore = 0
+          target = null
+          if skillCanBeCast(player, caster, "noxiousCloud") {
+            targets = Game.castTargets(casterLocation, caster, "noxiousCloud")
+            if !targets.isEmpty {
+              target = targets.randomItem
+              unitsAround = Game.unitsInRange(target.coordinates, 1)
+              enemiesAroundCount = unitsAround.count(=> !areAllies($0, caster))
+              noxiousCloudScore = enemiesAroundCount * 0.3 + (unitsAround.size - enemiesAroundCount) * 0.05
+            }
+          }
+          if skillCanBeCast(player, caster, "tofansKiss") {
+            targets = Game.castTargets(casterLocation, caster, "tofansKiss")
+            if !targets.isEmpty {
+              target = targets.maxBy(=> $0.content.type.merit)
+              tofansKissScore = target.content.type.merit / 1100 # almost guarantees casting on heroes
+            }
+          }
+          if skillCanBeCast(player, caster, "plagueSeeds") {
+            targets = Game.castTargets(casterLocation, caster, "plagueSeeds")
+            if !targets.isEmpty {
+              target = targets.randomItem
+              unitsAround = Game.unitsInRange(target.coordinates, 1)
+              enemiesAroundCount = unitsAround.count(=> areAllies($0, target.content))
+              plagueSeedsScore = enemiesAroundCount * 0.3 + (unitsAround.size - enemiesAroundCount) * 0.05
+            }
+          }
+          if noxiousCloudScore > 0 && noxiousCloudScore > tofansKissScore && noxiousCloudScore > plagueSeedsScore {
+            return [
+              considerations: [
+                [condition: true, score: noxiousCloudScore]
+              ],
+              run: fn {
+                Console.println("Casting noxious cloud")
+                Server.cast(caster, null, "noxiousCloud")
+              }
+            ]
+          } else if tofansKissScore > 0 && tofansKissScore > plagueSeedsScore {
+            return [
+              considerations: [
+                [condition: true, score: tofansKissScore]
+              ],
+              run: fn {
+                Console.println("Casting Tofan's kiss")
+                Server.cast(caster, target.coordinates, "tofansKiss")
+              }
+            ]
+          } else if plagueSeedsScore > 0 {
+            return [
+              considerations: [
+                [condition: true, score: plagueSeedsScore]
+              ],
+              run: fn {
+                Console.println("Casting plague seeds")
+                Server.cast(caster, target.coordinates, "plagueSeeds")
+              }
+            ]
+          }
+        }
+
+        "settler" {
+          castable = castFirstTargetableSkill(player, caster, [
+            "settlerRepair": 0.4,
+            "foundColony": 1 - totalCountForUnitType("colonialHall") * 0.35,
+            "foundPlantation": 0.75 - totalCountForUnitType("plantation") * 0.25
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+        
+        "rifleman" {
+          if Game.unitsInRange(casterLocation, 2).count(=> !areAllies($0, caster)) == 0 {
+            castable = castFirstTargetableSkill(player, caster, [
+              "mountToDragoon": 0.76
+            ])
+            if castable != null {
+              return castable
+            }
+          }
+        }
+        
+        "dragoon" {
+          if Game.unitsInRange(casterLocation, 2).count(=> !areAllies($0, caster)) >= 2 {
+            castable = castFirstTargetableSkill(player, caster, [
+              "dismountToRifleman": 0.57
+            ])
+            if castable != null {
+              return castable
+            }
+          }
+        }
+        
+        "assassin" {
+          castable = castFirstTargetableSkill(player, caster, [
+            "sabotage": 0.77
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+        
+        "steamGolem" {
+          castable = castFirstTargetableSkill(player, caster, [
+            "concussiveGrenade": sum(Game.unitsInRange(casterLocation, 2).where(=> !areAllies(caster, $0)).map(=> $0.type.merit / 1100)),
+            "retrofitToVoltWalker": 0.6 - 0.05 * player.ownedUnits.count(=> $0.type.id == "voltWalker")
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+        
+        "devilhornTank" {
+          castable = castFirstTargetableSkill(player, caster, [
+            "recrew": 0.75 - caster.hp / caster.health,
+            "retrofitToVoltTank": 0.6 - 0.05 * player.ownedUnits.count(=> $0.type.id == "voltTank")
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+        
+        "voltTank" || "assaultAirship" {
+          castable = castFirstTargetableSkill(player, caster, [
+            "recrew": 0.75 - caster.hp / caster.health
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+
+        "mev" {
+          castable = castFirstTargetableSkill(player, caster, [
+            "combatShields": Game.unitsInRange(casterLocation, 1).count(=> areAllies(caster, $0) && $0.type in ["rifleman", "dragoon"]) * 0.2, 
+            "amalgamation": Game.unitsInRange(casterLocation, 1).count(=> areAllies(caster, $0) && $0.type in ["rifleman", "dragoon"]) * 0.15 \
+              + Game.unitsInRange(casterLocation, 2).count(=> !areAllies(caster, $0)) * 0.1,
+            "patchEmUp": Game.unitsInRange(casterLocation, 1).count(=> $0.hp < $0.health) * 0.15
+          ])
+          if castable != null {
+            return castable
+          }
+        }
+
+        "colonialHall" {
+          if player.resources.u < 5 {
+            castable = castFirstTargetableSkill(player, caster, [
+              "buildMonument": 1 - 0.15 * player.ownedUnits.count(=> $0.type.id.startsWith("monument")),
+              "sendTribute": if (player.resources.g > 30) player.resources.g / 50.0 else 0
+            ])
+            if castable != null {
+              return castable
+            }
+          }
+        }
+
+        "airfield" {
+          if totalCountForSpellType("paradrop") < 1 && skillCanBeCast(player, caster, "addParadrop") {
+            return [
+              considerations: [
+                [condition: true, score: 0.3]
+              ],
+              run: fn {
+                Console.println("Casting addParadrop")
+                Server.cast(caster, null, "addParadrop")
+              }
+            ]
+          }
+        }
+
+        "magistratesCourt" {
+          skills = ["shipEndlessExpansion", "shipEradicateThePest", "shipAirSuperiority", "shipEmperorsFist"] \
+            .mapToObject(=> $0, => if skillCanBeCast(player, caster, $0) 0.9 else 0)
+          castable = castFirstTargetableSkill(player, caster, skills)
+          if castable != null {
+            return castable
+          }
+        }
+      }
+    }
+
+    return REJECTED_ACTION
+  }
+
+  castSpell(player, playableCards, spellIds, enemies) {
+    spells = playableCards.where(=> $0.type.id in spellIds)
+    if spells.isEmpty {
+      return REJECTED_ACTION
+    }
+    for spell in spells {
+      id = spell.type.id
+      scoreAndTargetPredicate = when id {
+        "bloodlust" => [
+          score: Math.min(0.35, 0.1 * player.ownedUnits.count(=> $0.ap < $0.speed)),
+          target: fn (targets) => targets.maxBy(=> $0.content.type.merit)
+        ]
+        "sanghoyHorde" => [
+          score: Math.min(0.7, 0.15 * enemies.size),
+          target: fn (targets) => targets.minBy(=> $0.distance([0, 0, 0]))
+        ]
+        "karrish" => [
+          score: Math.min(0.7, 0.15 * enemies.size),
+          target: fn (targets) => targets.maxBy(=> $0.content.type.merit)
+        ]
+        "bloodToRogash" => [
+          score: Math.min(0.7, (if (player.resources.u < 5) 0.23 else 0) + enemies.size * 0.1)
+        ]
+        "horribleMisshaping" => [
+          score: Math.min(0.8, 0.2 * enemies.size),
+          target: fn (targets) => targets.maxBy(=> $0.content.type.merit)
+        ]
+
+        "valiantPromotion" => [
+          score: Math.min(0.8, 0.2 * enemies.size),
+          target: fn (targets) => targets.maxBy(=> $0.content.type.merit)
+        ]
+        "paradrop" => [
+          score: Math.min(0.8, 0.2 * enemies.size),
+          target: fn (targets) => targets.minBy(=> $0.distance([0, 0, 0]))
+        ]
+        "endlessExpansionShipment" || "airSuperiorityShipment" || "eradicateThePestShipment" \
+          || "emperorsFistShipment" || "hardenedVeteransShipment" || "scrapyardColossusShipment" => [
+          score: 1, # always cast
+          target: fn (targets) => targets.minBy(=> $0.distance([0, 0, 0]))
+        ]
+        "theNextGenerationShipment" => [
+          score: player.ownedUnits.count(=> $0.type.id == "settler") * 0.1,
+          target: fn (targets) => targets.minBy(=> $0.distance([0, 0, 0]))
+        ]
+        "theCulling" => [
+          score: enemies.count(=> $0.content.hp < 20) * 0.2
+        ]
+
+        else {
+          throw "Not handled"
+          null
+        }
+      }
+      targets = Game.spellTargets(spell)
+      if targets == null { # not enabled
+        continue
+      }
+      targetPosition = null
+      if targets is List {
+        if targets.isEmpty {
+          continue
+        } else {
+          # Console.println("Got targets for spell $id: $targets")
+          # Console.println("Score and target spell predicate " + scoreAndTargetPredicate)
+          selectedTarget = if scoreAndTargetPredicate::target == null {
+            targets.randomItem
+          } else {
+            scoreAndTargetPredicate.target(targets)
+          }
+          # Console.println("Selected spell target " + selectedTarget)
+          targetPosition = selectedTarget.coordinates
+        }
+      }
+      return [
+        considerations: [
+          [condition: true, score: scoreAndTargetPredicate::score]
+        ],
+        run: fn {
+          Console.println("Casting spell $id")
+          Server.play(spell, targetPosition, null)
+        }
+      ]
+    }
+    return REJECTED_ACTION
+  }
+
+  explore(player) {
+    unitsThatCanMove = player.ownedUnits.where(=> $0.ap > 0)
+    if unitsThatCanMove.isEmpty {
+      # Console.println("Nothing to move")
+      return REJECTED_ACTION
+    }
+    firstUnitWithMovementRange = null
+    for unit in unitsThatCanMove {
+      mr = unit.movementRange
+      # Console.println("Movement range for $(unit.type.id) with AP $(unit.ap) is $(mr.size)")
+      if !mr.isEmpty {
+        firstUnitWithMovementRange = [unit, mr]
+        break
+      }
+    }
+    if firstUnitWithMovementRange == null {
+      # Console.println("Nothing with movement range")
+      return REJECTED_ACTION
+    }
+
+    unit = firstUnitWithMovementRange.0
+    unitLocation = unit.coordinates
+    hiddenCellsAround = Game.grid.cellsAround(unitLocation, unit.sight + 1, player) \
+      .where(=> $0.hasFogOfWar(player))
+    if hiddenCellsAround.isEmpty {
+      # Console.println("Nothing unexplored around")
+      # return REJECTED_ACTION
+      # if nothing's around, move towards the center of the map
+      hiddenCellsAround = Game.grid.hiddenCells(player)
+    }
+
+    if hiddenCellsAround.isEmpty { # there's no FOW anywhere
+      return REJECTED_ACTION
+    }
+
+    nearestCell = null
+    minDistance = Float.max
+
+    for mrCell in firstUnitWithMovementRange.1 {
+      nearestHiddenCell = hiddenCellsAround.minBy(=> $0.distance(mrCell.coordinates))
+      distance = nearestHiddenCell.distance(mrCell.coordinates)
+      if distance < minDistance {
+        nearestCell = mrCell
+        minDistance = distance
+      }
+    }
+    target = nearestCell.coordinates
+    # Console.print("Moving from $unitLocation to $target, distance is $minDistance")
+
+    return [
+      considerations: [
+        [condition: true, score: 0.2] # exploring is generally a low-level action
+      ],
+      run: fn {
+        Console.println("Exploring")
+        Server.move(unitLocation, target, unit.movementCost(target))
+      }
+    ]
+  }
+
+  changeStance(hero, soldiers, enemies) {
+    candidates = []
+    if hero != null && hero.coordinates != null && hero.ap > 0 {
+      candidates.add(hero)
+    }
+    nonHeroCandidates = soldiers.where(=> $0.ap > 0) # TODO handle building stances as well
+    if nonHeroCandidates.size > MAX_STANCE_CHANGES_TO_ANALYZE {
+      candidates.addAll(nonHeroCandidates.shuffled().take(MAX_STANCE_CHANGES_TO_ANALYZE))
+    } else {
+      candidates.addAll(nonHeroCandidates)
+    }
+    if candidates.isEmpty {
+      return REJECTED_ACTION
+    }
+    params = [score: 0, newStance: null, unit: null]
+    for unit in candidates {
+      score = 0
+      newStance = null
+      currentStance = unit.activeStance.name
+      availableStances = unit.availableStances
+      location = Game.grid.locate(unit)
+      nearbyEnemiesCount = enemies.count(=> location.distance($0.coordinates) <= 3)
+      if currentStance != "Camp" && unit.hp < unit.health * 0.3 && "Camp" in availableStances && nearbyEnemiesCount == 0 {
+        score = 0.7
+        newStance = "Camp"
+      } else if currentStance != "Defense" && "Defense" in availableStances && nearbyEnemiesCount >= 2 {
+        score = 0.5
+        newStance = "Defense"
+      } else if currentStance != "March" && "March" in availableStances && unit.hp >= unit.health * 0.7 && nearbyEnemiesCount == 0 {
+        score = 0.65
+        newStance = "March"
+      }
+      
+      # Frenza specific
+      else if currentStance == "DeployAutoturret" && nearbyEnemiesCount == 0 {
+        score = 0.7
+        newStance = "PackAutoturret"
+      } else if currentStance == "PackAutoturret" && nearbyEnemiesCount > 0 {
+        score = 0.7
+        newStance = "DeployAutoturret"
+      } else if currentStance != "Snipe" && "Snipe" in availableStances {
+        score = 0.67
+        newStance = "Snipe"
+      }
+
+      if score > params.score {
+        params.score = score
+        params.newStance = newStance
+        params.unit = unit
+      }
+    }
+    return [
+      considerations: [
+        [condition: true, score: params.score]
+      ],
+      run: fn {
+        Console.println("Changing stance to $(params.newStance).")
+        Server.changeStance(params.unit, params.newStance)
+      }
+    ]
+  }
+
+  interact(player) {
+    units = player.ownedUnits.where(=> $0.type.canInteract && $0.ap > 0).shuffled().take(MAX_INTERACTORS_TO_ANALYZE)
+    for unit in units {
+      interactable = Game.grid.cellsAround(unit.coordinates, 1, player) \
+        .first(=> $0.content != null && $0.content.owner.id == Game.nature.id && $0.content.type?.interactionEffect != null)
+      if interactable != null {
+        return [
+          considerations: [
+            [condition: true, score: 0.22] # interaction should be a low-priority action
+          ],
+          run: fn {
+            Console.println("Interacting with $(interactable.content.type.id)")
+            Server.interact(unit.coordinates, interactable.coordinates)
+          }
+        ]
+      }
+    }
+    return REJECTED_ACTION
+  }
+
+  concede(player, playableCards, miners, hero, heroProducer, unitProducers, soldiers) {
+    if Game.turn < 15 { # can't concede before round 15, to give it time to build up
+      return REJECTED_ACTION
+    }
+    if hero.coordinates != null \
+        || soldiers.size > 3 \
+        || (unitProducers.size > 1 && player.resources.g > 10) \
+        || (heroProducer != null && skillCanBeCast(player, heroProducer, "reviveHero")) \
+        || (miners.size > 1 && !unitProducers.isEmpty) {
+      return REJECTED_ACTION
+    }
+    return [
+      considerations: [
+        [condition: true, score: 1]
+      ],
+      run: fn {
+        Console.println("Conceding because I suck! ($(player.name))")
+        Server.concede(player)
+      }
+    ]
+  }
+}
+
+ai EasyAi is MeleeAi {
+  init {
+    @maxMoves = 10
+  }
+}
+
+ai NormalAi is MeleeAi {
+  init {
+    @maxMoves = 50
+  }
+}
+
+ai HardAi is MeleeAi {
+  onGameStart(player) {
+    Console.println("Cheating by adding more resources!")
+    player.addResources([g: 25, u: 5])
+  }
+}

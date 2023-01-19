@@ -1,0 +1,809 @@
+id: BlueLagoon
+title: Blue lagoon
+description: So close, yet so far...
+size: 9
+kind: 0
+maxPlayers: 2
+defaultTerrain: grass
+hexes:
+- c:
+  - -8
+  - 0
+  - 8
+  t: beach
+- c:
+  - -8
+  - 5
+  - 3
+  t: sea
+- c:
+  - -8
+  - 6
+  - 2
+  t: forest
+- c:
+  - -8
+  - 7
+  - 1
+  t: forest
+- c:
+  - -8
+  - 8
+  - 0
+  t: forest
+  content: site
+- c:
+  - -7
+  - -1
+  - 8
+  t: beach
+- c:
+  - -7
+  - 1
+  - 6
+  content: creepCampMedium
+- c:
+  - -7
+  - 3
+  - 4
+  content: site
+- c:
+  - -7
+  - 4
+  - 3
+  t: forest
+- c:
+  - -7
+  - 6
+  - 1
+  t: forest
+- c:
+  - -7
+  - 7
+  - 0
+  t: forest
+  content: creepCampMedium
+- c:
+  - -7
+  - 8
+  - -1
+  t: forest
+- c:
+  - -6
+  - -2
+  - 8
+  t: ocean
+- c:
+  - -6
+  - -1
+  - 7
+  t: beach
+  content: site
+- c:
+  - -6
+  - 0
+  - 6
+  t: beach
+- c:
+  - -6
+  - 2
+  - 4
+  t: beach
+- c:
+  - -6
+  - 4
+  - 2
+  content: goldMine
+- c:
+  - -6
+  - 5
+  - 1
+  content: creepCampSmall
+- c:
+  - -6
+  - 8
+  - -2
+  t: forest
+- c:
+  - -5
+  - -3
+  - 8
+  t: ocean
+- c:
+  - -5
+  - -2
+  - 7
+  t: ocean
+- c:
+  - -5
+  - -1
+  - 6
+  t: sea
+- c:
+  - -5
+  - 0
+  - 5
+  t: beach
+  content: beastDen
+- c:
+  - -5
+  - 1
+  - 4
+  startingLocation: 1
+- c:
+  - -5
+  - 6
+  - -1
+  t: jungle
+  content: beastDen
+- c:
+  - -5
+  - 8
+  - -3
+  t: forest
+- c:
+  - -4
+  - -4
+  - 8
+  t: ocean
+- c:
+  - -4
+  - -3
+  - 7
+  t: ocean
+- c:
+  - -4
+  - -2
+  - 6
+  t: sea
+- c:
+  - -4
+  - -1
+  - 5
+  t: sea
+- c:
+  - -4
+  - 0
+  - 4
+  t: beach
+- c:
+  - -4
+  - 3
+  - 1
+  t: forest
+- c:
+  - -4
+  - 5
+  - -1
+  t: jungle
+- c:
+  - -4
+  - 6
+  - -2
+  t: jungle
+  content: site
+- c:
+  - -4
+  - 8
+  - -4
+  t: jungle
+- c:
+  - -3
+  - -5
+  - 8
+  t: ocean
+- c:
+  - -3
+  - -4
+  - 7
+  t: ocean
+- c:
+  - -3
+  - -3
+  - 6
+  t: sea
+- c:
+  - -3
+  - -2
+  - 5
+  t: sea
+- c:
+  - -3
+  - -1
+  - 4
+  t: sea
+- c:
+  - -3
+  - 0
+  - 3
+  t: beach
+  content: creepCampSmall
+- c:
+  - -3
+  - 1
+  - 2
+  t: beach
+- c:
+  - -3
+  - 3
+  - 0
+  t: hills
+- c:
+  - -3
+  - 5
+  - -2
+  t: jungle
+- c:
+  - -3
+  - 7
+  - -4
+  t: jungle
+- c:
+  - -3
+  - 8
+  - -5
+  t: jungle
+- c:
+  - -2
+  - -6
+  - 8
+  t: ocean
+- c:
+  - -2
+  - -5
+  - 7
+  t: ocean
+- c:
+  - -2
+  - -4
+  - 6
+  t: sea
+- c:
+  - -2
+  - -3
+  - 5
+  t: sea
+- c:
+  - -2
+  - -2
+  - 4
+  t: sea
+- c:
+  - -2
+  - -1
+  - 3
+  t: sea
+- c:
+  - -2
+  - 0
+  - 2
+  t: sea
+- c:
+  - -2
+  - 1
+  - 1
+  t: beach
+- c:
+  - -2
+  - 4
+  - -2
+  content: creepCampMedium
+- c:
+  - -2
+  - 7
+  - -5
+  t: jungle
+- c:
+  - -2
+  - 8
+  - -6
+  t: hills
+- c:
+  - -1
+  - -7
+  - 8
+  t: beach
+- c:
+  - -1
+  - -6
+  - 7
+  t: beach
+  content: site
+- c:
+  - -1
+  - -5
+  - 6
+  t: sea
+- c:
+  - -1
+  - -4
+  - 5
+  t: sea
+- c:
+  - -1
+  - -3
+  - 4
+  t: sea
+- c:
+  - -1
+  - -2
+  - 3
+  t: sea
+- c:
+  - -1
+  - -1
+  - 2
+  t: sea
+- c:
+  - -1
+  - 0
+  - 1
+  t: river
+  content: beastDen
+- c:
+  - -1
+  - 1
+  - 0
+  t: jungle
+  content: site
+- c:
+  - -1
+  - 2
+  - -1
+  t: swamp
+- c:
+  - -1
+  - 3
+  - -2
+  t: swamp
+- c:
+  - -1
+  - 4
+  - -3
+  t: swamp
+- c:
+  - -1
+  - 7
+  - -6
+  content: site
+- c:
+  - -1
+  - 8
+  - -7
+  t: hills
+- c:
+  - 0
+  - -8
+  - 8
+  t: beach
+- c:
+  - 0
+  - -6
+  - 6
+  t: beach
+- c:
+  - 0
+  - -5
+  - 5
+  t: beach
+  content: beastDen
+- c:
+  - 0
+  - -4
+  - 4
+  t: beach
+- c:
+  - 0
+  - -3
+  - 3
+  t: beach
+  content: creepCampSmall
+- c:
+  - 0
+  - -2
+  - 2
+  t: sea
+- c:
+  - 0
+  - -1
+  - 1
+  t: river
+  content: beastDen
+- c:
+  - 0
+  - 0
+  - 0
+  t: river
+- c:
+  - 0
+  - 1
+  - -1
+  t: river
+- c:
+  - 0
+  - 2
+  - -2
+  t: river
+  content: beastDen
+- c:
+  - 0
+  - 3
+  - -3
+  t: swamp
+- c:
+  - 0
+  - 4
+  - -4
+  t: road
+- c:
+  - 0
+  - 5
+  - -5
+  t: swamp
+- c:
+  - 0
+  - 8
+  - -8
+  t: hills
+- c:
+  - 1
+  - -7
+  - 6
+  content: creepCampMedium
+- c:
+  - 1
+  - -5
+  - 4
+  startingLocation: 2
+- c:
+  - 1
+  - -3
+  - 2
+  t: beach
+- c:
+  - 1
+  - -2
+  - 1
+  t: beach
+- c:
+  - 1
+  - -1
+  - 0
+  t: jungle
+  content: site
+- c:
+  - 1
+  - 0
+  - -1
+  t: river
+- c:
+  - 1
+  - 1
+  - -2
+  t: river
+- c:
+  - 1
+  - 2
+  - -3
+  t: river
+- c:
+  - 1
+  - 3
+  - -4
+  t: road
+  content: creepCampLarge
+- c:
+  - 1
+  - 4
+  - -5
+  t: swamp
+- c:
+  - 1
+  - 5
+  - -6
+  t: jungle
+- c:
+  - 1
+  - 6
+  - -7
+  content: creepCampLarge
+- c:
+  - 1
+  - 7
+  - -8
+  t: hills
+  content: gemMine
+- c:
+  - 2
+  - -6
+  - 4
+  t: beach
+- c:
+  - 2
+  - -1
+  - -1
+  t: swamp
+- c:
+  - 2
+  - 0
+  - -2
+  t: river
+  content: beastDen
+- c:
+  - 2
+  - 1
+  - -3
+  t: river
+- c:
+  - 2
+  - 2
+  - -4
+  t: road
+- c:
+  - 2
+  - 3
+  - -5
+  t: river
+- c:
+  - 2
+  - 4
+  - -6
+  t: jungle
+- c:
+  - 2
+  - 5
+  - -7
+  t: jungle
+- c:
+  - 2
+  - 6
+  - -8
+  t: hills
+- c:
+  - 3
+  - -7
+  - 4
+  content: site
+- c:
+  - 3
+  - -4
+  - 1
+  t: forest
+- c:
+  - 3
+  - -3
+  - 0
+  t: hills
+- c:
+  - 3
+  - -1
+  - -2
+  t: swamp
+- c:
+  - 3
+  - 0
+  - -3
+  t: swamp
+- c:
+  - 3
+  - 1
+  - -4
+  t: road
+  content: creepCampLarge
+- c:
+  - 3
+  - 2
+  - -5
+  t: river
+- c:
+  - 3
+  - 3
+  - -6
+  t: river
+  content: site
+- c:
+  - 3
+  - 4
+  - -7
+  t: river
+- c:
+  - 3
+  - 5
+  - -8
+  t: jungle
+- c:
+  - 4
+  - -7
+  - 3
+  t: forest
+- c:
+  - 4
+  - -6
+  - 2
+  content: goldMine
+- c:
+  - 4
+  - -2
+  - -2
+  content: creepCampMedium
+- c:
+  - 4
+  - -1
+  - -3
+  t: swamp
+- c:
+  - 4
+  - 0
+  - -4
+  t: road
+- c:
+  - 4
+  - 1
+  - -5
+  t: swamp
+- c:
+  - 4
+  - 2
+  - -6
+  t: jungle
+- c:
+  - 4
+  - 3
+  - -7
+  t: river
+- c:
+  - 4
+  - 4
+  - -8
+  t: river
+  content: site
+- c:
+  - 5
+  - -8
+  - 3
+  t: sea
+- c:
+  - 5
+  - -6
+  - 1
+  content: creepCampSmall
+- c:
+  - 5
+  - -4
+  - -1
+  t: jungle
+- c:
+  - 5
+  - 0
+  - -5
+  t: swamp
+- c:
+  - 5
+  - 1
+  - -6
+  t: jungle
+- c:
+  - 5
+  - 2
+  - -7
+  t: jungle
+- c:
+  - 5
+  - 3
+  - -8
+  t: jungle
+- c:
+  - 6
+  - -8
+  - 2
+  t: forest
+- c:
+  - 6
+  - -7
+  - 1
+  t: forest
+- c:
+  - 6
+  - -5
+  - -1
+  t: jungle
+  content: beastDen
+- c:
+  - 6
+  - -4
+  - -2
+  t: jungle
+  content: site
+- c:
+  - 6
+  - 1
+  - -7
+  content: creepCampLarge
+- c:
+  - 6
+  - 2
+  - -8
+  t: hills
+- c:
+  - 7
+  - -8
+  - 1
+  t: forest
+- c:
+  - 7
+  - -7
+  - 0
+  t: forest
+  content: creepCampMedium
+- c:
+  - 7
+  - -5
+  - -2
+  t: jungle
+- c:
+  - 7
+  - -3
+  - -4
+  t: jungle
+- c:
+  - 7
+  - -2
+  - -5
+  t: jungle
+- c:
+  - 7
+  - -1
+  - -6
+  content: site
+- c:
+  - 7
+  - 1
+  - -8
+  t: hills
+  content: gemMine
+- c:
+  - 8
+  - -8
+  - 0
+  t: forest
+  content: site
+- c:
+  - 8
+  - -7
+  - -1
+  t: forest
+- c:
+  - 8
+  - -6
+  - -2
+  t: forest
+- c:
+  - 8
+  - -5
+  - -3
+  t: forest
+- c:
+  - 8
+  - -4
+  - -4
+  t: jungle
+- c:
+  - 8
+  - -3
+  - -5
+  t: jungle
+- c:
+  - 8
+  - -2
+  - -6
+  t: hills
+- c:
+  - 8
+  - -1
+  - -7
+  t: hills
+- c:
+  - 8
+  - 0
+  - -8
+  t: hills

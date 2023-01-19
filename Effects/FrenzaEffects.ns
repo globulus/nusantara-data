@@ -1,0 +1,1775 @@
+import "CommonEffects"
+import "NeutralEffects"
+import "../Bots/CommonBots"
+
+COLONY_INFLUENCE_RANGE = 3
+
+fn hasMajorUpgrade(player) => player.upgradeTree.allUpgrades.count(=> $0.type.kind == "major") > 0
+
+effect PayUpkeep {
+  CASTER_UPKEEP = 0.4
+  TANK_UPKEEP = 0.7
+  AIRSHIP_UPKEEP = 0.7
+
+  trigger = Triggers.startOfTurn
+
+  totalCost(caster) {
+    total = 0
+    total += CASTER_UPKEEP * caster.ownedUnits.count(=> $0.type.id in ["assassin", "mev"])
+    total += TANK_UPKEEP * caster.ownedUnits.count(=> $0.type.id in ["devilhornTank", "voltTank"])
+    total += AIRSHIP_UPKEEP * caster.ownedUnits.count(=> $0.type.id in ["assaultAirship", "cargoDirigible"])
+    if caster.hasUpgrade("taxCollectors") {
+      total *= 1.3
+    }
+    return Math.floor(total)
+  }
+
+  run(caster, target) {
+    caster.pay([g: totalCost(caster)])
+  }
+
+  sprite => "taxCollectors"
+
+  title => "payUpkeepTitle"
+
+  description(caster) => "Pay $CASTER_UPKEEP for each Assassin and MEV, $TANK_UPKEEP for each tank and $AIRSHIP_UPKEEP for each airship. Total: $(totalCost(caster))."
+}
+
+effect StatusReport {
+  FAVOR_PER_CELL = [[10, 0.3], [20, 0.24], [30, 0.18], [Int.max, 0.12]]
+  TURNS = 3
+
+  trigger = Triggers.endOfTurn
+
+  totalFavor(caster) {
+    count = 0
+    index = 0
+    currentState = FAVOR_PER_CELL.0
+    total = 0
+    # Tried using Game.grid.cells.count(=> $0.influencer == caster.id), but got an
+    # unable to read upvalue error. The loop does the trick, though.
+    for cell in Game.grid.cells {
+      if cell.influencer == caster.id {
+        count += 1
+        if count > currentState.0 {
+          index += 1
+          currentState = FAVOR_PER_CELL.(index)
+        }
+        total += currentState.1
+      }
+    }
+    return Math.floor(total)
+  }
+
+  run(caster, target) {
+    if Game.turn % TURNS == 0 {
+      caster.addResources([u: totalFavor(caster)])
+    }
+  }
+
+  sprite => "favor"
+
+  title => "statusReportTitle"
+
+  description(caster) => "Every $TURNS turns, gain favor for each influenced cell. Total: $(totalFavor(caster))."
+}
+
+effect BuildMonument {
+  MONUMENTS = ["monumentToSettlers", "monumentToLegions", "monumentToGovernors", "monumentToTheEmperor", "monumentToTheSeas"]
+
+  trigger => Triggers.cast
+  targets => Targets.none
+
+  monumentToBuild(caster) => MONUMENTS.first(fn (monumentId) => countUnitsOfTypeNear(caster, monumentId, COLONY_INFLUENCE_RANGE) \
+    + caster.owner.hand.count(=> $0.type.id == monumentId) == 0)
+
+  isEnabled(caster) => [
+    [caster.owner.canAddCards, "Your hand is full!"],
+    [monumentToBuild(caster) != null, "You already built all monuments!"]
+  ]
+  
+  cost(caster) => when monumentToBuild(caster) {
+    MONUMENTS.0 => [g: 6 // (if caster.owner.hasUpgrade("masterSculptors") 2 else 1), ap: 1]
+    MONUMENTS.1 => [g: 10 // (if caster.owner.hasUpgrade("masterSculptors") 2 else 1), ap: 1]
+    MONUMENTS.2 => [g: 12, u: 1, ap: 1]
+    MONUMENTS.3 => [g: 16, u: 2, ap: 2]
+    MONUMENTS.4 => [g: 20, u: 2, ap: 2]
+    else => "Not implemented"
+  }
+
+  run(caster, target) {
+    typeId = monumentToBuild(caster)
+    downtime = when typeId {
+      MONUMENTS.0 => 1
+      MONUMENTS.1 || MONUMENTS.2 => 2
+      MONUMENTS.3 || MONUMENTS.4 => 3
+      else => "Not implemented"
+    }
+    caster.owner.addToHand(typeId, downtime)
+  }
+
+  description(caster) => Game.localizedStr("monumentDescription")
+
+  flavor(caster) => Game.localizedStr(monumentToBuild(caster) + "Flavor")
+}
+
+effect RaiseColonialMilitia {
+  trigger = Triggers.cast
+  targets => Targets.none
+
+  cost(caster) => [g: 2, ap: 1]
+
+  isEnabled(caster) => [[hasVacantInfluencableCell(caster, COLONY_INFLUENCE_RANGE), "You need free space around!"]]
+
+  summonMilitia(cell, owner) {
+    militia = cell.summon("colonialMilitia", owner)
+    militia.addTempEffect(SelfDestructAtEndOfTurn(), militia, 1)
+    militia.restoreActions(militia.speed)
+  }
+
+  militiaCount(caster) => 2 + countUnitsOfTypeNear(caster, "barracks", COLONY_INFLUENCE_RANGE)
+
+  run(caster, target) {
+    player = caster.owner
+    count = militiaCount(caster)
+    for i in 0..count {
+      destination = getVacantInfluencableCell(caster, COLONY_INFLUENCE_RANGE)
+      if destination != null {
+        summonMilitia(destination, player)
+      } else {
+        break
+      }
+    }
+  }
+
+  description(caster) => "Summon $(militiaCount(caster)) Colonial Militia that die at the end of the turn. Improved for every Barracks nearby."
+}
+
+effect SendTribute {
+  GOLD_SENT = 3
+  FAVOR_RECEIVED = 1
+
+  trigger = Triggers.cast
+  targets => Targets.none
+  
+  cost(caster) => [g: GOLD_SENT]
+
+  run(caster, target) {
+    caster.owner.addResources([u: FAVOR_RECEIVED])
+    Game.animateVisualFx([
+      [
+        type: "earn",
+        coordinates: caster.coordinates,
+        color: "#0000FF"
+      ]
+    ])
+  }
+
+  description(caster) => "Send $GOLD_SENT gold to receive $FAVOR_RECEIVED favor."
+}
+
+effect ColonialHallGenerateGold {
+  BASE_GOLD = 5
+
+  trigger => Triggers.startOfTurn
+
+  gold(caster) {
+    g = BASE_GOLD + countUnitsOfTypeNear(caster, "airfield", COLONY_INFLUENCE_RANGE) * 2
+    if !caster.owner.hasUpgrade("theThirdShift") {
+      factoryGold = countUnitsOfTypeNear(caster, "factory", COLONY_INFLUENCE_RANGE)
+      if caster.owner.hasUpgrade("harnessingTheLightning") {
+        factoryGold *= 2
+      }
+      g += factoryGold
+    }
+    return g
+  }
+
+  run(caster, target) {
+    g = gold(caster)
+    caster.owner.addResources([g: g])
+    Game.animateVisualFx([
+      [
+        type: "earn",
+        coordinates: caster.coordinates
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " generates $g Gold.", LogLevels.info, caster.coordinates)
+  }
+  
+  description(caster) => "At start of turn, generate $(gold(caster)) gold. Improved for every Factory and Airfield nearby."
+}
+
+effect ColonialHallExertInfluence {
+  MAX_INFLUENCE = 3
+
+  trigger = Triggers.passive
+
+  extraInfluence(caster) {
+    nearbyBuildingsCount = Game.unitsInRange(caster.coordinates, MAX_INFLUENCE) \
+      .count(=> $0.isBuilding && $0.type.id != "colonialHall")
+    return if nearbyBuildingsCount < 2 {
+      0
+    } else if nearbyBuildingsCount < 5 {
+      1
+    } else {
+      2
+    }
+  }
+
+  run(caster, target) => [
+    influence: ["+", extraInfluence(caster)]
+  ]
+
+  description(caster) => "Exerts more influence based on number of nearby buildings. " + Game.describeAsStance(caster, run(caster, caster))
+}
+
+effect TrainSteamGolem is AddCardToHandWithRampingCost {
+  init {
+    super.init("steamGolem", 2, 12, 0, 1, 0.3, 0, 0)
+  }
+
+  downtimeOverride(caster) => if caster.owner.hasUpgrade("engineKits") 1 else 2
+}
+
+effect TrainDevilhornTank is AddCardToHandWithRampingCost {
+  init {
+    super.init("devilhornTank", 2, 15, 0, 2, 0.35, 0, 0)
+  }
+
+  isEnabled(caster) => [
+    [caster.owner.canAddCards, "Your hand is full!"],
+    [hasMajorUpgrade(caster.owner), "You need a Major Upgrade!"]
+  ]
+
+  downtimeOverride(caster) => if caster.owner.hasUpgrade("engineKits") 1 else 2
+}
+
+effect TrainMEV is AddCardToHandWithRampingCost {
+  init {
+    super.init("mev", 2, 12, 0, 1, 0.33, 0, 0)
+  }
+
+  downtimeOverride(caster) => if caster.owner.hasUpgrade("engineKits") 1 else 2
+}
+
+effect TrainAssaultAirship is AddCardToHandWithRampingCost {
+  init {
+    super.init("assaultAirship", 2, 14, 0, 2, 0.3, 0, 0)
+  }
+
+  isEnabled(caster) => [
+    [caster.owner.canAddCards, "Your hand is full!"],
+    [hasMajorUpgrade(caster.owner), "You need a Major Upgrade!"]
+  ]
+}
+
+effect Airlift {
+  trigger => Triggers.cast
+
+  cost(caster) => [ap: 1]
+
+  isEnabled(caster) => [[caster.owner.hasUpgrade("viciousVanguard"), "Get Vicious vanguard upgrade!"]]
+
+  check(caster, target) => areAllies(caster, target) && target.type.id == "rifleman"
+
+  run(caster, target) {
+    target.destroy(caster)
+    caster.owner.addToHand("paradrop", 1)
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " is undergoing parachute training...", LogLevels.info, target.coordinates)
+  }
+
+  description(caster) => "Target a friendly Rifleman. Destroy it and add a Paradrop spell to your hand."
+}
+
+effect GenerateFavorMonument {
+  init(@amount)
+
+  trigger => Triggers.startOfTurn
+
+  run(caster, target) {
+    caster.owner.addResources([u: amount])
+    Game.animateVisualFx([
+      [
+        type: "earn",
+        coordinates: caster.coordinates,
+        color: "#0000FF"
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " generates $amount Favor.", LogLevels.info, caster.coordinates)
+  }
+  
+  description(caster) => "Generate $amount Favor."
+}
+
+effect SettlerRepair is Repair {
+  repairAmount = 20
+
+  cost(caster) => [g: 2, ap: 1]
+}
+
+fn rampingFoundCost(player, typeId, baseCost, rampCost) => baseCost + countUnitsOfType(player, typeId) * rampCost
+
+effect BuildRoad {
+  extraId => "buildRoadTurnsLeft"
+  durations => [grass: 1, forest: 2, jungle: 2, swamp: 2, desert: 2, beach: 2, river: 2]
+
+  trigger => Triggers.cast
+  targets => Targets.cell
+
+  cost(caster) {
+    g = 4
+    ap = 3
+    if caster.owner.hasUpgrade("combatEngineers") {
+      g -= 2
+      ap -= 2
+    }
+    return [g: g, ap: ap]
+  }
+
+  check(caster, target) => target.terrain in durations().keys
+
+  run(caster, target) {
+    turnsLeft = target.getExtraValue(extraId())
+    if turnsLeft == null {
+      turnsLeft = durations().(target.terrain) ?? 3
+      if turnsLeft > 1 {
+        target.addExtra(extraId(), "buildRoadTitle", "buildRoad", turnsLeft)
+      }
+    }
+    Game.animateVisualFx([
+      [
+        type: "earn",
+        coordinates: target.coordinates,
+        color: "#D9D9D9"
+      ]
+    ])
+    if turnsLeft == 1 {
+      target.removeExtra(extraId())
+      target.setTerrain("road")
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " builds road!", LogLevels.info, caster.coordinates)
+    } else {
+      turnsLeft -= 1
+      target.updateExtra(extraId(), turnsLeft)
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " is building road, $turnsLeft turns left...", LogLevels.info, caster.coordinates)
+    }
+  }
+
+  description(caster) => "Change the terrain type of the nearby hex to Road. $(durations())"
+}
+
+effect FoundColony is MorphSelf {
+  newType = "colonialHall"
+
+  cost(caster) => [g: rampingFoundCost(caster.owner, newType, 25, 10)]
+}
+
+effect FoundPlantation is MorphSelf {
+  newType = "plantation"
+
+  cost(caster) => [g: rampingFoundCost(caster.owner, newType, 12, 4)]
+}
+
+effect TurtleFormation {
+  ATTACK = 1.5
+  DEFENSE = 0.8
+
+  trigger = Triggers.passive
+
+  nearbyRiflemen(caster) => countUnitsOfTypeNear(caster, "rifleman", 1)
+
+  isEnabled(caster) => [
+    [caster.owner.hasUpgrade("infantryFormations"), "You must have Infantry formations upgrade"],
+    [nearbyRiflemen(caster) > 0, "This only works if there are other Riflemen around"]
+  ]
+
+  run(caster, target) {
+    c = nearbyRiflemen(caster)
+    return [
+      attack: ["+", Math.floor(c * ATTACK)],
+      defense: ["+", Math.floor(c * DEFENSE)]
+    ]
+  }
+
+  description(caster) => "For each nearby Rifleman, add $ATTACK Attack and $DEFENSE Defense."
+}
+
+PLAGUE_SEEDS_DURATION = 3
+
+effect PlagueSeedsModifier {
+  DAMAGE_PERCENTAGE = 50
+  DAMAGE_PERCENTAGE_WITH_IMUNITY = 5
+
+  trigger => Triggers.startOfTurn
+
+  run(caster, target) {
+    damagePercentage = if target.owner.hasUpgrade("superspread") DAMAGE_PERCENTAGE_WITH_IMUNITY else DAMAGE_PERCENTAGE
+    damageTaken = target.hp * damagePercentage // 100
+    target.takeDamage(damageTaken, caster)
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " takes $damageTaken damage from Plague!", LogLevels.info, target.coordinates)
+    location = target.coordinates
+    if location != null { # didn't die yet, infect others
+      units = Game.unitsInRange(location, 1).where(=> isOrganic($0) && !$0.hasTempEffect("PlagueSeedsModifier"))
+      for unit in units {
+        Game.animateVisualFx([
+          [
+            type: "poison",
+            coordinates: unit.coordinates,
+            color: "#006400"
+          ]
+        ])
+        Game.logEvent(Game.localizedStr(unit.type.id + "Title") + " gets infected with Plague!", LogLevels.warn, unit.coordinates)
+        unit.addTempEffect(PlagueSeedsModifier(), caster, PLAGUE_SEEDS_DURATION)
+      }
+    }
+  }
+
+  sprite => "plagueSeeds"
+
+  title => "plagueSeedsTitle"
+  
+  description(caster) => "At the start of turn, take $DAMAGE_PERCENTAGE% damage. Infect all nearby organic units who aren't infected already."
+}
+
+effect Autoinfection {
+  trigger = Triggers.summon
+
+  isEnabled(caster) => [[caster.owner.hasUpgrade("superspread"), "You must have Superspread upgrade"]]
+
+  duration => PLAGUE_SEEDS_DURATION * 2
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "poison",
+        coordinates: caster.coordinates,
+        color: "#006400"
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " now bears plague!", LogLevels.warn, caster.coordinates)
+    caster.addTempEffect(PlagueSeedsModifier(), caster, duration())
+  }
+
+  description(caster) => "Infect the unit with Plague Seeds for $(duration()) turns."
+}
+
+effect VeterancyModifier is AuraModifier {
+  run(caster, target) => [
+    attack: ["+", 2],
+    defense: ["+", 1]
+  ]
+
+  sprite => "hardenedVeterans"
+
+  title => "veterancyTitle"
+}
+
+effect MorphSelfWithAutoinfectionAndVeterancy is MorphSelf {
+  retainAp(caster) => false
+
+  run(caster, target) {
+    casterAp = caster.ap
+    hasVeterancy = caster.hasTempEffect("VeterancyModifier")
+    super.run(caster, target)
+    autoinfection = Autoinfection()
+    if skillIsEnabled(autoinfection, caster) {
+      autoinfection.run(caster, caster)
+    } else {
+      Console.println("Autoinfection not enabled!")
+    }
+    if hasVeterancy {
+      target.addTempEffect(VeterancyModifier(), caster, INFINITY)
+    }
+    if retainAp(caster) {
+      target.setActions(casterAp)
+    }
+  }
+}
+
+effect MountToDragoon is MorphSelfWithAutoinfectionAndVeterancy {
+  newType => "dragoon"
+
+  retainAp(caster) => caster.owner.hasUpgrade("horsebackTraining")
+
+  cost(caster) => [ap: if caster.owner.hasUpgrade("horsebackTraining") 0 else 1]
+}
+
+effect DismountToRifleman is MountToDragoon {
+  newType => "rifleman"
+}
+
+effect Sabotage {
+  trigger => Triggers.cast
+  
+  cost(caster) => [g: 1, ap: 2]
+
+  check(caster, target) => !areAllies(caster, target) && target.isBuilding
+
+  run(caster, target) {
+    if target != null {
+      target.setActions(-target.speed) # stun
+      Game.animateVisualFx([
+        [
+          type: "explosion",
+          coordinates: target.coordinates
+        ]
+      ])
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sabotages " + Game.localizedStr(target.type.id + "Title"), LogLevels.info, caster.coordinates)
+    }
+  }
+
+  description(caster) => "Stun target enemy building."
+}
+
+effect ConcussiveGrenade {
+  DAMAGE = 5
+
+  trigger = Triggers.cast
+
+  cost(caster) => [g: 1, ap: 1]
+  check(caster, target) => !target.isBuilding && !areAllies(caster, target)
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "explosion",
+        coordinates: target.coordinates
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " throws concussive grenade at " + Game.localizedStr(target.type.id + "Title"), \
+      LogLevels.info, target.coordinates)
+    target.takeDamage(DAMAGE, caster)
+    target.setActions(-1) # stun
+  }
+
+  description(caster) => "Deal $DAMAGE damage to an enemy and stun it for 1 AP."
+}
+
+effect RetrofitToVoltWalker is MorphSelf {
+  newType = "voltWalker"
+
+  isEnabled(caster) => [[caster.owner.hasUpgrade("voltWalkers"), "You must have Volt walkers upgrade"]]
+
+  cost(caster) => [ap: 1]
+}
+
+effect Recrew {
+  validTypes => ["settler", "rifleman", "dragoon"]
+  baseHpRestored => 15
+  baseApRestored => 1
+
+  trigger => Triggers.cast
+  
+  range(caster) => 1
+  
+  check(caster, target) => areAllies(caster, target) && target.type.id in validTypes()
+
+  hpRestored(caster) => baseHpRestored()
+  apRestored(caster) => baseApRestored()
+
+  run(caster, target) {
+    target.destroy(caster)
+    hp = hpRestored(caster)
+    ap = apRestored(caster)
+    caster.restoreHealth(hp)
+    caster.restoreActions(ap)
+    Game.animateVisualFx([
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#800080"
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " recrews " + Game.localizedStr(caster.type.id + "Title") \
+      + ", restoring $hp HP and $ap AP.", LogLevels.info, caster.coordinates)
+  }
+
+  description(caster) => "Target nearby infantry or settler. Destroy it to restore $(hpRestored(caster)) HP and $(apRestored(caster)) AP."
+}
+
+effect BuildRoadDevilhornTank is BuildRoad {
+  isEnabled(caster) => [[caster.owner.hasUpgrade("combatEngineers"), "You must have Combat engineers upgrade"]]
+}
+
+effect RetrofitToVoltTank is MorphSelf {
+  newType = "voltTank"
+
+  isEnabled(caster) => [[caster.owner.hasUpgrade("harnessingTheLightning"), "You must have Harnessing the lightning upgrade"]]
+
+  cost(caster) => [ap: 1]
+}
+
+effect CombatShieldsModifier is AuraModifier {
+  run(caster, target) => [
+    retaliationCount: ["+", 2],
+    defense: ["+", 2]
+  ]
+
+  sprite => "combatShields"
+
+  title => "combatShieldsTitle"
+}
+
+effect CombatShields {
+  validTypes = ["rifleman", "dragoon"]
+  radius = 1
+  duration = 2
+  
+  trigger => Triggers.cast
+  targets => Targets.none
+  cost(caster) => [g: 5, ap: 2]
+
+  run(caster, target) {
+    modifier = CombatShieldsModifier()
+    around = Game.unitsInRange(Game.grid.locate(caster), radius) \
+      .where(=> areAllies(caster, $0) && $0.type.id in validTypes)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " issues combat shields to $(around.size) allies!", LogLevels.info, caster.coordinates)
+    Game.animateVisualFx(around.map(=> [
+      type: "boost",
+      coordinates: $0.coordinates,
+      color: "#D9D9D9"
+    ]))
+    for unit in around {
+      unit.addTempEffect(modifier, caster, duration)
+    }
+  }
+  
+  description(caster) => "Add $(CombatShieldsModifier().description(caster)) for $duration turns to all friendly riflemen and dragoons in radius $radius."
+}
+
+effect CellTechModifier is AuraModifier {
+  run(caster, target) => [
+    attack: ["+", 3],
+    attackCount: ["+", 1],
+    speed: ["+", 1]
+  ]
+
+  sprite => "cellTech"
+
+  title => "cellTechTitle"
+}
+
+effect CellTech {
+  validTypes = ["rifleman", "dragoon"]
+  radius = 1
+  duration = 1
+  
+  trigger => Triggers.cast
+  targets => Targets.none
+  cost(caster) => [g: 8, ap: 2]
+
+  run(caster, target) {
+    modifier = CellTechModifier()
+    around = Game.unitsInRange(Game.grid.locate(caster), radius) \
+      .where(=> areAllies(caster, $0) && $0.type.id in validTypes)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " issues dat dere cell tech to $(around.size) allies!", LogLevels.info, caster.coordinates)
+    Game.animateVisualFx(around.map(=> [
+      type: "boost",
+      coordinates: $0.coordinates,
+      color: "#00FF00"
+    ]))
+    for unit in around {
+      unit.addTempEffect(modifier, caster, duration)
+    }
+  }
+  
+  description(caster) => "Add $(CellTechModifier().description(caster)) for $duration turns to all friendly riflemen and dragoons in radius $radius."
+}
+
+effect Promoted {
+  HP_RESTORED = 2
+  FAVOR_RECEIVED = 1
+
+  trigger => Triggers.endOfTurn
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#00FF00"
+      ],
+      [
+        type: "earn",
+        coordinates: target.coordinates,
+        color: "#0000FF"
+      ]
+    ])
+    target.restoreHealth(HP_RESTORED)
+    target.owner.addResources([u: FAVOR_RECEIVED])
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + "'s past deeds give it a nice pension that provides premium healthcare.", LogLevels.info, target.coordinates)
+  }
+
+  sprite => "valiantPromotion"
+
+  description(caster) => "At the end of turn, gain $FAVOR_RECEIVED Favor and restore $HP_RESTORED HP."
+}
+
+effect ValiantPromotion is TargetableSpell {
+  DURATION = 2
+
+  check(caster, target) => isOrganic(target) && areAllies(caster, target) && !target.hasTempEffect("Promoted")
+
+  run(caster, target) {
+    target.addTempEffect(Promoted(), caster, DURATION)
+    Game.animateVisualFx([
+      [
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#FFD700"
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " gets promoted for valiance in the theater of war.", LogLevels.info, target.coordinates)
+  }
+
+  description(caster) => "Promote a friendly unit so that it generates favor and restores health at the end of turn. Doesn't stack."
+}
+
+effect BeaconOfLight {
+  trigger = Triggers.endOfTurn
+
+  favorGained(level) => Math.floor(level / 2.0)
+  castsValiantPromotion(level) => level >= 3
+  valiantPromotionRadius = 1
+
+  run(caster, target) {
+    l = getChampionLevel(caster)
+    caster.owner.addResources([u: favorGained(l)])
+    if castsValiantPromotion(l) {
+      vpTarget = Game.unitsInRange(caster.coordinates, valiantPromotionRadius) \
+        .where(=> areAllies(caster, $0) && !$0.isBuilding) \
+        .minBy(=> $0.hp)
+      if vpTarget != null {
+        ValiantPromotion().run(caster.owner, vpTarget)
+      }
+    }
+  }
+
+  description(caster) {
+    l = getChampionLevel(caster)
+    desc = "Gain $(favorGained(l)) Favor."
+    if castsValiantPromotion(l) {
+      desc += " Cast a Valiant Promotion on lowest health friendly unit in radius $valiantPromotionRadius."
+    }
+    return desc
+  }
+}
+
+effect BlazeOfGlory {
+  trigger = Triggers.cast
+  targets = Targets.none
+
+  hpRequired(caster) => Math.floor(caster.health * 0.2)
+  radius(level) => level // 3 + 1
+  damage(level) => level * 8
+
+  isEnabled(caster) => [[caster.hp <= hpRequired(caster), "Must be at $(hpRequired(caster)) HP or lower!!"]]
+
+  run(caster, target) {
+    l = getChampionLevel(caster)
+    location = caster.coordinates
+    dmg = damage(l)
+    for unit in Game.unitsInRange(location, radius(l)) {
+      if unit.id != caster.id {
+        animateHitOn(unit)
+        unit.takeDamage(dmg, caster)
+      }
+    }
+    Game.animateVisualFx([
+      [
+        type: "explosion",
+        coordinates: caster.coordinates
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s service ends in a fiery inferno that engulfs its enemies and allies alike.", LogLevels.warn, caster.coordinates)
+    caster.destroy(caster)
+  }
+
+  description(caster) {
+    l = getChampionLevel(caster)
+    return "Self-destruct, dealing $(damage(l)) damage to all units in radius $(radius(l))."
+  }
+}
+
+effect DisrepairedColossus {
+  CUTOFF_HEALTH_PERCENTAGE = 30
+
+  trigger = Triggers.passive
+
+  isEnabled(caster) => [[caster.hp < caster.health * CUTOFF_HEALTH_PERCENTAGE // 100, "Keep it repaired"]]
+
+  run(caster, target) => [
+    defense: ["=", 0],
+    retaliationCount: ["=", 0],
+    speed: ["=", 0],
+    regeneration: ["=", 0]
+  ]
+
+  description(caster) => "Doesn't function if HP is less than $CUTOFF_HEALTH_PERCENTAGE% of health."
+}
+
+effect LightningArc {
+  JUMPS = 2
+  DAMAGE = 7
+
+  trigger = Triggers.attack
+
+  run(caster, target) {
+    currentTarget = target
+    for i in 0..JUMPS {
+      currentTarget = Game.unitsInRange(currentTarget.coordinates, 1).where(=> !areAllies(caster, $0) && !$0.isBuilding).randomItem
+      if currentTarget == null {
+        break
+      }
+      # Console.println("Jumped to $currentTarget")
+      Game.animateVisualFx([
+        [
+          type: "electric",
+          coordinates: currentTarget.coordinates
+        ]
+      ])
+      currentTarget.takeDamage(DAMAGE - i, caster)
+    }
+  }
+
+  description(caster) => "Deal damage to a nearby enemy unit. Repeat $JUMPS times. Each jump deals 1 damage less than the previous one."
+}
+
+effect StrafingRun {
+  trigger = Triggers.cast
+
+  cost(caster) => [ap: 2]
+
+  range(caster) => 2
+
+  check(caster, target) => !areAllies(caster, target) && hasVacantCell(target, 1)
+
+  run(caster, target) {
+    startingCell = Game.grid.locate(caster)
+    targetCell = getVacantCell(target, 1)
+    caster.moveTo(targetCell.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " dive bombs at " + Game.localizedStr(target.type.id + "Title"), LogLevels.info, target.coordinates)
+    Game.combat(caster, target)
+    if targetCell.content != null {
+      caster.moveTo(startingCell.coordinates)
+    }
+  }
+
+  description(caster) => "Move to a cell next to an enemy. Combat, then return to starting position."
+}
+
+effect CitadelProtocol {
+  trigger = Triggers.afterDie
+
+  run(caster, target) {
+    target.summon("citadelWalker", caster.owner)
+    Game.animateVisualFx([
+      [
+        type: "explosion",
+        coordinates: target.coordinates
+      ]
+    ])
+    Game.logEvent("The crew runs off in a specialized survival walker...", LogLevels.info, target.coordinates)
+  }
+
+  description(caster) => "Summon a Citadel Walker."
+}
+
+# Heroes
+
+effect NoxiousCloud {
+  baseDamage = 5
+  poisonDamage = 2
+  basePoisonDuration = 2
+
+  trigger = Triggers.cast
+  targets = Targets.cell
+
+  cost(caster) => [ap: 2]
+
+  range(caster) => 2
+
+  level(caster) => if caster.hasUpgrade("noxiousCloudL3") 3 \
+    else if caster.hasUpgrade("noxiousCloudL2") 2 \
+    else if caster.hasUpgrade("noxiousCloudL1") 1 \
+    else 0
+
+  isEnabled(caster) => [[level(caster) > 0, "You need to invest in Noxious cloud upgrades"]]
+
+  params(caster) {
+    l = level(caster)
+    p = caster.prowess
+    radius = if (l < 3) 1 else 2
+    damage = Math.floor(baseDamage * l * (1 + 0.05 * p))
+    poisonDuration = Math.floor(basePoisonDuration * (1 + 0.3 * l + 0.05 * p))
+    return [radius: radius, damage: damage, poisonDuration: poisonDuration]
+  }
+
+  run(caster, target) {
+    p = params(caster)
+    Game.animateVisualFx([
+      [
+        type: "poison",
+        coordinates: target.coordinates,
+        color: "#800080"
+      ]
+    ])
+    units = Game.unitsInRange(target, p.radius).where(=> $0.id != caster.id && isOrganic($0))
+    if target.content != null {
+      units.add(target.content)
+    }
+    for unit in units {
+      unit.takeDamage(p.damage, caster)
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Noxious Cloud engulfs " + Game.localizedStr(target.type.id + "Title") \
+        + ", dealing $(p.damage) damage and poisoning it!", LogLevels.info, target.coordinates)
+      if !unit.hasTempEffect("PoisonModifier") {
+        unit.addTempEffect(PoisonModifier(poisonDamage), caster, p.poisonDuration)
+        Game.animateVisualFx([
+          [
+            type: "poison",
+            coordinates: unit.coordinates,
+            color: "#00FF00"
+          ]
+        ])
+      }
+    }
+  }
+
+  description(caster) {
+    p = params(caster)
+    return "Deal $(p.damage) to all organic units in radius $(p.radius). They take $posionDamage each turn for $(p.poisonDuration) turns."
+  }
+}
+
+effect TofansKissModifier {
+  init(@percentageDamage)
+
+  trigger => Triggers.startOfTurn
+
+  damageTaken(caster) => caster.hp * percentageDamage // 100
+
+  run(caster, target) {
+    damage = damageTaken(caster)
+    target.takeDamage(damage, caster)
+    Game.animateVisualFx([
+      [
+        type: "poison",
+        coordinates: target.coordinates,
+        color: "#FF0000"
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Kiss still lingers on " + Game.localizedStr(target.type.id + "Title") \
+      + "'s skin, dealing $damage damage.", LogLevels.info, target.coordinates)
+  }
+
+  sprite => "tofansKiss"
+
+  title => "tofansKissTitle"
+  
+  description(caster) => "At the start of turn, take $(damageTaken(caster)) damage."
+}
+
+effect TofansKiss {
+  BASE_PERCENTAGE = 10
+
+  trigger = Triggers.cast
+
+  cost(caster) => [ap: 1]
+
+  level(caster) => if caster.hasUpgrade("tofansKissL3") 3 \
+    else if caster.hasUpgrade("tofansKissL2") 2 \
+    else if caster.hasUpgrade("tofansKissL1") 1 \
+    else 0
+
+  isEnabled(caster) => [[level(caster) > 0, "You need to invest in Tofan's kiss upgrades"]]
+
+  params(caster) {
+    l = level(caster)
+    p = caster.prowess
+    percentage = Math.floor(BASE_PERCENTAGE * l * (1 + 0.05 * p))
+    baseDuration = 2
+    duration = Math.floor(baseDuration * (1 + 0.3 * l + 0.05 * p))
+    return [percentage: percentage, duration: duration]
+  }
+
+  check(caster, target) => isOrganic(target) && !areAllies(caster, target)
+
+  run(caster, target) {
+    p = params(caster)
+    target.takeDamage(target.hp * p.percentage // 100, caster)
+    target.addTempEffect(TofansKissModifier(p.percentage), caster, p.duration)
+    Game.animateVisualFx([
+      [
+        type: "poison",
+        coordinates: target.coordinates,
+        color: "#0000FF"
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Kiss is something " + Game.localizedStr(target.type.id + "Title") \
+      + " won't forget for at least $(p.duration) turns!", LogLevels.info, target.coordinates)
+  }
+
+  description(caster) {
+    p = params(caster)
+    return "Poison an enemy organic unit to take $(p.percentage)% of its remaining health as damage immediately and also for the next $(p.duration) turns."
+  }
+}
+
+effect PlagueSeeds {
+  trigger = Triggers.cast
+
+  cost(caster) => [g: 5, ap: 2]
+
+  range(caster) => 2
+
+  level(caster) => if caster.hasUpgrade("plagueSeeds") 1 \
+    else 0
+
+  isEnabled(caster) => [[level(caster) > 0, "You need to invest in Plague seeds upgrades"]]
+
+  check(caster, target) => isOrganic(target)
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "poison",
+        coordinates: target.coordinates,
+        color: "#006400"
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " exposes " + Game.localizedStr(target.type.id + "Title") \
+      + " to the deadly plague!", LogLevels.warn, target.coordinates)
+    target.addTempEffect(PlagueSeedsModifier(), caster, PLAGUE_SEEDS_DURATION)
+  }
+
+  description(caster) => "Plague an organic unit to take damage and spread plague further."
+}
+
+effect RecrewDenburhin is Recrew {
+  level(caster) => if caster.hasUpgrade("improvedOnboarding") 2 else 1
+
+  hpRestored(caster) => @baseHpRestored * (level(caster) * 1)
+  apRestored(caster) => @baseApRestored * level(caster)
+}
+
+effect DenburhinAttack {
+  ANTI_AIR_EXTRA_DAMAGE = 15
+  GROUND_EXTRA_DAMAGE = 12
+  BUILDING_EXTRA_DAMAGE = 14
+
+  trigger = [Triggers.attack, Triggers.defend]
+
+  hasAntiAirUpgrade(caster) => caster.hasUpgrade("antiAirTurrets")
+  hasAntiGroundUpgrade(caster) => caster.hasUpgrade("bombAutoloader")
+  hasAntiBuildingUpgrade(caster) => caster.hasUpgrade("incendiaryPayload")
+
+  run(caster, target) {
+    extraDamage = 0
+    if hasAntiAirUpgrade(caster) && target.movementType == "fly" {
+      extraDamage += ANTI_AIR_EXTRA_DAMAGE
+    } else if target.movementType != "fly" {
+      if hasAntiGroundUpgrade(caster) {
+        extraDamage += GROUND_EXTRA_DAMAGE
+      }
+      if hasAntiBuildingUpgrade(caster) && target.isBuilding {
+        extraDamage += BUILDING_EXTRA_DAMAGE
+      }
+    }
+    if extraDamage > 0 {
+      Game.animateVisualFx([
+        [
+          type: "explosion",
+          coordinates: target.coordinates
+        ]
+      ])
+    }
+    target.takeDamage(extraDamage, caster)
+  }
+
+  description(caster) {
+    desc = ""
+    if hasAntiAirUpgrade(caster) {
+      desc += "Deal $ANTI_AIR_EXTRA_DAMAGE to flying units. "
+    }
+    if hasAntiGroundUpgrade(caster) {
+      desc += "Deal $GROUND_EXTRA_DAMAGE to ground units. "
+    }
+    if hasAntiBuildingUpgrade(caster) {
+      desc += "Deal $BUILDING_EXTRA_DAMAGE to buildings."
+    }
+    if desc.isEmpty {
+      desc = "Invest in upgrades to deal more damage!"
+    }
+    return desc
+  }
+}
+
+effect TheFlagship {
+  EXTRA_DEFENSE = 2
+  EXTRA_REGEN = 1
+  EXTRA_ATTACK_COUNT = 1
+  EXTRA_SPEED = 1
+
+  trigger = Triggers.passive
+
+  hasDefenseUpgrade(caster) => caster.hasUpgrade("reinforcedHull")
+  hasRegenUpgrade(caster) => caster.hasUpgrade("repairCrews")
+  hasAttackCountUpgrade(caster) => caster.hasUpgrade("battleStations")
+  hasExtraSpeedUpgrade(caster) => caster.hasUpgrade("whereTheEmperorsWillLeadsUs")
+
+  run(caster, target) {
+    extraRegen = if hasRegenUpgrade(caster) EXTRA_REGEN else 0
+    return [
+      defense: ["+", if hasDefenseUpgrade(caster) EXTRA_DEFENSE else 0],
+      regeneration: ["+", extraRegen],
+      attackCount: ["+", if hasAttackCountUpgrade(caster) EXTRA_ATTACK_COUNT else 0],
+      speed: ["+", if hasExtraSpeedUpgrade(caster) EXTRA_SPEED else 0]
+    ]
+  }
+
+  description(caster) => Game.describeAsStance(caster, run(caster, null))
+}
+
+effect FireBrigade {
+  LOW_REGEN_THRESHOLD = 0.2
+  EXTRA_REGEN_ON_LOW = 10
+
+  trigger = Triggers.endOfTurn
+
+  isEnabled(caster) => [[caster.hasUpgrade("fireBrigade"), "You must have Fire brigade upgrade!"]]
+
+  run(caster, target) {
+    if caster.hp <= caster.health * LOW_REGEN_THRESHOLD {
+      Game.animateVisualFx([
+        [
+          type: "boost",
+          coordinates: caster.coordinates,
+          color: "#00FF00"
+        ]
+      ])
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Fire brigades serve with pride.", LogLevels.info, caster.coordinates)
+      caster.restoreHealth(EXTRA_REGEN_ON_LOW)
+    }
+  }
+
+  description(caster) => "If you're below $(LOW_REGEN_THRESHOLD * 100)% health, restore $EXTRA_REGEN_ON_LOW health."
+}
+
+effect AimForTheSun {
+  trigger = Triggers.cast
+  targets => Targets.cell
+
+  cost(caster) => [ap: 3]
+
+  level(caster) => if caster.hasUpgrade("aimForTheSunL2") 2 \
+    else if caster.hasUpgrade("aimForTheSunL1") 1 \
+    else 0
+
+  isEnabled(caster) => [[level(caster) > 0, "You need to invest in AIm for the sun upgrades"]]
+
+  range(caster) {
+    l = level(caster)
+    p = caster.prowess
+    baseRange = 4
+    r = Math.floor(baseRange * (1 + 0.15 * p) + l)
+    return Math.min(Game.grid.size, r)
+  }
+
+  damageTakenPercentage(caster) {
+    l = level(caster)
+    p = caster.prowess
+    baseDamagePercentage = 35
+    damagePercentage = baseDamagePercentage - l * 5 - p
+    return damagePercentage
+  }
+
+  damageTaken(caster) => caster.health * damageTakenPercentage(caster) // 100
+
+  check(caster, target) => target.content == null && caster.hp > damageTaken(caster)
+
+  run(caster, target) {
+    caster.moveTo(target.coordinates)
+    animateHitOn(caster)
+    caster.takeDamage(damageTaken(caster), caster)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " rises sharply and lands far, far away...", LogLevels.info, caster.coordinates)
+  }
+
+  description(caster) => "Instantly move to an empty cell with range $(range(caster)). Take damage equal to $(damageTakenPercentage(caster))% of your max health."
+}
+
+effect VitarronValiantPromotion is ValiantPromotion {
+  cost(caster) => [g: 5, ap: 3]
+  range(caster) => Math.floor(1 + 0.2 * caster.prowess)
+}
+
+effect GovernanceAuraModifier is AuraModifier {
+  init(@level)
+
+  run(caster, target) => [
+    speed: ["+", level]
+  ]
+
+  sprite => "governanceAura"
+
+  title => "governanceTitle"
+}
+
+effect GovernanceAura is Aura {
+  validTypes = ["settler", "colonialHall", "factory", "airfield", "barracks", "magistratesCourt"]
+
+  stacks = false
+
+  modifierId = "GovernanceAuraModifier"
+
+  level(caster) => if caster.hasUpgrade("governanceAuraL3") 3 \
+    else if caster.hasUpgrade("governanceAuraL2") 2 \
+    else if caster.hasUpgrade("governanceAuraL1") 1 \
+    else 0
+
+  totalLevel(caster) => Math.floor(level(caster) * 0.8 + 0.1 * caster.prowess)
+
+  range(caster) => Math.round(totalLevel(caster) * 0.51)
+
+  isEnabled(caster) => [[level(caster) > 0, "You must have Governance aura upgrade"]]
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id in validTypes
+
+  modifier(caster, target) => GovernanceAuraModifier(totalLevel(caster))
+}
+
+effect Insurrection {
+  trigger = Triggers.cast
+  targets = Targets.none
+
+  isEnabled(caster) => [
+    [caster.hasUpgrade("insurrection"), "You must have Insurrection upgrade"],
+    [caster.owner.ownedUnits.count(=> $0.type.id == "settler") > 0, "You must have settlers to start an insurrection!"]
+  ]
+
+  summonTypeForType(player, units, buildingType, unitType) {
+    for unit in units.where(=> $0.type.id == buildingType) {
+      destination = getVacantInfluencableCell(unit, 5)
+      if destination != null {
+        destination?.summon(unitType, player)
+      }
+    }
+  }
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "aura",
+        coordinates: caster.coordinates,
+        color: "#FF0000"
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " decides to take matters into his own hands...", LogLevels.error, caster.coordinates)
+    player = caster.owner
+    units = player.ownedUnits
+    for unit in units.where(=> $0.type.id == "settler") {
+      unit.setType("colonialMilitia")
+    }
+    for unit in units.where(=> $0.type.id in ["colonialHall", "magistratesCourt"]) {
+      unit.destroy(caster)
+    }
+    summonTypeForType(player, units, "barracks", "rifleman")
+    summonTypeForType(player, units, "factory", "steamGolem")
+    summonTypeForType(player, units, "airfield", "assaultAirship")
+    cardsToRemove = player.hand.where(=> $0.type.id in ["settler", "magistratesCourt", "colonialHall", 
+      "endlessExpansionShipment", "airSuperiorityShipment", "eradicateThePestShipment", "emperorsFistShipment"])
+    for card in cardsToRemove {
+      player.removeFromHand(card.id)
+    }
+  }
+
+  description(caster) => "Convert all Settlers into Colonial Militia. Add a Rifleman for every Barracks, Steam Golem for every Factory\n" \
+    + "and Assault Airship for every Air Field. Destroy all Colonial Halls and MagistratesCourts. Cancel all shipments."
+}
+
+# Spells
+
+effect Paradrop is TargetableSpell {
+  targets => Targets.cell
+
+  check(caster, target) => target.content == null
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "ripple",
+        coordinates: target.coordinates,
+        color: "#0000FF"
+      ]
+    ])
+    Game.logEvent("A Frenza paratrooper appears from the sky.", LogLevels.info, target.coordinates)
+    target.summon("rifleman", caster.owner)
+  }
+
+  description(caster) => "Summon a Rifleman on an empty cell."
+}
+
+effect Shipment is TargetableSpell {
+  targets => Targets.cell
+
+  check(caster, target) => target.content == null && target.influencer == caster.owner.id
+
+  run(caster, target) {
+    player = caster.owner
+    p = @payload(player)
+    units = p?.units
+    if units != null {
+      for unitType in units.keys {
+        for i in 0..units.(unitType) {
+          destination = getVacantInfluencableCellAroundCellIncludingIt(target, player)
+          if destination != null {
+            destination.summon(unitType, player)
+          }
+        }
+      }
+    }
+    cards = p?.cards
+    if cards != null {
+      for cardType in cards.keys {
+        for i in 0..cards.(cardType) {
+          player.addToHand(cardType, 0)
+        }
+      }
+    }
+    Game.logEvent("A shipment arrives.", LogLevels.info, target.coordinates)
+  }
+
+  description(caster) => "Select an empty cell under your influence. Summon $(@payload(caster.owner)) on it and nearby empty cells."
+}
+
+effect EndlessExpansionShipment is Shipment {
+  payload(player) => [
+    units: [
+      colonialHall: 1,
+      settler: 2,
+      rifleman: 1
+    ]
+  ]
+}
+
+effect AirSuperiorityShipment is Shipment {
+  payload(player) => [
+    units: [
+      assaultAirship: 2,
+      cargoDirigible: 1
+    ],
+    cards: [
+      paradrop: 1
+    ]
+  ]
+}
+
+effect EradicateThePestShipment is Shipment {
+  payload(player) => [
+     units: [
+      assassin: 3
+     ]
+  ]
+}
+
+effect EmperorsFistShipment is Shipment {
+  payload(player) => [
+     units: [
+      imperialJuggernaut: 1
+     ]
+  ]
+}
+
+effect TheNextGeneration is Shipment {
+  payload(player) {
+    settlerCount = player.ownedUnits.count(=> $0.type.id == "settler") // 3
+    return [
+      units: [
+        settler: settlerCount
+      ]
+    ]
+  }
+}
+
+effect HardenedVeteransShipment is Shipment {
+  COUNT = 2
+  HP_PERCENTAGE = 30
+
+  run(caster, target) {
+    player = caster.owner
+    for i in 0..COUNT {
+      destination = getVacantInfluencableCellAroundCellIncludingIt(target, player)
+      if destination != null {
+        unit = destination.summon("rifleman", player)
+        unit.setHealth(unit.health * HP_PERCENTAGE // 100)
+        unit.addTempEffect(VeterancyModifier(), caster, INFINITY)
+      }
+    }
+    Game.logEvent("A pair of hardened veterans arrive to join battle.", LogLevels.info, target.coordinates)
+  }
+
+  description(caster) => "Summon $COUNT Riflemen with $HP_PERCENTAGE% health and Veterancy."
+}
+
+effect TheCullingModifier {
+  FAVOR_RECEIVED = 2
+
+  trigger => Triggers.kill
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "earn",
+        coordinates: caster.coordinates,
+        color: "#0000FF"
+      ]
+    ])
+    Game.logEvent("The culling grants Emperor's bounty for each hostile head.", LogLevels.info, caster.coordinates)
+    caster.owner.addResources([u: FAVOR_RECEIVED])
+  }
+
+  sprite => "theCulling"
+
+  title => "theCullingTitle"
+
+  description(caster) => "Gain $FAVOR_RECEIVED Favor."
+}
+
+effect TheCulling {
+  DURATION = 2
+
+  trigger = Triggers.cast
+  targets = Targets.none
+
+  run(caster, target) {
+    for unit in caster.owner.ownedUnits.where(=> !$0.isBuilding) {
+      unit.addTempEffect(TheCullingModifier(), caster, DURATION)
+    }
+  }
+
+  description(caster) => "For the next $DURATION turns, whenever your unit kills something, it gains 2 Favor."
+}
+
+effect ScrapyardColossusShipment is Shipment {
+  HP_PERCENTAGE = 25
+
+  run(caster, target) {
+    player = caster.owner
+    destination = getVacantInfluencableCellAroundCellIncludingIt(target, player)
+    if destination != null {
+      unit = destination.summon("colossusTank", player)
+      unit.setHealth(unit.health * HP_PERCENTAGE // 100)
+      Game.logEvent("The vehicle is massive, its gun spires rising above the canopies of even the tallest trees. It does need some refurbishment, though.", \
+        LogLevels.info, destination.coordinates)
+    }
+  }
+
+  description(caster) => "Summon a Colossus Tank with $HP_PERCENTAGE% health."
+}
+
+# Upgrades
+
+effect AddTheNextGeneration {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    if caster.owner.canAddCards {
+      caster.owner.addToHand("theNextGenerationShipment", 0)
+    }
+  }
+
+  description(caster) => "Adds the Next Generation spell to hand."
+}
+
+effect TaxCollectors {
+  GOLD_PER_CELL = 0.12
+  trigger = Triggers.endOfTurn
+
+  run(caster, target) {
+    playerId = caster.owner.id
+    influencedCellCount = Game.grid.cells.count(=> $0.influencer == playerId)
+    # Console.println("Influenced cell " + influencedCellCount)
+    caster.owner.addResources([g: Math.floor(GOLD_PER_CELL * influencedCellCount)])
+  }
+
+  describeAsStance(caster) => "Gain $GOLD_PER_CELL Gold for every influenced cell."
+}
+
+effect MasterSculptors {
+  FAVOR_RECEIVED = 4
+
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    caster.owner.addResources([u: FAVOR_RECEIVED])
+  }
+
+  description(caster) => "Gain $FAVOR_RECEIVED Favor."
+}
+
+effect HardenedVeterans {
+  MAX_HP_PERCENTAGE = 50
+
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    player = caster.owner
+    for unit in player.ownedUnits.where(=> $0.type.id == "rifleman" && $0.hp < $0.health * MAX_HP_PERCENTAGE // 100) {
+      if !unit.hasTempEffect("VeterancyModifier") {
+        unit.addTempEffect(VeterancyModifier(), caster, INFINITY)
+      }
+    }
+    if player.canAddCards {
+      player.addToHand("hardenedVeteransShipment", 0)
+    }
+  }
+
+  description(caster) => "Give Veterancy to all your Riflemen under $MAX_HP_PERCENTAGE% health. Add Hardened Veterans shipment to your hand."
+}
+
+effect ViciousVanguard {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    caster.owner.addToHand("paradrop", 0)
+  }
+
+  description(caster) => "Increases speed of all airships. Add a Paradrop to your hand. Enabled Airfields to perform Airlift."
+}
+
+effect ViciousVanguardModifier is AuraModifier {
+  run(caster, target) => [
+    speed: ["+", 1]
+  ]
+
+  sprite => "viciousVanguard"
+
+  title => "viciousVanguardTitle"
+}
+
+effect ViciousVanguardAura is Aura {
+  stacks = false
+  modifierId = "ViciousVanguardModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && "airship" in target.type?.tags
+
+  modifier(caster, target) => ViciousVanguardModifier()
+}
+
+effect HeliumPocketsModifier is AuraModifier {
+  run(caster, target) => [
+    speed: ["+", 1],
+    sight: ["+", 1]
+  ]
+
+  sprite => "heliumPockets"
+
+  title => "heliumPocketsTitle"
+}
+
+effect HeliumPockets is Aura {
+  stacks = false
+  modifierId = "HeliumPocketsModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id == "cargoDirigible"
+
+  modifier(caster, target) => HeliumPocketsModifier()
+}
+
+effect DeathSquads {
+   MAX_HP_PERCENTAGE = 80
+   VALID_TYPES = ["rifleman", "dragoon", "assassin"]
+
+  trigger = Triggers.summon
+   
+  run(caster, target) {
+    player = caster.owner
+    for unit in player.ownedUnits.where(=> $0.type.id in VALID_TYPES && $0.hp < $0.health * MAX_HP_PERCENTAGE // 100) {
+      if !unit.hasTempEffect("VeterancyModifier") {
+        unit.addTempEffect(VeterancyModifier(), caster, INFINITY)
+      }
+    }
+    if player.canAddCards {
+      player.addToHand("theCulling", 0)
+    }
+  }
+
+  description(caster) => "Permanently increase attack of Assassins." \
+    + " Give Veterancy to all your Riflemen, Dragoons and Assassins under $MAX_HP_PERCENTAGE% health." \
+    + " Add The Culling spell to your hand."
+}
+
+effect DeathSquadsModifier is AuraModifier {
+  run(caster, target) => [
+    attack: ["+", 4]
+  ]
+
+  sprite => "deathSquads"
+
+  title => "deathSquadsTitle"
+}
+
+effect DeathSquadsAura is Aura {
+  stacks = false
+  modifierId = "DeathSquadsModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => areAllies(caster, target) && target.type.id == "assassin"
+
+  modifier(caster, target) => DeathSquadsModifier()
+}
+
+effect Superspread {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    for unit in caster.owner.ownedUnits.where(=> $0.type.id in ["rifleman", "dragoon", "assassin"] && !$0.hasTempEffect("PlagueSeedsModifier")) {
+      unit.addTempEffect(PlagueSeedsModifier(), caster, PLAGUE_SEEDS_DURATION * 2)
+    }
+  }
+
+  description(caster) => "Infect all your infantry with Plague Seeds."
+}
+
+
+
+effect UncommonValorUpgrade {
+  trigger => Triggers.summon
+
+  run(caster, target) {
+    if !caster.owner.hasEffect("UncommonValor") {
+      caster.owner.addEffect("UncommonValor")
+    }
+  }
+}
+
+effect UncommonValor {
+  HP_PERCENTAGE = 75
+  PROMOTIONS_COUNT = 1
+
+  trigger = Triggers.endOfTurn
+
+  isEnabled(caster) => [[caster.hasUpgrade("uncommonValor"), "You must have Uncommon Valor upgrade!"]]
+
+  run(caster, target) {
+    allUnits = caster.ownedUnits.where(=> !$0.isBuilding)
+    for unit in allUnits.where(=> $0.hp < $0.health * HP_PERCENTAGE // 100) {
+      if !unit.hasTempEffect("VeterancyModifier") {
+        Game.animateVisualFx([
+          [
+            type: "boost",
+            coordinates: unit.coordinates,
+            color: "#800080"
+          ]
+        ])
+        unit.addTempEffect(VeterancyModifier(), unit, INFINITY)
+      }
+    }
+    promotionsLeft = PROMOTIONS_COUNT
+    for unit in allUnits {
+      if !unit.hasTempEffect("Promoted") {
+        Game.animateVisualFx([
+          [
+            type: "boost",
+            coordinates: unit.coordinates,
+            color: "#0000FF"
+          ]
+        ])
+        unit.addTempEffect(Promoted(), unit, INFINITY)
+        promotionsLeft -= 1
+        if promotionsLeft == 0 {
+          break
+        }
+      }
+    }
+  }
+
+  sprite => "uncommonValor"
+
+  title => "uncommonValorTitle"
+
+  description(caster) => "Promote all units below $HP_PERCENTAGE% to Veterancy. Hand out $PROMOTIONS_COUNT Valiant Promotion(s) to random units."
+}
+
+effect IntensiveIndustrialization {
+  VALID_TYPES = ["factory", "airfield"]
+
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    player = caster.owner
+    for unit in player.ownedUnits.where(=> $0.type.id in VALID_TYPES) {
+      unit.restoreActions(unit.speed)
+    }
+  }
+}
+
+effect TheThirdShiftModifier is AuraModifier {
+  run(caster, target) => [
+    speed: ["+", 2]
+  ]
+
+  sprite => "theThirdShift"
+
+  title => "theThirdShiftTitle"
+}
+
+effect TheThirdShift is Aura {
+  stacks = false
+  modifierId = "TheThirdShiftModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => target.type.id == "factory" && caster.owner.isAllyOf(target.owner)
+
+  modifier(caster, target) => TheThirdShiftModifier()
+}
+
+effect ScrapyardColossus {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    if caster.owner.canAddCards {
+      caster.owner.addToHand("scrapyardColossusShipment", 0)
+    }
+  }
+}
+
+effect AddVoltTankToHand {
+  COST = [g: 15]
+
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    if !caster.owner.canPay(COST) {
+      return
+    }
+    caster.owner.addToHand("voltTank", 1)
+  }
+
+  description(caster) => "If you can pay $(COST.g) Gold, add a Volt Tank to your hand."
+}
+
+effect ConvertToVoltWalker {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    steamGolem = caster.owner.ownedUnits.first(=> $0.type.id == "steamGolem")
+    if steamGolem != null {
+      steamGolem.setType("voltWalker")
+      steamGolem.restoreHealth(steamGolem.health)
+      steamGolem.setActions(0)
+      Game.animateVisualFx([
+        [
+          type: "electric",
+          coordinates: steamGolem.coordinates
+        ]
+      ])
+    Game.logEvent("Time to see what this experimental walker can do...", LogLevels.info, steamGolem.coordinates)
+    }
+  }
+}

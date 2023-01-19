@@ -1,0 +1,22 @@
+id: BasicTutorial
+title: basicTutorialTitle
+description: basicTutorialDescription
+difficulties:
+  - normal
+map: BasicTutorialMap
+ruleset:
+  id: BasicTutorialRuleset
+  inherits: Deathmatch
+  randomizedFirstPlayer: false
+  autoCameraReposition: false
+  turnLength: 1800
+players:
+  - name: Player
+    color: red
+    team: 1
+    faction: sanghoy
+  - name: Enemy
+    color: blue
+    team: 2
+    faction: sanghoy
+    ai: EasyAi

@@ -1,0 +1,11 @@
+id: OtokWithoutTimeouts
+inherits: Deathmatch
+title: otokWithoutTimeoutsTitle
+description: otokWithoutTimeoutsDescription
+otokRuleset:
+  rounds: 3
+  initialResources: 10
+  resourcesPerDraft: 10
+  draftDuration: 9000
+  combatTurnsPerRound: 5
+  combatTurnDuration: 1500

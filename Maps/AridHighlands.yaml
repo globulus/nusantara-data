@@ -1,0 +1,5097 @@
+id: AridHighlands
+title: Arid Highlands
+description: The center plateau is rich and well-protected, but also in everyone's way...
+size: 24
+kind: Hexagonal
+maxPlayers: 8
+defaultTerrain: grass
+hexes:
+- c:
+  - -23
+  - 9
+  - 14
+  t: ocean
+- c:
+  - -23
+  - 10
+  - 13
+  t: ocean
+- c:
+  - -23
+  - 11
+  - 12
+  t: ocean
+- c:
+  - -23
+  - 12
+  - 11
+  t: ocean
+- c:
+  - -23
+  - 13
+  - 10
+  t: ocean
+- c:
+  - -23
+  - 14
+  - 9
+  t: ocean
+- c:
+  - -22
+  - 9
+  - 13
+  t: ocean
+- c:
+  - -22
+  - 10
+  - 12
+  t: ocean
+- c:
+  - -22
+  - 11
+  - 11
+  t: ocean
+- c:
+  - -22
+  - 12
+  - 10
+  t: ocean
+- c:
+  - -22
+  - 13
+  - 9
+  t: ocean
+- c:
+  - -21
+  - 3
+  - 18
+  content: site
+- c:
+  - -21
+  - 7
+  - 14
+  t: river
+- c:
+  - -21
+  - 8
+  - 13
+  t: beach
+- c:
+  - -21
+  - 9
+  - 12
+  t: ocean
+- c:
+  - -21
+  - 10
+  - 11
+  t: ocean
+- c:
+  - -21
+  - 11
+  - 10
+  t: ocean
+- c:
+  - -21
+  - 12
+  - 9
+  t: ocean
+- c:
+  - -21
+  - 13
+  - 8
+  t: beach
+- c:
+  - -21
+  - 15
+  - 6
+  t: river
+- c:
+  - -21
+  - 16
+  - 5
+  t: river
+- c:
+  - -21
+  - 17
+  - 4
+  t: river
+- c:
+  - -21
+  - 18
+  - 3
+  t: jungle
+- c:
+  - -21
+  - 19
+  - 2
+  t: river
+- c:
+  - -21
+  - 20
+  - 1
+  t: river
+- c:
+  - -20
+  - -1
+  - 21
+  content: beastDen
+- c:
+  - -20
+  - 6
+  - 14
+  t: river
+- c:
+  - -20
+  - 7
+  - 13
+  t: beach
+- c:
+  - -20
+  - 8
+  - 12
+  t: ocean
+- c:
+  - -20
+  - 9
+  - 11
+  t: ocean
+- c:
+  - -20
+  - 10
+  - 10
+  t: ocean
+- c:
+  - -20
+  - 11
+  - 9
+  t: ocean
+- c:
+  - -20
+  - 12
+  - 8
+  t: ocean
+- c:
+  - -20
+  - 13
+  - 7
+  t: beach
+- c:
+  - -20
+  - 15
+  - 5
+  t: jungle
+  content: beastDen
+- c:
+  - -20
+  - 16
+  - 4
+  t: jungle
+  content: creepCampSmall
+- c:
+  - -20
+  - 17
+  - 3
+  t: river
+- c:
+  - -20
+  - 18
+  - 2
+  t: river
+- c:
+  - -20
+  - 19
+  - 1
+  content: creepCampSmall
+- c:
+  - -19
+  - 2
+  - 17
+  t: jungle
+  content: creepCampSmall
+- c:
+  - -19
+  - 3
+  - 16
+  t: jungle
+- c:
+  - -19
+  - 6
+  - 13
+  t: river
+- c:
+  - -19
+  - 7
+  - 12
+  t: beach
+- c:
+  - -19
+  - 8
+  - 11
+  t: ocean
+- c:
+  - -19
+  - 9
+  - 10
+  t: ocean
+- c:
+  - -19
+  - 10
+  - 9
+  t: ocean
+- c:
+  - -19
+  - 11
+  - 8
+  t: ocean
+- c:
+  - -19
+  - 12
+  - 7
+  t: beach
+- c:
+  - -18
+  - 0
+  - 18
+  startingLocation: 1
+- c:
+  - -18
+  - 5
+  - 13
+  t: river
+- c:
+  - -18
+  - 6
+  - 12
+  t: river
+- c:
+  - -18
+  - 7
+  - 11
+  t: beach
+- c:
+  - -18
+  - 8
+  - 10
+  t: ocean
+- c:
+  - -18
+  - 9
+  - 9
+  t: ocean
+- c:
+  - -18
+  - 10
+  - 8
+  t: ocean
+- c:
+  - -18
+  - 11
+  - 7
+  t: beach
+- c:
+  - -18
+  - 13
+  - 5
+  content: site
+- c:
+  - -18
+  - 14
+  - 4
+  content: beastDen
+- c:
+  - -18
+  - 20
+  - -2
+  content: goldMine
+- c:
+  - -17
+  - -3
+  - 20
+  content: goldMine
+- c:
+  - -17
+  - 3
+  - 14
+  t: forest
+- c:
+  - -17
+  - 4
+  - 13
+  t: forest
+- c:
+  - -17
+  - 5
+  - 12
+  t: river
+- c:
+  - -17
+  - 6
+  - 11
+  t: beach
+- c:
+  - -17
+  - 7
+  - 10
+  t: ocean
+- c:
+  - -17
+  - 8
+  - 9
+  t: ocean
+- c:
+  - -17
+  - 9
+  - 8
+  t: ocean
+- c:
+  - -17
+  - 10
+  - 7
+  t: ocean
+- c:
+  - -17
+  - 11
+  - 6
+  t: beach
+- c:
+  - -17
+  - 14
+  - 3
+  t: forest
+- c:
+  - -17
+  - 15
+  - 2
+  t: forest
+- c:
+  - -17
+  - 17
+  - 0
+  startingLocation: 6
+- c:
+  - -17
+  - 20
+  - -3
+  content: creepCampSmall
+- c:
+  - -16
+  - -4
+  - 20
+  t: jungle
+  content: creepCampSmall
+- c:
+  - -16
+  - 2
+  - 14
+  t: forest
+- c:
+  - -16
+  - 3
+  - 13
+  t: forest
+  content: creepCampMedium
+- c:
+  - -16
+  - 4
+  - 12
+  t: forest
+- c:
+  - -16
+  - 5
+  - 11
+  t: beach
+- c:
+  - -16
+  - 6
+  - 10
+  t: ocean
+- c:
+  - -16
+  - 7
+  - 9
+  t: ocean
+- c:
+  - -16
+  - 8
+  - 8
+  t: ocean
+- c:
+  - -16
+  - 9
+  - 7
+  t: ocean
+- c:
+  - -16
+  - 10
+  - 6
+  t: ocean
+- c:
+  - -16
+  - 11
+  - 5
+  t: beach
+- c:
+  - -16
+  - 13
+  - 3
+  t: forest
+  content: creepCampMedium
+- c:
+  - -16
+  - 14
+  - 2
+  t: forest
+- c:
+  - -16
+  - 15
+  - 1
+  t: forest
+- c:
+  - -15
+  - -6
+  - 21
+  t: river
+- c:
+  - -15
+  - -5
+  - 20
+  t: river
+- c:
+  - -15
+  - -4
+  - 19
+  t: river
+- c:
+  - -15
+  - -3
+  - 18
+  t: river
+- c:
+  - -15
+  - 2
+  - 13
+  t: forest
+  content: beastDen
+- c:
+  - -15
+  - 3
+  - 12
+  t: forest
+- c:
+  - -15
+  - 5
+  - 10
+  t: beach
+- c:
+  - -15
+  - 6
+  - 9
+  t: ocean
+- c:
+  - -15
+  - 7
+  - 8
+  t: ocean
+- c:
+  - -15
+  - 8
+  - 7
+  t: ocean
+- c:
+  - -15
+  - 9
+  - 6
+  t: ocean
+- c:
+  - -15
+  - 10
+  - 5
+  t: beach
+- c:
+  - -15
+  - 13
+  - 2
+  t: forest
+- c:
+  - -15
+  - 14
+  - 1
+  t: forest
+- c:
+  - -15
+  - 16
+  - -1
+  t: forest
+- c:
+  - -15
+  - 17
+  - -2
+  t: forest
+- c:
+  - -15
+  - 18
+  - -3
+  t: river
+- c:
+  - -15
+  - 21
+  - -6
+  t: river
+- c:
+  - -15
+  - 23
+  - -8
+  t: ocean
+- c:
+  - -14
+  - -5
+  - 19
+  t: river
+- c:
+  - -14
+  - -4
+  - 18
+  t: jungle
+  content: creepCampSmall
+- c:
+  - -14
+  - -3
+  - 17
+  t: river
+- c:
+  - -14
+  - 4
+  - 10
+  t: beach
+- c:
+  - -14
+  - 5
+  - 9
+  t: ocean
+- c:
+  - -14
+  - 6
+  - 8
+  t: ocean
+- c:
+  - -14
+  - 7
+  - 7
+  t: ocean
+- c:
+  - -14
+  - 8
+  - 6
+  t: ocean
+- c:
+  - -14
+  - 9
+  - 5
+  t: beach
+- c:
+  - -14
+  - 15
+  - -1
+  t: forest
+- c:
+  - -14
+  - 16
+  - -2
+  t: forest
+  content: creepCampMedium
+- c:
+  - -14
+  - 17
+  - -3
+  t: forest
+- c:
+  - -14
+  - 18
+  - -4
+  t: river
+- c:
+  - -14
+  - 19
+  - -5
+  t: river
+- c:
+  - -14
+  - 20
+  - -6
+  t: river
+- c:
+  - -14
+  - 21
+  - -7
+  t: beach
+- c:
+  - -14
+  - 22
+  - -8
+  t: ocean
+- c:
+  - -14
+  - 23
+  - -9
+  t: ocean
+- c:
+  - -13
+  - -10
+  - 23
+  t: ocean
+- c:
+  - -13
+  - -9
+  - 22
+  t: ocean
+- c:
+  - -13
+  - -8
+  - 21
+  t: beach
+- c:
+  - -13
+  - -7
+  - 20
+  t: beach
+- c:
+  - -13
+  - -5
+  - 18
+  t: jungle
+- c:
+  - -13
+  - -4
+  - 17
+  t: river
+- c:
+  - -13
+  - -3
+  - 16
+  t: forest
+- c:
+  - -13
+  - -2
+  - 15
+  t: forest
+- c:
+  - -13
+  - 3
+  - 10
+  t: beach
+- c:
+  - -13
+  - 4
+  - 9
+  t: ocean
+- c:
+  - -13
+  - 5
+  - 8
+  t: ocean
+- c:
+  - -13
+  - 6
+  - 7
+  t: ocean
+- c:
+  - -13
+  - 7
+  - 6
+  t: ocean
+- c:
+  - -13
+  - 8
+  - 5
+  t: ocean
+- c:
+  - -13
+  - 9
+  - 4
+  t: beach
+- c:
+  - -13
+  - 15
+  - -2
+  t: forest
+- c:
+  - -13
+  - 16
+  - -3
+  t: forest
+- c:
+  - -13
+  - 18
+  - -5
+  t: beach
+- c:
+  - -13
+  - 19
+  - -6
+  t: beach
+- c:
+  - -13
+  - 20
+  - -7
+  t: beach
+- c:
+  - -13
+  - 21
+  - -8
+  t: ocean
+- c:
+  - -13
+  - 22
+  - -9
+  t: ocean
+- c:
+  - -13
+  - 23
+  - -10
+  t: ocean
+- c:
+  - -12
+  - -11
+  - 23
+  t: ocean
+- c:
+  - -12
+  - -10
+  - 22
+  t: ocean
+- c:
+  - -12
+  - -9
+  - 21
+  t: ocean
+- c:
+  - -12
+  - -8
+  - 20
+  t: ocean
+- c:
+  - -12
+  - -7
+  - 19
+  t: beach
+- c:
+  - -12
+  - -4
+  - 16
+  t: forest
+- c:
+  - -12
+  - -3
+  - 15
+  t: forest
+  content: creepCampMedium
+- c:
+  - -12
+  - -2
+  - 14
+  t: forest
+- c:
+  - -12
+  - 3
+  - 9
+  t: beach
+- c:
+  - -12
+  - 4
+  - 8
+  t: ocean
+- c:
+  - -12
+  - 5
+  - 7
+  t: ocean
+- c:
+  - -12
+  - 6
+  - 6
+  t: ocean
+- c:
+  - -12
+  - 7
+  - 5
+  t: ocean
+- c:
+  - -12
+  - 8
+  - 4
+  t: beach
+- c:
+  - -12
+  - 17
+  - -5
+  t: beach
+- c:
+  - -12
+  - 18
+  - -6
+  t: ocean
+- c:
+  - -12
+  - 19
+  - -7
+  t: ocean
+- c:
+  - -12
+  - 20
+  - -8
+  t: ocean
+- c:
+  - -12
+  - 21
+  - -9
+  t: ocean
+- c:
+  - -12
+  - 22
+  - -10
+  t: ocean
+- c:
+  - -12
+  - 23
+  - -11
+  t: ocean
+- c:
+  - -11
+  - -12
+  - 23
+  t: ocean
+- c:
+  - -11
+  - -11
+  - 22
+  t: ocean
+- c:
+  - -11
+  - -10
+  - 21
+  t: ocean
+- c:
+  - -11
+  - -9
+  - 20
+  t: ocean
+- c:
+  - -11
+  - -8
+  - 19
+  t: ocean
+- c:
+  - -11
+  - -7
+  - 18
+  t: beach
+- c:
+  - -11
+  - -6
+  - 17
+  t: beach
+- c:
+  - -11
+  - -5
+  - 16
+  t: beach
+- c:
+  - -11
+  - -4
+  - 15
+  t: forest
+- c:
+  - -11
+  - -3
+  - 14
+  t: forest
+- c:
+  - -11
+  - 0
+  - 11
+  content: site
+- c:
+  - -11
+  - 2
+  - 9
+  t: beach
+- c:
+  - -11
+  - 3
+  - 8
+  t: beach
+- c:
+  - -11
+  - 4
+  - 7
+  t: sea
+- c:
+  - -11
+  - 5
+  - 6
+  t: ocean
+- c:
+  - -11
+  - 6
+  - 5
+  t: ocean
+- c:
+  - -11
+  - 7
+  - 4
+  t: beach
+- c:
+  - -11
+  - 15
+  - -4
+  t: beach
+- c:
+  - -11
+  - 16
+  - -5
+  t: beach
+- c:
+  - -11
+  - 17
+  - -6
+  t: ocean
+- c:
+  - -11
+  - 18
+  - -7
+  t: ocean
+- c:
+  - -11
+  - 19
+  - -8
+  t: ocean
+- c:
+  - -11
+  - 20
+  - -9
+  t: ocean
+- c:
+  - -11
+  - 21
+  - -10
+  t: ocean
+- c:
+  - -11
+  - 22
+  - -11
+  t: ocean
+- c:
+  - -11
+  - 23
+  - -12
+  t: ocean
+- c:
+  - -10
+  - -13
+  - 23
+  t: ocean
+- c:
+  - -10
+  - -12
+  - 22
+  t: ocean
+- c:
+  - -10
+  - -11
+  - 21
+  t: ocean
+- c:
+  - -10
+  - -10
+  - 20
+  t: ocean
+- c:
+  - -10
+  - -9
+  - 19
+  t: ocean
+- c:
+  - -10
+  - -8
+  - 18
+  t: ocean
+- c:
+  - -10
+  - -7
+  - 17
+  t: ocean
+- c:
+  - -10
+  - -6
+  - 16
+  t: ocean
+- c:
+  - -10
+  - -5
+  - 15
+  t: beach
+- c:
+  - -10
+  - -4
+  - 14
+  t: beach
+- c:
+  - -10
+  - -3
+  - 13
+  t: beach
+- c:
+  - -10
+  - 1
+  - 9
+  t: beach
+- c:
+  - -10
+  - 2
+  - 8
+  t: beach
+- c:
+  - -10
+  - 3
+  - 7
+  t: sea
+- c:
+  - -10
+  - 4
+  - 6
+  t: sea
+- c:
+  - -10
+  - 5
+  - 5
+  t: sea
+- c:
+  - -10
+  - 6
+  - 4
+  t: sea
+- c:
+  - -10
+  - 7
+  - 3
+  t: sea
+- c:
+  - -10
+  - 8
+  - 2
+  t: sea
+- c:
+  - -10
+  - 10
+  - 0
+  content: site
+- c:
+  - -10
+  - 14
+  - -4
+  t: beach
+- c:
+  - -10
+  - 15
+  - -5
+  t: ocean
+- c:
+  - -10
+  - 16
+  - -6
+  t: ocean
+- c:
+  - -10
+  - 17
+  - -7
+  t: ocean
+- c:
+  - -10
+  - 18
+  - -8
+  t: ocean
+- c:
+  - -10
+  - 19
+  - -9
+  t: ocean
+- c:
+  - -10
+  - 20
+  - -10
+  t: ocean
+- c:
+  - -10
+  - 21
+  - -11
+  t: ocean
+- c:
+  - -10
+  - 22
+  - -12
+  t: ocean
+- c:
+  - -10
+  - 23
+  - -13
+  t: ocean
+- c:
+  - -9
+  - -13
+  - 22
+  t: ocean
+- c:
+  - -9
+  - -12
+  - 21
+  t: ocean
+- c:
+  - -9
+  - -11
+  - 20
+  t: ocean
+- c:
+  - -9
+  - -10
+  - 19
+  t: ocean
+- c:
+  - -9
+  - -9
+  - 18
+  t: ocean
+- c:
+  - -9
+  - -8
+  - 17
+  t: ocean
+- c:
+  - -9
+  - -7
+  - 16
+  t: ocean
+- c:
+  - -9
+  - -6
+  - 15
+  t: ocean
+- c:
+  - -9
+  - -5
+  - 14
+  t: ocean
+- c:
+  - -9
+  - -4
+  - 13
+  t: ocean
+- c:
+  - -9
+  - -3
+  - 12
+  t: beach
+- c:
+  - -9
+  - -2
+  - 11
+  t: beach
+- c:
+  - -9
+  - -1
+  - 10
+  t: beach
+- c:
+  - -9
+  - 1
+  - 8
+  t: beach
+  content: creepCampLarge
+- c:
+  - -9
+  - 2
+  - 7
+  t: beach
+- c:
+  - -9
+  - 3
+  - 6
+  t: sea
+- c:
+  - -9
+  - 4
+  - 5
+  t: sea
+- c:
+  - -9
+  - 5
+  - 4
+  t: sea
+- c:
+  - -9
+  - 6
+  - 3
+  t: sea
+- c:
+  - -9
+  - 7
+  - 2
+  t: sea
+- c:
+  - -9
+  - 8
+  - 1
+  t: sea
+- c:
+  - -9
+  - 9
+  - 0
+  t: beach
+  content: beastDen
+- c:
+  - -9
+  - 12
+  - -3
+  t: beach
+- c:
+  - -9
+  - 13
+  - -4
+  t: beach
+- c:
+  - -9
+  - 14
+  - -5
+  t: ocean
+- c:
+  - -9
+  - 15
+  - -6
+  t: ocean
+- c:
+  - -9
+  - 16
+  - -7
+  t: ocean
+- c:
+  - -9
+  - 17
+  - -8
+  t: ocean
+- c:
+  - -9
+  - 18
+  - -9
+  t: ocean
+- c:
+  - -9
+  - 19
+  - -10
+  t: ocean
+- c:
+  - -9
+  - 20
+  - -11
+  t: ocean
+- c:
+  - -9
+  - 21
+  - -12
+  t: ocean
+- c:
+  - -9
+  - 22
+  - -13
+  t: ocean
+- c:
+  - -9
+  - 23
+  - -14
+  t: ocean
+- c:
+  - -8
+  - -13
+  - 21
+  t: beach
+- c:
+  - -8
+  - -12
+  - 20
+  t: ocean
+- c:
+  - -8
+  - -11
+  - 19
+  t: ocean
+- c:
+  - -8
+  - -10
+  - 18
+  t: ocean
+- c:
+  - -8
+  - -9
+  - 17
+  t: ocean
+- c:
+  - -8
+  - -8
+  - 16
+  t: ocean
+- c:
+  - -8
+  - -7
+  - 15
+  t: ocean
+- c:
+  - -8
+  - -6
+  - 14
+  t: ocean
+- c:
+  - -8
+  - -5
+  - 13
+  t: ocean
+- c:
+  - -8
+  - -4
+  - 12
+  t: ocean
+- c:
+  - -8
+  - -3
+  - 11
+  t: sea
+- c:
+  - -8
+  - -2
+  - 10
+  t: sea
+- c:
+  - -8
+  - -1
+  - 9
+  t: beach
+  content: beastDen
+- c:
+  - -8
+  - 0
+  - 8
+  t: beach
+- c:
+  - -8
+  - 1
+  - 7
+  t: beach
+- c:
+  - -8
+  - 2
+  - 6
+  t: beach
+- c:
+  - -8
+  - 3
+  - 5
+  t: beach
+- c:
+  - -8
+  - 4
+  - 4
+  t: sea
+- c:
+  - -8
+  - 5
+  - 3
+  t: sea
+- c:
+  - -8
+  - 6
+  - 2
+  t: sea
+- c:
+  - -8
+  - 7
+  - 1
+  t: sea
+- c:
+  - -8
+  - 8
+  - 0
+  t: beach
+- c:
+  - -8
+  - 9
+  - -1
+  t: beach
+- c:
+  - -8
+  - 10
+  - -2
+  t: beach
+  content: creepCampLarge
+- c:
+  - -8
+  - 11
+  - -3
+  t: beach
+- c:
+  - -8
+  - 12
+  - -4
+  t: sea
+- c:
+  - -8
+  - 13
+  - -5
+  t: sea
+- c:
+  - -8
+  - 14
+  - -6
+  t: ocean
+- c:
+  - -8
+  - 15
+  - -7
+  t: ocean
+- c:
+  - -8
+  - 16
+  - -8
+  t: ocean
+- c:
+  - -8
+  - 17
+  - -9
+  t: ocean
+- c:
+  - -8
+  - 18
+  - -10
+  t: ocean
+- c:
+  - -8
+  - 19
+  - -11
+  t: beach
+- c:
+  - -8
+  - 20
+  - -12
+  t: beach
+- c:
+  - -8
+  - 21
+  - -13
+  t: beach
+- c:
+  - -7
+  - -13
+  - 20
+  t: beach
+- c:
+  - -7
+  - -12
+  - 19
+  t: beach
+- c:
+  - -7
+  - -11
+  - 18
+  t: beach
+- c:
+  - -7
+  - -10
+  - 17
+  t: ocean
+- c:
+  - -7
+  - -9
+  - 16
+  t: ocean
+- c:
+  - -7
+  - -8
+  - 15
+  t: ocean
+- c:
+  - -7
+  - -7
+  - 14
+  t: ocean
+- c:
+  - -7
+  - -6
+  - 13
+  t: ocean
+- c:
+  - -7
+  - -5
+  - 12
+  t: ocean
+- c:
+  - -7
+  - -4
+  - 11
+  t: sea
+- c:
+  - -7
+  - -3
+  - 10
+  t: sea
+- c:
+  - -7
+  - -2
+  - 9
+  t: sea
+- c:
+  - -7
+  - -1
+  - 8
+  t: beach
+- c:
+  - -7
+  - 0
+  - 7
+  t: beach
+- c:
+  - -7
+  - 1
+  - 6
+  t: beach
+- c:
+  - -7
+  - 2
+  - 5
+  t: beach
+- c:
+  - -7
+  - 3
+  - 4
+  t: beach
+- c:
+  - -7
+  - 4
+  - 3
+  t: beach
+- c:
+  - -7
+  - 5
+  - 2
+  t: beach
+- c:
+  - -7
+  - 6
+  - 1
+  t: beach
+- c:
+  - -7
+  - 7
+  - 0
+  t: beach
+- c:
+  - -7
+  - 8
+  - -1
+  t: beach
+- c:
+  - -7
+  - 9
+  - -2
+  t: beach
+- c:
+  - -7
+  - 10
+  - -3
+  t: beach
+- c:
+  - -7
+  - 11
+  - -4
+  t: sea
+- c:
+  - -7
+  - 12
+  - -5
+  t: sea
+- c:
+  - -7
+  - 13
+  - -6
+  t: sea
+- c:
+  - -7
+  - 14
+  - -7
+  t: ocean
+- c:
+  - -7
+  - 15
+  - -8
+  t: ocean
+- c:
+  - -7
+  - 16
+  - -9
+  t: ocean
+- c:
+  - -7
+  - 17
+  - -10
+  t: ocean
+- c:
+  - -7
+  - 18
+  - -11
+  t: beach
+- c:
+  - -6
+  - -15
+  - 21
+  t: river
+- c:
+  - -6
+  - -11
+  - 17
+  t: beach
+- c:
+  - -6
+  - -10
+  - 16
+  t: ocean
+- c:
+  - -6
+  - -9
+  - 15
+  t: ocean
+- c:
+  - -6
+  - -8
+  - 14
+  t: ocean
+- c:
+  - -6
+  - -7
+  - 13
+  t: ocean
+- c:
+  - -6
+  - -6
+  - 12
+  t: ocean
+- c:
+  - -6
+  - -5
+  - 11
+  t: sea
+- c:
+  - -6
+  - -4
+  - 10
+  t: sea
+- c:
+  - -6
+  - -3
+  - 9
+  t: sea
+- c:
+  - -6
+  - -2
+  - 8
+  t: beach
+- c:
+  - -6
+  - -1
+  - 7
+  t: desert
+- c:
+  - -6
+  - 0
+  - 6
+  t: desert
+- c:
+  - -6
+  - 1
+  - 5
+  t: desert
+- c:
+  - -6
+  - 2
+  - 4
+  t: desert
+- c:
+  - -6
+  - 3
+  - 3
+  t: desert
+- c:
+  - -6
+  - 4
+  - 2
+  t: desert
+- c:
+  - -6
+  - 5
+  - 1
+  t: desert
+  content: site
+- c:
+  - -6
+  - 6
+  - 0
+  t: desert
+- c:
+  - -6
+  - 7
+  - -1
+  t: desert
+- c:
+  - -6
+  - 8
+  - -2
+  t: beach
+- c:
+  - -6
+  - 9
+  - -3
+  t: beach
+- c:
+  - -6
+  - 10
+  - -4
+  t: beach
+- c:
+  - -6
+  - 11
+  - -5
+  t: sea
+- c:
+  - -6
+  - 12
+  - -6
+  t: sea
+- c:
+  - -6
+  - 13
+  - -7
+  t: ocean
+- c:
+  - -6
+  - 14
+  - -8
+  t: ocean
+- c:
+  - -6
+  - 15
+  - -9
+  t: ocean
+- c:
+  - -6
+  - 16
+  - -10
+  t: beach
+- c:
+  - -6
+  - 17
+  - -11
+  t: beach
+- c:
+  - -5
+  - -15
+  - 20
+  t: river
+- c:
+  - -5
+  - -14
+  - 19
+  t: river
+- c:
+  - -5
+  - -11
+  - 16
+  t: beach
+- c:
+  - -5
+  - -10
+  - 15
+  t: beach
+- c:
+  - -5
+  - -9
+  - 14
+  t: beach
+- c:
+  - -5
+  - -8
+  - 13
+  t: ocean
+- c:
+  - -5
+  - -7
+  - 12
+  t: ocean
+- c:
+  - -5
+  - -6
+  - 11
+  t: sea
+- c:
+  - -5
+  - -5
+  - 10
+  t: sea
+- c:
+  - -5
+  - -4
+  - 9
+  t: sea
+- c:
+  - -5
+  - -3
+  - 8
+  t: beach
+- c:
+  - -5
+  - -2
+  - 7
+  t: desert
+- c:
+  - -5
+  - -1
+  - 6
+  t: desert
+- c:
+  - -5
+  - 0
+  - 5
+  t: desert
+- c:
+  - -5
+  - 1
+  - 4
+  t: desert
+- c:
+  - -5
+  - 2
+  - 3
+  t: hills
+- c:
+  - -5
+  - 3
+  - 2
+  t: hills
+- c:
+  - -5
+  - 4
+  - 1
+  t: desert
+- c:
+  - -5
+  - 5
+  - 0
+  t: desert
+- c:
+  - -5
+  - 6
+  - -1
+  t: desert
+- c:
+  - -5
+  - 7
+  - -2
+  t: desert
+- c:
+  - -5
+  - 8
+  - -3
+  t: beach
+- c:
+  - -5
+  - 9
+  - -4
+  t: beach
+- c:
+  - -5
+  - 10
+  - -5
+  t: sea
+- c:
+  - -5
+  - 11
+  - -6
+  t: sea
+- c:
+  - -5
+  - 12
+  - -7
+  t: sea
+- c:
+  - -5
+  - 13
+  - -8
+  t: beach
+- c:
+  - -5
+  - 14
+  - -9
+  t: beach
+- c:
+  - -5
+  - 15
+  - -10
+  t: beach
+- c:
+  - -5
+  - 19
+  - -14
+  content: creepCampSmall
+- c:
+  - -4
+  - -15
+  - 19
+  t: river
+- c:
+  - -4
+  - -14
+  - 18
+  t: river
+- c:
+  - -4
+  - -9
+  - 13
+  t: beach
+- c:
+  - -4
+  - -8
+  - 12
+  t: beach
+- c:
+  - -4
+  - -7
+  - 11
+  t: sea
+- c:
+  - -4
+  - -6
+  - 10
+  t: sea
+- c:
+  - -4
+  - -5
+  - 9
+  t: sea
+- c:
+  - -4
+  - -4
+  - 8
+  t: beach
+- c:
+  - -4
+  - -3
+  - 7
+  t: desert
+- c:
+  - -4
+  - -2
+  - 6
+  t: hills
+- c:
+  - -4
+  - -1
+  - 5
+  t: hills
+- c:
+  - -4
+  - 0
+  - 4
+  t: hills
+  content: site
+- c:
+  - -4
+  - 1
+  - 3
+  t: hills
+- c:
+  - -4
+  - 2
+  - 2
+  t: desert
+- c:
+  - -4
+  - 3
+  - 1
+  t: hills
+  content: gemMine
+- c:
+  - -4
+  - 4
+  - 0
+  t: hills
+- c:
+  - -4
+  - 5
+  - -1
+  t: desert
+- c:
+  - -4
+  - 6
+  - -2
+  t: desert
+- c:
+  - -4
+  - 7
+  - -3
+  t: desert
+- c:
+  - -4
+  - 8
+  - -4
+  t: beach
+- c:
+  - -4
+  - 9
+  - -5
+  t: beach
+- c:
+  - -4
+  - 10
+  - -6
+  t: sea
+- c:
+  - -4
+  - 11
+  - -7
+  t: sea
+- c:
+  - -4
+  - 12
+  - -8
+  t: beach
+- c:
+  - -4
+  - 20
+  - -16
+  content: site
+- c:
+  - -3
+  - -15
+  - 18
+  t: jungle
+- c:
+  - -3
+  - -14
+  - 17
+  t: river
+- c:
+  - -3
+  - -13
+  - 16
+  t: river
+- c:
+  - -3
+  - -10
+  - 13
+  t: forest
+- c:
+  - -3
+  - -9
+  - 12
+  t: forest
+- c:
+  - -3
+  - -8
+  - 11
+  t: beach
+- c:
+  - -3
+  - -7
+  - 10
+  t: sea
+- c:
+  - -3
+  - -6
+  - 9
+  t: sea
+- c:
+  - -3
+  - -5
+  - 8
+  t: beach
+- c:
+  - -3
+  - -4
+  - 7
+  t: desert
+- c:
+  - -3
+  - -3
+  - 6
+  t: desert
+- c:
+  - -3
+  - -2
+  - 5
+  t: hills
+  content: gemMine
+- c:
+  - -3
+  - -1
+  - 4
+  t: desert
+- c:
+  - -3
+  - 0
+  - 3
+  t: desert
+- c:
+  - -3
+  - 1
+  - 2
+  t: desert
+- c:
+  - -3
+  - 2
+  - 1
+  t: desert
+- c:
+  - -3
+  - 3
+  - 0
+  t: desert
+- c:
+  - -3
+  - 4
+  - -1
+  t: hills
+- c:
+  - -3
+  - 5
+  - -2
+  t: desert
+- c:
+  - -3
+  - 6
+  - -3
+  t: desert
+- c:
+  - -3
+  - 7
+  - -4
+  t: desert
+- c:
+  - -3
+  - 8
+  - -5
+  t: beach
+- c:
+  - -3
+  - 9
+  - -6
+  t: beach
+- c:
+  - -3
+  - 10
+  - -7
+  t: beach
+- c:
+  - -3
+  - 11
+  - -8
+  t: beach
+- c:
+  - -3
+  - 14
+  - -11
+  t: forest
+- c:
+  - -3
+  - 15
+  - -12
+  t: forest
+- c:
+  - -3
+  - 18
+  - -15
+  content: goldMine
+- c:
+  - -2
+  - -16
+  - 18
+  t: jungle
+  content: creepCampSmall
+- c:
+  - -2
+  - -15
+  - 17
+  t: jungle
+- c:
+  - -2
+  - -14
+  - 16
+  t: river
+- c:
+  - -2
+  - -13
+  - 15
+  t: river
+- c:
+  - -2
+  - -12
+  - 14
+  t: river
+- c:
+  - -2
+  - -11
+  - 13
+  t: forest
+- c:
+  - -2
+  - -10
+  - 12
+  t: forest
+  content: creepCampMedium
+- c:
+  - -2
+  - -9
+  - 11
+  t: forest
+- c:
+  - -2
+  - -8
+  - 10
+  t: beach
+- c:
+  - -2
+  - -7
+  - 9
+  t: beach
+- c:
+  - -2
+  - -6
+  - 8
+  t: beach
+- c:
+  - -2
+  - -5
+  - 7
+  t: desert
+- c:
+  - -2
+  - -4
+  - 6
+  t: desert
+- c:
+  - -2
+  - -3
+  - 5
+  t: hills
+- c:
+  - -2
+  - -2
+  - 4
+  t: desert
+- c:
+  - -2
+  - -1
+  - 3
+  t: desert
+- c:
+  - -2
+  - 0
+  - 2
+  t: desert
+- c:
+  - -2
+  - 1
+  - 1
+  t: desert
+- c:
+  - -2
+  - 2
+  - 0
+  t: desert
+- c:
+  - -2
+  - 3
+  - -1
+  t: desert
+- c:
+  - -2
+  - 4
+  - -2
+  t: hills
+- c:
+  - -2
+  - 5
+  - -3
+  t: desert
+- c:
+  - -2
+  - 6
+  - -4
+  t: desert
+- c:
+  - -2
+  - 7
+  - -5
+  t: beach
+- c:
+  - -2
+  - 8
+  - -6
+  t: beach
+  content: beastDen
+- c:
+  - -2
+  - 13
+  - -11
+  t: forest
+  content: creepCampMedium
+- c:
+  - -2
+  - 14
+  - -12
+  t: forest
+- c:
+  - -2
+  - 15
+  - -13
+  t: forest
+- c:
+  - -2
+  - 21
+  - -19
+  t: jungle
+- c:
+  - -1
+  - -19
+  - 20
+  content: beastDen
+- c:
+  - -1
+  - -11
+  - 12
+  t: forest
+- c:
+  - -1
+  - -10
+  - 11
+  t: forest
+- c:
+  - -1
+  - -6
+  - 7
+  t: desert
+- c:
+  - -1
+  - -5
+  - 6
+  t: desert
+- c:
+  - -1
+  - -4
+  - 5
+  t: hills
+- c:
+  - -1
+  - -3
+  - 4
+  t: desert
+- c:
+  - -1
+  - -2
+  - 3
+  t: desert
+- c:
+  - -1
+  - -1
+  - 2
+  t: desert
+- c:
+  - -1
+  - 0
+  - 1
+  t: desert
+- c:
+  - -1
+  - 1
+  - 0
+  t: desert
+- c:
+  - -1
+  - 2
+  - -1
+  t: desert
+- c:
+  - -1
+  - 3
+  - -2
+  t: desert
+- c:
+  - -1
+  - 4
+  - -3
+  t: hills
+- c:
+  - -1
+  - 5
+  - -4
+  t: desert
+- c:
+  - -1
+  - 6
+  - -5
+  t: desert
+- c:
+  - -1
+  - 7
+  - -6
+  t: beach
+- c:
+  - -1
+  - 13
+  - -12
+  t: forest
+- c:
+  - -1
+  - 14
+  - -13
+  t: forest
+- c:
+  - -1
+  - 20
+  - -19
+  t: jungle
+  content: creepCampSmall
+- c:
+  - -1
+  - 21
+  - -20
+  t: jungle
+- c:
+  - 0
+  - -18
+  - 18
+  startingLocation: 2
+- c:
+  - 0
+  - -7
+  - 7
+  t: desert
+- c:
+  - 0
+  - -6
+  - 6
+  t: desert
+- c:
+  - 0
+  - -5
+  - 5
+  t: hills
+- c:
+  - 0
+  - -4
+  - 4
+  t: desert
+- c:
+  - 0
+  - -3
+  - 3
+  t: desert
+  content: site
+- c:
+  - 0
+  - -2
+  - 2
+  t: desert
+- c:
+  - 0
+  - -1
+  - 1
+  t: desert
+- c:
+  - 0
+  - 0
+  - 0
+  t: desert
+  startingLocation: 7
+- c:
+  - 0
+  - 1
+  - -1
+  t: desert
+- c:
+  - 0
+  - 2
+  - -2
+  t: desert
+- c:
+  - 0
+  - 3
+  - -3
+  t: desert
+- c:
+  - 0
+  - 4
+  - -4
+  t: hills
+- c:
+  - 0
+  - 5
+  - -5
+  t: desert
+- c:
+  - 0
+  - 6
+  - -6
+  t: desert
+- c:
+  - 0
+  - 7
+  - -7
+  content: creepCampLarge
+- c:
+  - 0
+  - 9
+  - -9
+  content: site
+- c:
+  - 0
+  - 16
+  - -16
+  startingLocation: 5
+- c:
+  - 0
+  - 19
+  - -19
+  t: jungle
+- c:
+  - 0
+  - 20
+  - -20
+  t: jungle
+- c:
+  - 0
+  - 21
+  - -21
+  t: jungle
+- c:
+  - 1
+  - -12
+  - 11
+  t: jungle
+- c:
+  - 1
+  - -8
+  - 7
+  t: desert
+  content: beastDen
+- c:
+  - 1
+  - -7
+  - 6
+  t: desert
+- c:
+  - 1
+  - -6
+  - 5
+  t: hills
+- c:
+  - 1
+  - -5
+  - 4
+  t: desert
+- c:
+  - 1
+  - -4
+  - 3
+  t: desert
+- c:
+  - 1
+  - -3
+  - 2
+  t: desert
+- c:
+  - 1
+  - -2
+  - 1
+  t: desert
+- c:
+  - 1
+  - -1
+  - 0
+  t: desert
+- c:
+  - 1
+  - 0
+  - -1
+  t: desert
+- c:
+  - 1
+  - 1
+  - -2
+  t: desert
+- c:
+  - 1
+  - 2
+  - -3
+  t: desert
+  content: site
+- c:
+  - 1
+  - 3
+  - -4
+  t: desert
+- c:
+  - 1
+  - 4
+  - -5
+  t: hills
+  content: site
+- c:
+  - 1
+  - 5
+  - -6
+  t: desert
+- c:
+  - 1
+  - 6
+  - -7
+  t: desert
+- c:
+  - 1
+  - 7
+  - -8
+  t: beach
+- c:
+  - 1
+  - 19
+  - -20
+  t: jungle
+- c:
+  - 1
+  - 20
+  - -21
+  t: jungle
+- c:
+  - 2
+  - -19
+  - 17
+  content: goldMine
+- c:
+  - 2
+  - -10
+  - 8
+  content: site
+- c:
+  - 2
+  - -9
+  - 7
+  content: creepCampLarge
+- c:
+  - 2
+  - -8
+  - 6
+  t: desert
+- c:
+  - 2
+  - -7
+  - 5
+  t: hills
+- c:
+  - 2
+  - -6
+  - 4
+  t: desert
+- c:
+  - 2
+  - -5
+  - 3
+  t: desert
+- c:
+  - 2
+  - -4
+  - 2
+  t: desert
+- c:
+  - 2
+  - -3
+  - 1
+  t: desert
+- c:
+  - 2
+  - -2
+  - 0
+  t: desert
+- c:
+  - 2
+  - -1
+  - -1
+  t: desert
+- c:
+  - 2
+  - 0
+  - -2
+  t: desert
+- c:
+  - 2
+  - 1
+  - -3
+  t: desert
+- c:
+  - 2
+  - 2
+  - -4
+  t: desert
+- c:
+  - 2
+  - 3
+  - -5
+  t: desert
+- c:
+  - 2
+  - 4
+  - -6
+  t: hills
+- c:
+  - 2
+  - 5
+  - -7
+  t: desert
+- c:
+  - 2
+  - 6
+  - -8
+  t: beach
+- c:
+  - 2
+  - 12
+  - -14
+  t: forest
+  content: creepCampMedium
+- c:
+  - 2
+  - 13
+  - -15
+  t: forest
+- c:
+  - 2
+  - 14
+  - -16
+  t: river
+- c:
+  - 2
+  - 15
+  - -17
+  t: river
+- c:
+  - 2
+  - 17
+  - -19
+  t: jungle
+  content: beastDen
+- c:
+  - 2
+  - 18
+  - -20
+  t: jungle
+- c:
+  - 2
+  - 19
+  - -21
+  t: jungle
+- c:
+  - 3
+  - -18
+  - 15
+  t: jungle
+  content: creepCampSmall
+- c:
+  - 3
+  - -15
+  - 12
+  t: forest
+- c:
+  - 3
+  - -14
+  - 11
+  t: forest
+- c:
+  - 3
+  - -12
+  - 9
+  t: jungle
+- c:
+  - 3
+  - -9
+  - 6
+  t: desert
+- c:
+  - 3
+  - -8
+  - 5
+  t: desert
+- c:
+  - 3
+  - -7
+  - 4
+  t: hills
+- c:
+  - 3
+  - -6
+  - 3
+  t: desert
+  content: site
+- c:
+  - 3
+  - -5
+  - 2
+  t: desert
+- c:
+  - 3
+  - -4
+  - 1
+  t: desert
+- c:
+  - 3
+  - -3
+  - 0
+  t: desert
+- c:
+  - 3
+  - -2
+  - -1
+  t: desert
+- c:
+  - 3
+  - -1
+  - -2
+  t: desert
+- c:
+  - 3
+  - 0
+  - -3
+  t: desert
+- c:
+  - 3
+  - 1
+  - -4
+  t: desert
+- c:
+  - 3
+  - 2
+  - -5
+  t: desert
+- c:
+  - 3
+  - 3
+  - -6
+  t: hills
+- c:
+  - 3
+  - 4
+  - -7
+  t: desert
+- c:
+  - 3
+  - 5
+  - -8
+  t: beach
+- c:
+  - 3
+  - 6
+  - -9
+  t: beach
+- c:
+  - 3
+  - 7
+  - -10
+  t: beach
+- c:
+  - 3
+  - 8
+  - -11
+  t: beach
+- c:
+  - 3
+  - 9
+  - -12
+  t: beach
+- c:
+  - 3
+  - 11
+  - -14
+  t: forest
+- c:
+  - 3
+  - 12
+  - -15
+  t: forest
+  content: beastDen
+- c:
+  - 3
+  - 13
+  - -16
+  t: forest
+- c:
+  - 3
+  - 15
+  - -18
+  t: river
+- c:
+  - 3
+  - 16
+  - -19
+  t: jungle
+- c:
+  - 3
+  - 17
+  - -20
+  t: jungle
+- c:
+  - 3
+  - 18
+  - -21
+  t: jungle
+- c:
+  - 4
+  - -20
+  - 16
+  t: jungle
+  content: creepCampSmall
+- c:
+  - 4
+  - -19
+  - 15
+  t: jungle
+- c:
+  - 4
+  - -16
+  - 12
+  t: forest
+  content: beastDen
+- c:
+  - 4
+  - -15
+  - 11
+  t: forest
+  content: creepCampMedium
+- c:
+  - 4
+  - -14
+  - 10
+  t: forest
+- c:
+  - 4
+  - -9
+  - 5
+  t: desert
+- c:
+  - 4
+  - -8
+  - 4
+  t: hills
+  content: site
+- c:
+  - 4
+  - -7
+  - 3
+  t: desert
+- c:
+  - 4
+  - -6
+  - 2
+  t: desert
+- c:
+  - 4
+  - -5
+  - 1
+  t: desert
+- c:
+  - 4
+  - -4
+  - 0
+  t: desert
+- c:
+  - 4
+  - -3
+  - -1
+  t: desert
+- c:
+  - 4
+  - -2
+  - -2
+  t: desert
+- c:
+  - 4
+  - -1
+  - -3
+  t: desert
+- c:
+  - 4
+  - 0
+  - -4
+  t: desert
+- c:
+  - 4
+  - 1
+  - -5
+  t: desert
+- c:
+  - 4
+  - 2
+  - -6
+  t: desert
+- c:
+  - 4
+  - 3
+  - -7
+  t: hills
+- c:
+  - 4
+  - 4
+  - -8
+  t: beach
+- c:
+  - 4
+  - 5
+  - -9
+  t: beach
+- c:
+  - 4
+  - 6
+  - -10
+  t: beach
+- c:
+  - 4
+  - 7
+  - -11
+  t: sea
+- c:
+  - 4
+  - 8
+  - -12
+  t: sea
+- c:
+  - 4
+  - 9
+  - -13
+  t: beach
+- c:
+  - 4
+  - 11
+  - -15
+  t: forest
+- c:
+  - 4
+  - 12
+  - -16
+  t: forest
+- c:
+  - 4
+  - 15
+  - -19
+  t: river
+- c:
+  - 4
+  - 16
+  - -20
+  t: jungle
+- c:
+  - 4
+  - 17
+  - -21
+  t: river
+- c:
+  - 5
+  - -16
+  - 11
+  t: forest
+- c:
+  - 5
+  - -15
+  - 10
+  t: forest
+- c:
+  - 5
+  - -12
+  - 7
+  t: beach
+- c:
+  - 5
+  - -11
+  - 6
+  t: beach
+- c:
+  - 5
+  - -10
+  - 5
+  t: beach
+- c:
+  - 5
+  - -9
+  - 4
+  t: desert
+- c:
+  - 5
+  - -8
+  - 3
+  t: hills
+- c:
+  - 5
+  - -7
+  - 2
+  t: desert
+- c:
+  - 5
+  - -6
+  - 1
+  t: desert
+- c:
+  - 5
+  - -5
+  - 0
+  t: desert
+- c:
+  - 5
+  - -4
+  - -1
+  t: desert
+  startingLocation: 8
+- c:
+  - 5
+  - -3
+  - -2
+  t: desert
+- c:
+  - 5
+  - -2
+  - -3
+  t: desert
+  content: site
+- c:
+  - 5
+  - -1
+  - -4
+  t: desert
+- c:
+  - 5
+  - 0
+  - -5
+  t: desert
+- c:
+  - 5
+  - 1
+  - -6
+  t: desert
+- c:
+  - 5
+  - 2
+  - -7
+  t: hills
+- c:
+  - 5
+  - 3
+  - -8
+  t: beach
+- c:
+  - 5
+  - 4
+  - -9
+  t: beach
+- c:
+  - 5
+  - 5
+  - -10
+  t: sea
+- c:
+  - 5
+  - 6
+  - -11
+  t: sea
+- c:
+  - 5
+  - 7
+  - -12
+  t: sea
+- c:
+  - 5
+  - 8
+  - -13
+  t: sea
+- c:
+  - 5
+  - 9
+  - -14
+  t: beach
+- c:
+  - 5
+  - 10
+  - -15
+  t: beach
+- c:
+  - 5
+  - 11
+  - -16
+  t: beach
+- c:
+  - 5
+  - 15
+  - -20
+  t: river
+- c:
+  - 5
+  - 16
+  - -21
+  t: river
+- c:
+  - 6
+  - -21
+  - 15
+  content: site
+- c:
+  - 6
+  - -17
+  - 11
+  t: beach
+- c:
+  - 6
+  - -16
+  - 10
+  t: beach
+- c:
+  - 6
+  - -15
+  - 9
+  t: beach
+- c:
+  - 6
+  - -14
+  - 8
+  t: beach
+- c:
+  - 6
+  - -13
+  - 7
+  t: beach
+- c:
+  - 6
+  - -12
+  - 6
+  t: sea
+- c:
+  - 6
+  - -11
+  - 5
+  t: sea
+- c:
+  - 6
+  - -10
+  - 4
+  t: beach
+- c:
+  - 6
+  - -9
+  - 3
+  t: desert
+- c:
+  - 6
+  - -8
+  - 2
+  t: hills
+- c:
+  - 6
+  - -7
+  - 1
+  t: desert
+- c:
+  - 6
+  - -6
+  - 0
+  t: desert
+- c:
+  - 6
+  - -5
+  - -1
+  t: desert
+- c:
+  - 6
+  - -4
+  - -2
+  t: desert
+- c:
+  - 6
+  - -3
+  - -3
+  t: desert
+- c:
+  - 6
+  - -2
+  - -4
+  t: desert
+- c:
+  - 6
+  - -1
+  - -5
+  t: desert
+- c:
+  - 6
+  - 0
+  - -6
+  t: desert
+- c:
+  - 6
+  - 1
+  - -7
+  t: hills
+- c:
+  - 6
+  - 2
+  - -8
+  t: beach
+- c:
+  - 6
+  - 3
+  - -9
+  t: beach
+- c:
+  - 6
+  - 4
+  - -10
+  t: sea
+- c:
+  - 6
+  - 5
+  - -11
+  t: sea
+- c:
+  - 6
+  - 6
+  - -12
+  t: sea
+- c:
+  - 6
+  - 7
+  - -13
+  t: sea
+- c:
+  - 6
+  - 8
+  - -14
+  t: ocean
+- c:
+  - 6
+  - 9
+  - -15
+  t: ocean
+- c:
+  - 6
+  - 10
+  - -16
+  t: ocean
+- c:
+  - 6
+  - 11
+  - -17
+  t: beach
+- c:
+  - 7
+  - -20
+  - 13
+  t: beach
+- c:
+  - 7
+  - -19
+  - 12
+  t: beach
+- c:
+  - 7
+  - -18
+  - 11
+  t: beach
+- c:
+  - 7
+  - -17
+  - 10
+  t: ocean
+- c:
+  - 7
+  - -16
+  - 9
+  t: ocean
+- c:
+  - 7
+  - -15
+  - 8
+  t: ocean
+- c:
+  - 7
+  - -14
+  - 7
+  t: ocean
+- c:
+  - 7
+  - -13
+  - 6
+  t: sea
+- c:
+  - 7
+  - -12
+  - 5
+  t: sea
+- c:
+  - 7
+  - -11
+  - 4
+  t: sea
+- c:
+  - 7
+  - -10
+  - 3
+  t: beach
+- c:
+  - 7
+  - -9
+  - 2
+  t: desert
+- c:
+  - 7
+  - -8
+  - 1
+  t: hills
+- c:
+  - 7
+  - -7
+  - 0
+  t: desert
+- c:
+  - 7
+  - -6
+  - -1
+  t: desert
+- c:
+  - 7
+  - -5
+  - -2
+  t: desert
+- c:
+  - 7
+  - -4
+  - -3
+  t: desert
+- c:
+  - 7
+  - -3
+  - -4
+  t: hills
+  content: gemMine
+- c:
+  - 7
+  - -2
+  - -5
+  t: hills
+- c:
+  - 7
+  - -1
+  - -6
+  t: desert
+- c:
+  - 7
+  - 0
+  - -7
+  t: hills
+- c:
+  - 7
+  - 1
+  - -8
+  t: beach
+- c:
+  - 7
+  - 2
+  - -9
+  t: beach
+- c:
+  - 7
+  - 3
+  - -10
+  t: sea
+- c:
+  - 7
+  - 4
+  - -11
+  t: sea
+- c:
+  - 7
+  - 5
+  - -12
+  t: sea
+- c:
+  - 7
+  - 6
+  - -13
+  t: ocean
+- c:
+  - 7
+  - 7
+  - -14
+  t: ocean
+- c:
+  - 7
+  - 8
+  - -15
+  t: ocean
+- c:
+  - 7
+  - 9
+  - -16
+  t: ocean
+- c:
+  - 7
+  - 10
+  - -17
+  t: ocean
+- c:
+  - 7
+  - 11
+  - -18
+  t: beach
+- c:
+  - 8
+  - -21
+  - 13
+  t: beach
+- c:
+  - 8
+  - -20
+  - 12
+  t: ocean
+- c:
+  - 8
+  - -19
+  - 11
+  t: ocean
+- c:
+  - 8
+  - -18
+  - 10
+  t: ocean
+- c:
+  - 8
+  - -17
+  - 9
+  t: ocean
+- c:
+  - 8
+  - -16
+  - 8
+  t: ocean
+- c:
+  - 8
+  - -15
+  - 7
+  t: ocean
+- c:
+  - 8
+  - -14
+  - 6
+  t: ocean
+- c:
+  - 8
+  - -13
+  - 5
+  t: sea
+- c:
+  - 8
+  - -12
+  - 4
+  t: sea
+- c:
+  - 8
+  - -11
+  - 3
+  t: beach
+- c:
+  - 8
+  - -10
+  - 2
+  t: beach
+- c:
+  - 8
+  - -9
+  - 1
+  t: desert
+- c:
+  - 8
+  - -8
+  - 0
+  t: hills
+  content: gemMine
+- c:
+  - 8
+  - -7
+  - -1
+  t: desert
+- c:
+  - 8
+  - -6
+  - -2
+  t: desert
+- c:
+  - 8
+  - -5
+  - -3
+  t: desert
+- c:
+  - 8
+  - -4
+  - -4
+  t: hills
+- c:
+  - 8
+  - -3
+  - -5
+  t: desert
+- c:
+  - 8
+  - -2
+  - -6
+  t: hills
+- c:
+  - 8
+  - -1
+  - -7
+  t: hills
+- c:
+  - 8
+  - 0
+  - -8
+  t: beach
+- c:
+  - 8
+  - 1
+  - -9
+  t: beach
+- c:
+  - 8
+  - 2
+  - -10
+  t: sea
+- c:
+  - 8
+  - 3
+  - -11
+  t: sea
+- c:
+  - 8
+  - 4
+  - -12
+  t: sea
+- c:
+  - 8
+  - 5
+  - -13
+  t: ocean
+- c:
+  - 8
+  - 6
+  - -14
+  t: ocean
+- c:
+  - 8
+  - 7
+  - -15
+  t: ocean
+- c:
+  - 8
+  - 8
+  - -16
+  t: ocean
+- c:
+  - 8
+  - 9
+  - -17
+  t: ocean
+- c:
+  - 8
+  - 10
+  - -18
+  t: ocean
+- c:
+  - 8
+  - 11
+  - -19
+  t: beach
+- c:
+  - 8
+  - 12
+  - -20
+  t: beach
+- c:
+  - 9
+  - -22
+  - 13
+  t: ocean
+- c:
+  - 9
+  - -21
+  - 12
+  t: ocean
+- c:
+  - 9
+  - -20
+  - 11
+  t: ocean
+- c:
+  - 9
+  - -19
+  - 10
+  t: ocean
+- c:
+  - 9
+  - -18
+  - 9
+  t: ocean
+- c:
+  - 9
+  - -17
+  - 8
+  t: ocean
+- c:
+  - 9
+  - -16
+  - 7
+  t: ocean
+- c:
+  - 9
+  - -15
+  - 6
+  t: ocean
+- c:
+  - 9
+  - -14
+  - 5
+  t: sea
+- c:
+  - 9
+  - -13
+  - 4
+  t: sea
+- c:
+  - 9
+  - -12
+  - 3
+  t: sea
+- c:
+  - 9
+  - -11
+  - 2
+  t: beach
+- c:
+  - 9
+  - -10
+  - 1
+  t: beach
+- c:
+  - 9
+  - -9
+  - 0
+  t: desert
+- c:
+  - 9
+  - -8
+  - -1
+  t: hills
+- c:
+  - 9
+  - -7
+  - -2
+  t: hills
+- c:
+  - 9
+  - -6
+  - -3
+  t: hills
+- c:
+  - 9
+  - -5
+  - -4
+  t: hills
+  content: site
+- c:
+  - 9
+  - -4
+  - -5
+  t: desert
+- c:
+  - 9
+  - -3
+  - -6
+  t: beach
+- c:
+  - 9
+  - -2
+  - -7
+  t: beach
+- c:
+  - 9
+  - -1
+  - -8
+  t: beach
+- c:
+  - 9
+  - 0
+  - -9
+  t: beach
+- c:
+  - 9
+  - 1
+  - -10
+  t: sea
+- c:
+  - 9
+  - 2
+  - -11
+  t: sea
+- c:
+  - 9
+  - 3
+  - -12
+  t: sea
+- c:
+  - 9
+  - 4
+  - -13
+  t: ocean
+- c:
+  - 9
+  - 5
+  - -14
+  t: ocean
+- c:
+  - 9
+  - 6
+  - -15
+  t: ocean
+- c:
+  - 9
+  - 7
+  - -16
+  t: ocean
+- c:
+  - 9
+  - 8
+  - -17
+  t: ocean
+- c:
+  - 9
+  - 9
+  - -18
+  t: ocean
+- c:
+  - 9
+  - 10
+  - -19
+  t: ocean
+- c:
+  - 9
+  - 11
+  - -20
+  t: ocean
+- c:
+  - 9
+  - 12
+  - -21
+  t: beach
+- c:
+  - 10
+  - -23
+  - 13
+  t: ocean
+- c:
+  - 10
+  - -22
+  - 12
+  t: ocean
+- c:
+  - 10
+  - -21
+  - 11
+  t: ocean
+- c:
+  - 10
+  - -20
+  - 10
+  t: ocean
+- c:
+  - 10
+  - -19
+  - 9
+  t: ocean
+- c:
+  - 10
+  - -18
+  - 8
+  t: ocean
+- c:
+  - 10
+  - -17
+  - 7
+  t: ocean
+- c:
+  - 10
+  - -16
+  - 6
+  t: ocean
+- c:
+  - 10
+  - -15
+  - 5
+  t: ocean
+- c:
+  - 10
+  - -14
+  - 4
+  t: sea
+- c:
+  - 10
+  - -13
+  - 3
+  t: sea
+- c:
+  - 10
+  - -12
+  - 2
+  t: sea
+- c:
+  - 10
+  - -11
+  - 1
+  t: beach
+- c:
+  - 10
+  - -10
+  - 0
+  content: creepCampLarge
+- c:
+  - 10
+  - -9
+  - -1
+  t: desert
+- c:
+  - 10
+  - -8
+  - -2
+  t: desert
+- c:
+  - 10
+  - -7
+  - -3
+  t: hills
+  content: site
+- c:
+  - 10
+  - -6
+  - -4
+  t: hills
+- c:
+  - 10
+  - -5
+  - -5
+  t: desert
+- c:
+  - 10
+  - -4
+  - -6
+  t: beach
+- c:
+  - 10
+  - -3
+  - -7
+  content: creepCampLarge
+- c:
+  - 10
+  - -1
+  - -9
+  content: beastDen
+- c:
+  - 10
+  - 0
+  - -10
+  t: beach
+- c:
+  - 10
+  - 1
+  - -11
+  t: sea
+- c:
+  - 10
+  - 2
+  - -12
+  t: sea
+- c:
+  - 10
+  - 3
+  - -13
+  t: sea
+- c:
+  - 10
+  - 4
+  - -14
+  t: ocean
+- c:
+  - 10
+  - 5
+  - -15
+  t: ocean
+- c:
+  - 10
+  - 6
+  - -16
+  t: ocean
+- c:
+  - 10
+  - 7
+  - -17
+  t: ocean
+- c:
+  - 10
+  - 8
+  - -18
+  t: ocean
+- c:
+  - 10
+  - 9
+  - -19
+  t: ocean
+- c:
+  - 10
+  - 10
+  - -20
+  t: ocean
+- c:
+  - 10
+  - 11
+  - -21
+  t: ocean
+- c:
+  - 10
+  - 12
+  - -22
+  t: ocean
+- c:
+  - 11
+  - -23
+  - 12
+  t: ocean
+- c:
+  - 11
+  - -22
+  - 11
+  t: ocean
+- c:
+  - 11
+  - -21
+  - 10
+  t: ocean
+- c:
+  - 11
+  - -20
+  - 9
+  t: ocean
+- c:
+  - 11
+  - -19
+  - 8
+  t: ocean
+- c:
+  - 11
+  - -18
+  - 7
+  t: ocean
+- c:
+  - 11
+  - -17
+  - 6
+  t: ocean
+- c:
+  - 11
+  - -16
+  - 5
+  t: ocean
+- c:
+  - 11
+  - -15
+  - 4
+  t: ocean
+- c:
+  - 11
+  - -14
+  - 3
+  t: sea
+- c:
+  - 11
+  - -13
+  - 2
+  t: sea
+- c:
+  - 11
+  - -12
+  - 1
+  t: sea
+- c:
+  - 11
+  - -11
+  - 0
+  t: beach
+- c:
+  - 11
+  - -9
+  - -2
+  content: beastDen
+- c:
+  - 11
+  - -7
+  - -4
+  t: beach
+- c:
+  - 11
+  - -6
+  - -5
+  t: beach
+- c:
+  - 11
+  - -5
+  - -6
+  t: beach
+- c:
+  - 11
+  - -2
+  - -9
+  content: site
+- c:
+  - 11
+  - 0
+  - -11
+  t: beach
+- c:
+  - 11
+  - 1
+  - -12
+  t: sea
+- c:
+  - 11
+  - 2
+  - -13
+  t: sea
+- c:
+  - 11
+  - 3
+  - -14
+  t: beach
+- c:
+  - 11
+  - 4
+  - -15
+  t: ocean
+- c:
+  - 11
+  - 5
+  - -16
+  t: ocean
+- c:
+  - 11
+  - 6
+  - -17
+  t: ocean
+- c:
+  - 11
+  - 7
+  - -18
+  t: ocean
+- c:
+  - 11
+  - 8
+  - -19
+  t: ocean
+- c:
+  - 11
+  - 9
+  - -20
+  t: ocean
+- c:
+  - 11
+  - 10
+  - -21
+  t: ocean
+- c:
+  - 11
+  - 11
+  - -22
+  t: ocean
+- c:
+  - 11
+  - 12
+  - -23
+  t: ocean
+- c:
+  - 12
+  - -23
+  - 11
+  t: ocean
+- c:
+  - 12
+  - -22
+  - 10
+  t: ocean
+- c:
+  - 12
+  - -21
+  - 9
+  t: ocean
+- c:
+  - 12
+  - -20
+  - 8
+  t: ocean
+- c:
+  - 12
+  - -19
+  - 7
+  t: beach
+- c:
+  - 12
+  - -18
+  - 6
+  t: beach
+- c:
+  - 12
+  - -17
+  - 5
+  t: beach
+- c:
+  - 12
+  - -16
+  - 4
+  t: beach
+- c:
+  - 12
+  - -15
+  - 3
+  t: beach
+- c:
+  - 12
+  - -14
+  - 2
+  t: sea
+- c:
+  - 12
+  - -13
+  - 1
+  t: sea
+- c:
+  - 12
+  - -12
+  - 0
+  t: beach
+- c:
+  - 12
+  - -10
+  - -2
+  content: site
+- c:
+  - 12
+  - -8
+  - -4
+  t: beach
+- c:
+  - 12
+  - -7
+  - -5
+  t: sea
+- c:
+  - 12
+  - -6
+  - -6
+  t: sea
+- c:
+  - 12
+  - -5
+  - -7
+  t: beach
+- c:
+  - 12
+  - -4
+  - -8
+  t: beach
+- c:
+  - 12
+  - 0
+  - -12
+  t: beach
+- c:
+  - 12
+  - 1
+  - -13
+  t: beach
+- c:
+  - 12
+  - 2
+  - -14
+  t: beach
+- c:
+  - 12
+  - 3
+  - -15
+  t: beach
+- c:
+  - 12
+  - 4
+  - -16
+  t: ocean
+- c:
+  - 12
+  - 5
+  - -17
+  t: ocean
+- c:
+  - 12
+  - 6
+  - -18
+  t: ocean
+- c:
+  - 12
+  - 7
+  - -19
+  t: ocean
+- c:
+  - 12
+  - 8
+  - -20
+  t: ocean
+- c:
+  - 12
+  - 9
+  - -21
+  t: ocean
+- c:
+  - 12
+  - 10
+  - -22
+  t: ocean
+- c:
+  - 12
+  - 11
+  - -23
+  t: ocean
+- c:
+  - 13
+  - -23
+  - 10
+  t: ocean
+- c:
+  - 13
+  - -21
+  - 8
+  t: beach
+- c:
+  - 13
+  - -20
+  - 7
+  t: beach
+- c:
+  - 13
+  - -15
+  - 2
+  t: beach
+- c:
+  - 13
+  - -14
+  - 1
+  t: beach
+- c:
+  - 13
+  - -13
+  - 0
+  t: beach
+- c:
+  - 13
+  - -9
+  - -4
+  t: beach
+- c:
+  - 13
+  - -8
+  - -5
+  t: sea
+- c:
+  - 13
+  - -7
+  - -6
+  t: sea
+- c:
+  - 13
+  - -6
+  - -7
+  t: sea
+- c:
+  - 13
+  - -5
+  - -8
+  t: sea
+- c:
+  - 13
+  - -4
+  - -9
+  t: beach
+- c:
+  - 13
+  - -3
+  - -10
+  t: beach
+- c:
+  - 13
+  - 1
+  - -14
+  t: forest
+- c:
+  - 13
+  - 2
+  - -15
+  t: forest
+  content: beastDen
+- c:
+  - 13
+  - 4
+  - -17
+  t: beach
+- c:
+  - 13
+  - 5
+  - -18
+  t: beach
+- c:
+  - 13
+  - 6
+  - -19
+  t: beach
+  content: site
+- c:
+  - 13
+  - 7
+  - -20
+  t: ocean
+- c:
+  - 13
+  - 8
+  - -21
+  t: ocean
+- c:
+  - 13
+  - 9
+  - -22
+  t: ocean
+- c:
+  - 13
+  - 10
+  - -23
+  t: ocean
+- c:
+  - 14
+  - -20
+  - 6
+  t: forest
+- c:
+  - 14
+  - -19
+  - 5
+  t: forest
+- c:
+  - 14
+  - -9
+  - -5
+  t: beach
+- c:
+  - 14
+  - -8
+  - -6
+  t: sea
+- c:
+  - 14
+  - -7
+  - -7
+  t: sea
+- c:
+  - 14
+  - -6
+  - -8
+  t: sea
+- c:
+  - 14
+  - -5
+  - -9
+  t: sea
+- c:
+  - 14
+  - -4
+  - -10
+  t: sea
+- c:
+  - 14
+  - -3
+  - -11
+  t: beach
+- c:
+  - 14
+  - 0
+  - -14
+  t: forest
+- c:
+  - 14
+  - 1
+  - -15
+  t: forest
+- c:
+  - 14
+  - 2
+  - -16
+  t: forest
+- c:
+  - 14
+  - 6
+  - -20
+  t: beach
+- c:
+  - 14
+  - 7
+  - -21
+  t: beach
+- c:
+  - 14
+  - 8
+  - -22
+  t: ocean
+- c:
+  - 14
+  - 9
+  - -23
+  t: ocean
+- c:
+  - 15
+  - -21
+  - 6
+  t: forest
+- c:
+  - 15
+  - -20
+  - 5
+  t: forest
+  content: creepCampMedium
+- c:
+  - 15
+  - -19
+  - 4
+  t: forest
+- c:
+  - 15
+  - -13
+  - -2
+  t: forest
+- c:
+  - 15
+  - -12
+  - -3
+  t: forest
+- c:
+  - 15
+  - -10
+  - -5
+  t: beach
+- c:
+  - 15
+  - -9
+  - -6
+  t: ocean
+- c:
+  - 15
+  - -8
+  - -7
+  t: ocean
+- c:
+  - 15
+  - -7
+  - -8
+  t: sea
+- c:
+  - 15
+  - -6
+  - -9
+  t: sea
+- c:
+  - 15
+  - -5
+  - -10
+  t: sea
+- c:
+  - 15
+  - -4
+  - -11
+  t: sea
+- c:
+  - 15
+  - -3
+  - -12
+  t: beach
+- c:
+  - 15
+  - 0
+  - -15
+  t: forest
+  content: creepCampMedium
+- c:
+  - 15
+  - 1
+  - -16
+  t: forest
+- c:
+  - 15
+  - 3
+  - -18
+  content: goldMine
+- c:
+  - 15
+  - 5
+  - -20
+  content: creepCampSmall
+- c:
+  - 15
+  - 8
+  - -23
+  t: ocean
+- c:
+  - 16
+  - -21
+  - 5
+  t: forest
+  content: beastDen
+- c:
+  - 16
+  - -20
+  - 4
+  t: forest
+- c:
+  - 16
+  - -14
+  - -2
+  t: forest
+- c:
+  - 16
+  - -13
+  - -3
+  t: forest
+- c:
+  - 16
+  - -12
+  - -4
+  t: forest
+- c:
+  - 16
+  - -11
+  - -5
+  t: beach
+- c:
+  - 16
+  - -10
+  - -6
+  t: ocean
+- c:
+  - 16
+  - -9
+  - -7
+  t: ocean
+- c:
+  - 16
+  - -8
+  - -8
+  t: ocean
+- c:
+  - 16
+  - -7
+  - -9
+  t: ocean
+- c:
+  - 16
+  - -6
+  - -10
+  t: sea
+- c:
+  - 16
+  - -5
+  - -11
+  t: sea
+- c:
+  - 16
+  - -4
+  - -12
+  t: beach
+- c:
+  - 17
+  - -17
+  - 0
+  startingLocation: 3
+- c:
+  - 17
+  - -14
+  - -3
+  t: forest
+  content: creepCampMedium
+- c:
+  - 17
+  - -13
+  - -4
+  t: forest
+- c:
+  - 17
+  - -12
+  - -5
+  t: beach
+- c:
+  - 17
+  - -11
+  - -6
+  t: ocean
+- c:
+  - 17
+  - -10
+  - -7
+  t: ocean
+- c:
+  - 17
+  - -9
+  - -8
+  t: ocean
+- c:
+  - 17
+  - -8
+  - -9
+  t: ocean
+- c:
+  - 17
+  - -7
+  - -10
+  t: ocean
+- c:
+  - 17
+  - -6
+  - -11
+  t: ocean
+- c:
+  - 17
+  - -5
+  - -12
+  t: ocean
+- c:
+  - 17
+  - -4
+  - -13
+  t: beach
+- c:
+  - 17
+  - 0
+  - -17
+  startingLocation: 4
+- c:
+  - 17
+  - 3
+  - -20
+  t: jungle
+- c:
+  - 18
+  - -20
+  - 2
+  content: goldMine
+- c:
+  - 18
+  - -12
+  - -6
+  t: beach
+- c:
+  - 18
+  - -11
+  - -7
+  t: ocean
+- c:
+  - 18
+  - -10
+  - -8
+  t: ocean
+- c:
+  - 18
+  - -9
+  - -9
+  t: ocean
+- c:
+  - 18
+  - -8
+  - -10
+  t: ocean
+- c:
+  - 18
+  - -7
+  - -11
+  t: ocean
+- c:
+  - 18
+  - -6
+  - -12
+  t: ocean
+- c:
+  - 18
+  - -5
+  - -13
+  t: beach
+- c:
+  - 18
+  - 3
+  - -21
+  t: jungle
+  content: creepCampSmall
+- c:
+  - 19
+  - -12
+  - -7
+  t: beach
+- c:
+  - 19
+  - -11
+  - -8
+  t: ocean
+- c:
+  - 19
+  - -10
+  - -9
+  t: ocean
+- c:
+  - 19
+  - -9
+  - -10
+  t: ocean
+- c:
+  - 19
+  - -8
+  - -11
+  t: ocean
+- c:
+  - 19
+  - -7
+  - -12
+  t: ocean
+- c:
+  - 19
+  - -6
+  - -13
+  t: beach
+- c:
+  - 19
+  - -3
+  - -16
+  t: forest
+- c:
+  - 19
+  - -2
+  - -17
+  t: forest
+- c:
+  - 19
+  - 2
+  - -21
+  t: jungle
+  content: beastDen
+- c:
+  - 20
+  - -21
+  - 1
+  content: creepCampSmall
+- c:
+  - 20
+  - -16
+  - -4
+  t: jungle
+  content: site
+- c:
+  - 20
+  - -15
+  - -5
+  t: jungle
+  content: creepCampSmall
+- c:
+  - 20
+  - -13
+  - -7
+  t: beach
+- c:
+  - 20
+  - -12
+  - -8
+  t: ocean
+- c:
+  - 20
+  - -11
+  - -9
+  t: ocean
+- c:
+  - 20
+  - -10
+  - -10
+  t: ocean
+- c:
+  - 20
+  - -9
+  - -11
+  t: ocean
+- c:
+  - 20
+  - -8
+  - -12
+  t: ocean
+- c:
+  - 20
+  - -7
+  - -13
+  t: beach
+- c:
+  - 20
+  - -5
+  - -15
+  content: site
+- c:
+  - 20
+  - -4
+  - -16
+  t: forest
+  content: creepCampMedium
+- c:
+  - 20
+  - -3
+  - -17
+  t: forest
+- c:
+  - 20
+  - -2
+  - -18
+  t: forest
+- c:
+  - 20
+  - 1
+  - -21
+  t: river
+- c:
+  - 21
+  - -18
+  - -3
+  content: beastDen
+- c:
+  - 21
+  - -14
+  - -7
+  t: beach
+- c:
+  - 21
+  - -13
+  - -8
+  t: beach
+- c:
+  - 21
+  - -12
+  - -9
+  t: ocean
+- c:
+  - 21
+  - -11
+  - -10
+  t: ocean
+- c:
+  - 21
+  - -10
+  - -11
+  t: ocean
+- c:
+  - 21
+  - -9
+  - -12
+  t: ocean
+- c:
+  - 21
+  - -8
+  - -13
+  t: beach
+- c:
+  - 21
+  - -4
+  - -17
+  t: forest
+- c:
+  - 21
+  - -3
+  - -18
+  t: forest
+- c:
+  - 21
+  - -2
+  - -19
+  t: river
+- c:
+  - 21
+  - -1
+  - -20
+  t: river
+- c:
+  - 21
+  - 0
+  - -21
+  t: river
+- c:
+  - 22
+  - -13
+  - -9
+  t: ocean
+- c:
+  - 22
+  - -12
+  - -10
+  t: ocean
+- c:
+  - 22
+  - -11
+  - -11
+  t: ocean
+- c:
+  - 22
+  - -10
+  - -12
+  t: ocean
+- c:
+  - 22
+  - -9
+  - -13
+  t: ocean
+- c:
+  - 23
+  - -13
+  - -10
+  t: ocean
+- c:
+  - 23
+  - -12
+  - -11
+  t: ocean
+- c:
+  - 23
+  - -11
+  - -12
+  t: ocean
+- c:
+  - 23
+  - -10
+  - -13
+  t: ocean

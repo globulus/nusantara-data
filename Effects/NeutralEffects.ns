@@ -1,0 +1,873 @@
+import "CommonEffects"
+
+effect MineGold {
+  amountMined = 1 # as batch multiplier
+  targetExtraId = "mineableGold"
+  batchExtraId = "goldBatch"
+
+  trigger = Triggers.cast
+
+  cost(caster) => [ap: 2]
+
+  check(caster, target) => target.extras?.first(=> $0.id == targetExtraId)?.value ?? 0 > 0
+
+  run(caster, target) {
+    currentGoldCapacity = target.extras.first(=> $0.id == targetExtraId).value
+    goldBatch = target.extras.first(=> $0.id == batchExtraId).value
+    mined = Math.min(currentGoldCapacity, amountMined * goldBatch)
+    target.updateExtra(targetExtraId, currentGoldCapacity - mined)
+    caster.owner.addResources([g: mined])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " mines $mined gold from " \
+      + Game.localizedStr(target.type.id + "Title") + ".", LogLevels.info, caster.coordinates)
+    Game.animateVisualFx([
+      [
+        type: "earn",
+        coordinates: caster.coordinates
+      ]
+    ])
+  }
+
+  description(caster) => "Mine gold."
+}
+
+effect AutoAttackAtStartTurn {
+  init(@attack, @rng)
+
+  trigger => Triggers.startOfTurn
+
+  targets => Targets.none
+
+  run(caster, target) {
+    casterOwner = caster.owner
+    around = Game.unitsInRange(Game.grid.locate(caster), rng)\
+      .where(=> !$0.owner.isAllyOf(casterOwner))
+    randomTarget = around.randomItem()
+    if randomTarget != null {
+      damage = Math.max(1, attack - randomTarget.defense(caster))
+      Game.animateAttack(caster, randomTarget)
+      randomTarget.takeDamage(damage, caster)
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " auto-attacks " + Game.localizedStr(target.type.id + "Title") + " for $damage", LogLevels.info, caster.coordinates)
+    }
+  }
+
+  description(caster) => "At the start of turn, deal $attack damage (minus defender defense) to a random enemy withing range $rng."
+}
+
+effect AddMajorUpgrade {
+  typeId = "majorUpgrade"
+
+  trigger => Triggers.cast
+
+  targets => Targets.none
+
+  cost(caster) {
+    baseGold = 10
+    baseUnique = 3
+    ramp = 0.5
+    tree = caster.owner.upgradeTree
+    numMajors = tree.allUpgrades.count(=> $0.type.kind == "major")
+    gold = Math.floor(baseGold * (1 + ramp * numMajors))
+    unique = Math.floor(baseUnique * (1 + ramp * numMajors))
+    return [g: gold, u: unique, ap: 1]
+  }
+
+  run(caster, target) {
+    caster.owner.addToHand(typeId, 2) # two turns downtime
+  }
+
+  description(caster) => "Add Major Upgrade to hand.\n" + Game.localizedStr(typeId + "Description")
+  flavor(caster) => Game.localizedStr(typeId + "Flavor")
+}
+
+effect SiegeAttack {
+  extraAttack = 10
+
+  trigger => Triggers.passive
+
+  check(caster, target) => target.isBuilding
+
+  run(caster, target) => [
+    attack: ["+", extraAttack]
+  ]
+  
+  description(caster) => "When attacking a building, has $extraAttack attack extra."
+}
+
+effect GenerateGold {
+  init(amount) {
+    @gold = [g: amount]
+  }
+
+  trigger => Triggers.startOfTurn
+
+  run(caster, target) {
+    caster.owner.addResources(@gold)
+    Game.animateVisualFx([
+      [
+        type: "earn",
+        coordinates: caster.coordinates
+      ]
+    ])
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " generates $(gold.g) Gold.", LogLevels.info, caster.coordinates)
+  }
+
+  description(caster) => "Generate $(@gold.g) Gold."
+}
+
+effect RandomBounty {
+  init(@level)
+
+  trigger => Triggers.onDie
+
+  addMinorUpgrade(player) {
+    Game.showMessage(Game.localizedStr("uncoveredHiddenKnowledge"))
+    player.addToHand("minorUpgrade", 0)
+  }
+
+  addUnits(player, num) {
+    unitId = when player.faction {
+      "sanghoy" => "warrior"
+      "frenza" => "rifleman"
+      else => "Invalid faction"
+    }
+    Game.showMessage(Game.localizedStr("rescuedPrisoners"))
+    for i in num.times {
+      player.addToHand(unitId, 0)
+    }
+  }
+
+  run(caster, target) {
+    player = Game.currentPlayer
+    prizeIndex = Math.randomInt(1, 6)
+    when level {
+      1 {
+        Game.showMessage("You uncovered hidden treasures!")
+        when prizeIndex {
+          1 || 2 {
+            player.addResources([g: 5])
+          }
+          3 || 4 {
+            player.addResources([u: 2])
+          }
+          5 {
+            player.addResources([g: 4, u: 1])
+          }
+        }
+      }
+      2 {
+        when prizeIndex {
+          1 || 2 {
+            Game.showMessage("You uncovered a chest of  gold!")
+            player.addResources([g: 10])
+          }
+          3 || 4 {
+            addUnits(player, 1)
+          }
+          5 {
+            addMinorUpgrade(player)
+          }
+        }
+      }
+      3 {
+        when prizeIndex {
+          1 {
+            Game.showMessage("You uncovered a great treasure of 15 gold and 5 unique!")
+            player.addResources([g: 15, u: 5])
+          }
+          2 {
+            Game.showMessage("You found the fountain of youth! Restored 10 health to all your units!")
+            for unit in player.ownedUnits {
+              unit.restoreHealth(10)
+            }
+          }
+          3 || 4 {
+            addMinorUpgrade(player)
+            addMinorUpgrade(player)
+          }
+          5 {
+            addUnits(player, 3)
+          }
+        }
+      }
+    }
+  }
+  
+  description(caster) => "When this dies, whoever killed it gets a random treasure!"
+}
+
+effect IncreaseHeroStats {
+  trigger = Triggers.passive
+
+  run(caster, target) => [
+    vitality: ["+", 1],
+    fortitude: ["+", 1],
+    guard: ["+", 1],
+    prowess: ["+", 1]
+  ]
+  
+  description(caster) => "+1 to all Hero attributes."
+}
+
+effect PoisonModifier {
+  init(@damageTaken)
+
+  trigger => Triggers.startOfTurn
+
+  run(caster, target) {
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " takes $damageTaken poison damage!", LogLevels.info, target.coordinates)
+    target.takeDamage(damageTaken, caster)
+  }
+
+  sprite => "kingPython"
+
+  title => "poisonedTitle"
+  
+  description(caster) => "At the start of turn, take $damageTaken damage."
+}
+
+effect VenomStrike {
+  init(@damageTaken, @duration)
+
+  trigger => Triggers.attack
+
+  check(caster, target) => isOrganic(target)
+
+  run(caster, target) {
+    if !target.hasTempEffect("PoisonModifier") {
+      target.addTempEffect(PoisonModifier(damageTaken), caster, duration)
+      
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " poisons " + Game.localizedStr(target.type.id + "Title") + " to take $damageTaken damage for $duration turns!", \
+        LogLevels.info, caster.coordinates)
+      Game.animateVisualFx([
+        [
+          type: "poison",
+          coordinates: target.coordinates,
+          color: "#00FF00"
+        ]
+      ])
+    }
+  }
+  
+  description(caster) => "Poison the target to take $damageTaken damage for $duration turns."
+}
+
+effect FeastOfFlesh {
+  init(@hpRestored)
+
+  trigger => Triggers.kill
+
+  check(caster, target) => isOrganic(target)
+
+  run(caster, target) {
+    caster.restoreHealth(hpRestored)
+    Game.animateVisualFx([
+      [
+        type: "blood",
+        coordinates: caster.coordinates
+      ]
+    ])
+  }
+
+  description(caster) => "Heal self for $hpRestored."
+}
+
+effect DefeatOwner {
+  trigger => Triggers.onDie
+
+  run(caster, target) {
+    player = caster.owner
+    Game.showMessage("$(player.name) is defeated!")
+    Server.concede(player)
+  }
+
+  description(caster) => "Once this is out, so are you!"
+}
+
+effect TakeDamageIfNotMoved {
+  DAMAGE = 10
+
+  trigger = Triggers.endOfTurn
+
+  run(caster, target) {
+    if caster.ap == caster.speed {
+      caster.takeDamage(DAMAGE, caster)
+    }
+  }
+
+  description(caster) => "If you didn't spend any AP this turn, take $DAMAGE damage."
+}
+
+effect WonderSummon {
+  initialWonderTurns = 5
+  targetExtraId = "wonderTurnsRemaining"
+
+  trigger => Triggers.summon
+
+  run(caster, target) {
+    caster.addExtra(targetExtraId, "turnsTillWinTitle", "wonder", initialWonderTurns)
+  }
+
+  description(caster) => "The clock is ticking!"
+}
+
+effect WonderTick {
+  targetExtraId = "wonderTurnsRemaining"
+
+  trigger => Triggers.startOfTurn
+
+  turnsRemaining(caster) => caster.extras.first(=> $0.id == targetExtraId).value
+
+  run(caster, target) {
+    turns = turnsRemaining(caster) - 1
+    if turns == 0 {
+      Server.win(caster.owner)
+    } else {
+      caster.updateExtra(targetExtraId, turns)
+    }
+  }
+
+  description(caster) => "Win in $(turnsRemaining(caster)) turns!"
+}
+
+effect LoadTransport {
+  trigger = Triggers.cast
+  
+  isEnabled(caster) => [[caster.canLoad, "Can't load any more units!"]]
+
+  check(caster, target) => areAllies(caster, target) && !target.isBuilding && target.movementType != "fly"
+
+  run(caster, target) {
+    caster.load(target)
+  }
+
+  description(caster) => "Load the target unit into the transport."
+}
+
+effect UnloadTransport {
+  trigger = Triggers.cast
+  targets = Targets.cell
+  
+  isEnabled(caster) => [[!caster.loadedUnits.isEmpty, "Nothing to unload!"]]
+
+  check(caster, target) => target.content == null
+
+  run(caster, target) {
+    caster.unload(target.coordinates)
+  }
+
+  description(caster) => "Unload the last loaded unit at the target cell"
+}
+
+effect RandomSarcomancyModifier is AuraModifier {
+  init {
+    @attack = Math.randomInt(-3, 2)
+    @defense = Math.randomInt(-2, 1)
+    @speed = Math.randomInt(-1, 1)
+  }
+
+  run(caster, target) => [
+    attack: ["+", @attack],
+    defense: ["+", @defense],
+    speed: ["+", @speed]
+  ]
+
+  sprite => "sarcomancy"
+
+  title => "sarcomancyTitle"
+}
+
+effect WingedSerpentSarcomancy {
+  trigger => Triggers.attack
+
+  check(caster, target) => isOrganic(target)
+
+  run(caster, target) {
+    target.addTempEffect(RandomSarcomancyModifier(), source: caster, duration: INFINITY)
+    Game.animateVisualFx([
+      [
+        type: "blood",
+        coordinates: caster.coordinates
+      ],
+      [
+        type: "blood",
+        coordinates: target.coordinates
+      ]
+    ])
+  }
+
+  description(caster) => "Add a random sarcomancy modifier."
+}
+
+effect RuinedWellInteraction {
+  trigger => Triggers.interact
+
+  run(caster, target) {
+    casterLocation = Game.grid.locate(caster)
+    caster.destroy(caster)
+    when Math.randomInt(1, 4) {
+      1 { # add resources
+        when target.owner.faction {
+          "sanghoy" {
+            Game.showMessage("You harvested the corpses from the old well to power sarcomantic rituals!")
+            target.owner.addResources([u: 3])
+          }
+          "frenza" {
+            Game.showMessage("Some corpses thrown in the well still had their gold ornaments on them!")
+            target.owner.addResources([g: 4])
+          }
+        }
+      }
+      2 { # add Amalgam
+        Game.showMessage("From the ruins of the ancient well emeges an Amalgam. Convinced you're its master, it'll serve you until the end of its short life.")
+        casterLocation.summon("amalgam", target.owner)
+        Game.animateVisualFx([
+          [
+            type: "blood",
+            coordinates: casterLocation.coordinates
+          ]
+        ])
+      }
+      3 { # take some damage
+        Game.showMessage("The ancient well was empty and collapsed as soon as you approached it! Fortunately, you got away with just a few scratches.")
+        Game.animateVisualFx([
+          [
+            type: "hit",
+            coordinates: target.coordinates
+          ]
+        ])
+        target.takeDamage(4, caster)
+      }
+    }
+  }
+}
+
+effect ColonialShipwreckInteraction {
+  amountMined = 3
+  targetExtraId = "lootRemaining"
+
+  trigger => Triggers.interact
+
+  run(caster, target) {
+    currentGoldCapacity = caster.extras.first(=> $0.id == targetExtraId).value
+    mined = Math.min(currentGoldCapacity, amountMined)
+    Game.showMessage("You looted the shipwreck's vaults!")
+    target.owner.addResources([g: mined])
+    Game.animateVisualFx([
+      [
+        type: "earn",
+        coordinates: target.coordinates
+      ]
+    ])
+    if mined < currentGoldCapacity {
+      caster.updateExtra(targetExtraId, currentGoldCapacity - mined)
+    } else {
+      caster.destroy(caster)
+    }
+  }
+}
+
+effect SwitchOwnerInteraction {
+  trigger => Triggers.interact
+
+  run(caster, target) {
+    caster.setOwner(target.owner)
+    Game.showMessage("You took control of this $(Game.localizedStr(caster.type.title))!")
+  }
+}
+
+effect AirShieldAuraModifier is AuraModifier {
+  attackGained = 3
+
+  run(caster, target) => [
+    attack: ["+", if target.movementType == "fly" {
+      attackGained
+    } else {
+      0
+    }]
+  ]
+
+  description(caster) => "If the attacked enemy's flying, strike with $attackGained more attack."
+
+  sprite = "dischargedBallista"
+
+  title => "airShieldTitle"
+}
+
+effect AirShieldAura is Aura {
+  stacks = false
+  modifierId = "AirShieldAuraModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => caster.isAllyOf(target.owner)
+
+  modifier(caster, target) => AirShieldAuraModifier()
+
+  sprite = "dischargedBallista"
+
+  description(caster) => "Provides a global attack boost vs flyers!"
+}
+
+effect DischargedBallistaInteraction {
+  trigger => Triggers.interact
+
+  run(caster, target) {
+    Game.showMessage("The broken battle machine, its target decaying on its wooden frame, inspires your warriors to strike harder versus flying foes!")
+    target.owner.addEffect("AirShieldAura")
+    caster.destroy(caster)
+  }
+}
+
+effect WingedSerpentNestInteraction {
+  trigger => Triggers.interact
+
+  run(caster, target) {
+    Game.showMessage("You approach a winged serpent nest and slowly make your way to its summit...")
+    casterOwner = caster.owner
+    casterLocation = Game.grid.locate(caster)
+    caster.destroy(caster)
+    when Math.randomInt(1, 7) {
+      in 1...3 { # wild winged serpent appears
+        Game.showMessage("Atop, you find an enraged Winged Serpent, guarding the nest!")
+        serpent = casterLocation.summon("wingedSerpent", casterOwner)
+        Game.combat(serpent, target)
+      }
+      4 || 5 { # eat a delicious omelette
+        Game.showMessage("The nest contains two freshly laid eggs. You take it to make delicious omelette for your troops!")
+        for unit in Game.unitsInRange(casterLocation, 1).where(=> target.owner.id == $0.owner.id) {
+          Game.animateVisualFx([
+            [
+              type: "boost",
+              coordinates: unit.coordinates,
+              color: "#800080"
+            ]
+          ])
+          unit.restoreHealth(5)
+        }
+      }
+      6 { # find a tame winged serpent
+        Game.showMessage("In the nest, you find a winged serpent cub, waiting for its mother to return. You snatch it, confident in your ability to tame and subject it to your will!")
+        target.owner.addToHand("wingedSerpent", 2)
+      }
+    }
+  }
+}
+
+effect BrokenTotemInteraction {
+  trigger => Triggers.interact
+
+  run(caster, target) {
+    casterLocation = Game.grid.locate(caster)
+    when Math.randomInt(1, 21) {
+      in 1...3 { # totem dies
+        Game.showMessage("Terrifying murmuring leaves you and your party disturbed, but unharmed. In your rage, you destroy the totem and use it for firewood.")
+        Game.animateVisualFx([
+          [
+            type: "bonefire",
+            coordinates: casterLocation.coordinates
+          ]
+        ])
+        caster.destroy(target)
+      }
+      in 4...9 { # find sarcomancer
+        Game.showMessage("At the broken totem's base, you find a sarcomancer, devastated at the loss of his altar. You give him a shoulder to cry on and he's ready to join your cause!")
+        caster.destroy(caster)
+        casterLocation.summon("sarcomancer", target.owner)
+      }
+      in 10...16 { # units take damage
+        Game.showMessage("The humming comming from the totem draws you near, until the vicious smoke of its fire suffocates your troops!")
+        Game.animateVisualFx([
+          [
+            type: "circle",
+            coordinates: casterLocation.coordinates
+          ]
+        ])
+        nearbyUnits = Game.unitsInRange(casterLocation, 1).where(=> target.owner.id == $0.owner.id)
+        for unit in nearbyUnits {
+          Game.animateVisualFx([
+            [
+              type: "poison",
+              coordinates: unit.coordinates,
+              color: "#006400"
+            ]
+          ])
+          unit.takeDamage(6, caster)
+        }
+      }
+      17 { # study to become a Warlock
+        caster.destroy(caster)
+        target.owner.upgradeTree.addNode([
+          type: "darkWhispers",
+          subnodes: [
+            [
+              type: "eldritchBlast",
+              subnodes: [
+                [
+                  type: "summoningRift"
+                ]
+              ]
+            ]
+          ]
+        ])
+        Game.showMessage("You sit at the base of the burning totem, drawn inexplicably to the soft murmuring coming from within. What started out as random mumbling soon turns into a clear message, embossed with a purpose: there's more out there to learn, more to grasp and conquer... (CHECK YOUR UPGRADE TREE!)")
+      }
+      18 || 19 { # nearby units attack each other
+        Game.showMessage("Whispers of doom converge on your troops, preventing them from telling friends from foes!")
+        nearbyUnits = Game.unitsInRange(casterLocation, 1).where(=> target.owner.id == $0.owner.id)
+        for unit in nearbyUnits {
+          location = unit.coordinates
+          if location == null {
+            continue
+          }
+          friendlyTarget = Game.unitsInRange(location, 1).first(=> $0.owner.id == unit.owner.id)
+          if friendlyTarget != null {
+            Game.animateVisualFx([
+              [
+                type: "poison",
+                coordinates: location,
+                color: "#006400"
+              ]
+            ])
+            Game.combat(unit, friendlyTarget)
+          }
+        }
+      }
+      20 { # summon demon
+        casterOwner = caster.owner
+        Game.animateVisualFx([
+          [
+            type: "bonefire",
+            coordinates: casterLocation.coordinates
+          ]
+        ])
+        Game.showMessage("The purple fire engulfs the wood of the totem, its flame darkening amidst terrifying howling coming from its core!")
+        caster.destroy(caster)
+        demon = casterLocation.summon("vanguard", casterOwner)
+        Game.showMessage("From its ashes emerges a hideous figure, its carpace and many limbs emanating an otherwordly glow. After stumbling around, it shrieks and attacks you!")
+        Game.combat(demon, target)
+      }
+    }
+  }
+}
+
+effect TitheCollectorInteraction {
+  DAMAGE = 15
+
+  trigger => Triggers.interact
+
+  run(caster, target) {
+    if target.hp < DAMAGE {
+      Game.showMessage("This weakling is unworthy of being offered to Rogash!")
+      return
+    }
+    Game.showMessage("You encounter a wandering priest, collecting Rogash's bloody tithe in exchange for blessings. Curious, you let him take a stab at one of your troops.")
+    target.takeDamage(DAMAGE, caster)
+    Game.animateVisualFx([
+      [
+        type: "blood",
+        coordinates: target.coordinates
+      ]
+    ])
+    outcome = Math.randomInt(1, 16)
+    when outcome {
+      1 || 2 { # nothing happens
+        Game.showMessage("Apparently, nothing happens. The priest argues that the blessing will come some time in the future in some shape or form.")
+        if outcome == 2 {
+          Game.showMessage("Frustrated, you beat him to death.")
+          caster.destroy(target)
+        }
+      }
+      15 { # the unit dies
+        Game.showMessage("The collector's not-so-keen adherence to hygiene practices leaves a gangrenous wound that shortly proves fatal.")
+        target.destroy(caster)
+      }
+      else { # blessing
+        Game.showMessage("Apparently, nothing happens, but you've seen enough of Rogash's miracles already to have faith in his power. Something good will come your way, sooner or later!")
+        if !target.owner.hasEffect("BlessingOfRogash") {
+          target.owner.addEffect("BlessingOfRogash")
+        }
+      }
+    }
+  }
+}
+
+effect NeutralSarcomancyModifier is AuraModifier {
+  run(caster, target) => [
+    attack: ["+", 4],
+    defense: ["+", 1]
+  ]
+
+  sprite => "sarcomancy"
+
+  title => "sarcomancyTitle"
+}
+
+effect BlessingOfRogash {
+  UNITS_COUNT = 3
+  HP_RESTORED = 18
+  AP_EXTRA = 2
+
+  trigger => Triggers.startOfTurn
+
+  run(caster, target) {
+    if Math.randomInt(1, 5) == 1 {
+      caster.removeEffect("BlessingOfRogash")
+      targets = caster.ownedUnits.where(isOrganic).take(UNITS_COUNT)
+      if targets.isEmpty {
+        return
+      }
+      when Math.randomInt(1, 4) {
+        1 {
+          Game.logEvent("The wounds of your troops suddenly heal, restoring $HP_RESTORED to $UNITS_COUNT of them!", \
+            LogLevels.positive, targets.0.coordinates)
+          for unit in targets {
+            unit.restoreHealth(HP_RESTORED)
+            Game.animateVisualFx([
+              [
+                type: "boost",
+                coordinates: unit.coordinates,
+                color: "#00FF00"
+              ]
+            ])
+          }
+        }
+        2 {
+          Game.logEvent("The flesh of your troops begins to change, as if a sarcomanctic ritual was performed on $UNITS_COUNT of them!", \
+            LogLevels.positive, targets.0.coordinates)
+          for unit in targets {
+            unit.addTempEffect(NeutralSarcomancyModifier(), source: unit, duration: INFINITY)
+            Game.animateVisualFx([
+              [
+                type: "boost",
+                coordinates: unit.coordinates,
+                color: "#FF0000"
+              ]
+            ])
+          }
+        }
+        3 {
+          Game.logEvent("$UNITS_COUNT of your troops suddenly feed invigorated to do more, with extra $AP_EXTRA actions this turn!", \
+            LogLevels.positive, targets.0.coordinates)
+          for unit in targets {
+            unit.setActions(unit.speed + AP_EXTRA)
+            Game.animateVisualFx([
+              [
+                type: "boost",
+                coordinates: unit.coordinates,
+                color: "#0000FF"
+              ]
+            ])
+          }
+        }
+      }
+    }
+  }
+
+  sprite => "blessingOfRogash"
+
+  description(caster) => "Life flows from Rogash; its tides and swirls hold something special for your troops..."
+}
+
+effect MercilessRenegadesInteraction {
+  COST = [g: 5]
+
+  trigger => Triggers.interact
+
+  run(caster, target) {
+    if !target.owner.canPay(COST) {
+      Game.showMessage("You found the lair of the assassins, but your broke ass can't affort their services. Begone!")
+      return
+    }
+    casterLocation = Game.grid.locate(caster)
+    caster.destroy(caster)
+    Game.showMessage("You found the assassins' lair, sat and drank with them, and after a while decided to pay them a retainer for their future services.")
+    target.owner.pay(COST)
+    target.owner.addToHand("mercilessAssassination", 1)
+  }
+}
+
+effect MercilessAssassination is TargetableSpell {
+  check(caster, target) => target.isHero() && !areAllies(caster, target)
+
+  run(caster, target) {
+    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " dies under mysterious circumstainces...", LogLevels.warn, target.coordinates)
+    Game.animateVisualFx([
+      [
+        type: ["hit", "poison", "explosion", "electric", "blood"].randomItem(),
+        coordinates: target.coordinates
+      ]
+    ])
+    target.destroy(caster)
+  }
+
+  description(caster) => Game.localizedStr("mercilessAssassinationDescription")
+}
+
+# Upgrades
+
+effect CastDarkWhispers {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    for opponent in Game.players.where(=> $0.id != caster.owner.id && $0.id != Game.nature.id) {
+      topUnit = opponent.ownedUnits.maxBy(=> $0.type.merit)
+      topUnit.setActions(-topUnit.speed) # stun
+      animateHitOn(topUnit)
+    }
+  }
+}
+
+effect AddEldritchBlast {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    hero = caster.owner.hero
+    if hero == null {
+      Console.println("No hero, no Eldritch Blast!")
+      return
+    }
+    if hero.addSkill("eldritchBlast") {
+      Game.showMessage("Your hero now wields the power to summon otherworldly tentacles...")
+    }
+  }
+}
+
+effect EldritchBlast {
+  DAMAGE_LO = 10
+  DAMAGE_HI = 20
+  CONVERSION_CHANCE = 7 # percent
+
+  trigger => Triggers.cast
+
+  check(caster, target) => !target.isBuilding() && !areAllies(caster, target)
+
+  run(caster, target) {
+    Game.animateVisualFx([
+      [
+        type: "ripple",
+        coordinates: caster.coordinates,
+        color: "#FF00FF"
+      ]
+    ])
+    animateHitOn(target)
+    if isOrganic(target) && Math.randomInt(0, 100) < CONVERSION_CHANCE {
+      target.setOwner(caster.owner)
+      Game.animateVisualFx([
+        [
+          type: "circle",
+          coordinates: target.coordinates
+        ]
+      ])
+    }
+  }
+
+  description(caster) => "Deal $DAMAGE_LO-$DAMAGE_HI damage to an enemy unit. If it's organic, there's a $CONVERSION_CHANCE% chance to take ownership of it."
+}
+
+effect SummoningRift {
+  trigger = Triggers.summon
+
+  run(caster, target) {
+    caster.owner.addToHand("vanguard", 0)
+  }
+}

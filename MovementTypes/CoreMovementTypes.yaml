@@ -1,0 +1,146 @@
+- id: immovable
+  title: immovableTitle
+  stationary: true
+  costs:
+    - terrain: '*'
+      mp: 1000 # impassable
+- id: walk
+  title: walkTitle
+  costs:
+    - terrain: grass
+      mp: 2
+    - terrain: beach
+      mp: 2
+    - terrain: hills
+      mp: 4
+    - terrain: forest
+      mp: 3
+    - terrain: jungle
+      mp: 4
+    - terrain: swamp
+      mp: 4
+    - terrain: ocean
+      mp: 1000 # impassable
+    - terrain: river
+      mp: 3
+    - terrain: desert
+      mp: 3
+    - terrain: sea
+      mp: 1000 # impassable
+    - terrain: road
+      mp: 2
+- id: riding
+  title: ridingTitle
+  costs:
+    - terrain: grass
+      mp: 2
+    - terrain: beach
+      mp: 3
+    - terrain: hills
+      mp: 4
+    - terrain: forest
+      mp: 4
+    - terrain: jungle
+      mp: 5
+    - terrain: swamp
+      mp: 5
+    - terrain: ocean
+      mp: 1000 # impassable
+    - terrain: river
+      mp: 4
+    - terrain: desert
+      mp: 3
+    - terrain: sea
+      mp: 1000 # impassable
+    - terrain: road
+      mp: 1
+- id: fly
+  title: flyTitle
+  costs:
+    - terrain: '*'
+      mp: 1
+      ignoreObstacles: true
+- id: jungleWalk
+  title: jungleWalkTitle
+  costs:
+    - terrain: grass
+      mp: 2
+    - terrain: beach
+      mp: 2
+    - terrain: hills
+      mp: 3
+    - terrain: forest
+      mp: 2
+    - terrain: jungle
+      mp: 1
+    - terrain: swamp
+      mp: 4
+    - terrain: ocean
+      mp: 1000 # impassable
+    - terrain: river
+      mp: 3
+    - terrain: desert
+      mp: 4
+    - terrain: sea
+      mp: 1000 # impassable
+- id: tracks
+  title: tracksTitle
+  costs:
+    - terrain: grass
+      mp: 1
+    - terrain: beach
+      mp: 2
+    - terrain: hills
+      mp: 4
+    - terrain: forest
+      mp: 3
+    - terrain: jungle
+      mp: 4
+    - terrain: swamp
+      mp: 4
+    - terrain: ocean
+      mp: 1000 # impassable
+    - terrain: river
+      mp: 2
+    - terrain: desert
+      mp: 2
+    - terrain: sea
+      mp: 1000 # impassable
+    - terrain: road
+      mp: 1
+- id: naval
+  title: navalTitle
+  costs:
+    - terrain: river
+      mp: 1
+    - terrain: ocean
+      mp: 1
+    - terrain: sea
+      mp: 1
+    - terrain: '*'
+      mp: 1000 # impassable
+- id: amphibious
+  title: amphibiousTitle
+  costs:
+    - terrain: river
+      mp: 1
+    - terrain: ocean
+      mp: 1
+    - terrain: sea
+      mp: 1
+    - terrain: grass
+      mp: 3
+    - terrain: beach
+      mp: 3
+    - terrain: hills
+      mp: 3
+    - terrain: forest
+      mp: 3
+    - terrain: jungle
+      mp: 3
+    - terrain: swamp
+      mp: 1
+    - terrain: desert
+      mp: 3
+    - terrain: '*'
+      mp: 1000 # impassable

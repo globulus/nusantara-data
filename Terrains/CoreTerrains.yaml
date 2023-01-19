@@ -1,0 +1,213 @@
+- id: grass
+  title: grassTitle
+  influencable: true
+  layer: 2
+  sprites:
+    base: grass
+    alt:
+      - grassDark
+      - grassBlue
+      - grassDirt
+  debrisFrequency: 0.75
+  debris:
+    - bush1
+    - bush2
+    - bush3
+    - bush4
+    - rocks1
+    - rocks2
+    - dirt
+    - dirt2
+    - plateau
+    - stump
+    - stones
+    - bigRock
+    - dirtRoad
+    - dirtRoad2
+    - dirtRoad3
+- id: forest
+  title: forestTitle
+  influencable: true
+  layer: 2
+  sprites:
+    base: forest
+    alt:
+      - forestLush
+    mirrorable:
+      - forest
+      - forestLush
+- id: jungle
+  title: jungleTitle
+  influencable: true
+  layer: 2
+  sprites: 
+    base: jungle
+    mirrorable:
+      - jungle
+- id: swamp
+  title: swampTitle
+  influencable: true
+  layer: 2
+  sprites: 
+    base: swamp
+    mirrorable:
+      - swamp
+- id: hills
+  title: hillsTitle
+  influencable: true
+  layer: 4
+  sprites: 
+    base: hills
+    alt:
+      - hillsGreen
+  debrisFrequency: 0.5
+  debris:
+    - cave
+    - dirtRoad
+- id: ocean
+  title: oceanTitle
+  influencable: false
+  layer: 2
+  sprites: 
+    base: ocean
+  debrisFrequency: 0.4
+  debris:
+    - shipwreck1
+    - shipwreck2
+    - islet
+    - bigRock
+    - rocks1
+    - rocks2
+- id: beach
+  title: beachTitle
+  influencable: true
+  layer: 2
+  sprites: 
+    base: beach
+    border:
+      - beachGrass1
+      - beachGrass2
+      - beachGrass3
+      - beachGrass4
+      - beachGrass5
+      - beachGrass6
+      - beachRiver1
+      - beachRiver2
+      - beachRiver3
+      - beachRiver4
+      - beachRiver5
+      - beachRiver6
+      - beachSea1
+      - beachSea2
+      - beachSea3
+      - beachSea4
+      - beachSea5
+      - beachSea6
+  spriteRules:
+    - sprite: beach
+      rules:
+        - neighbor: [grass, forest, jungle, swamp]
+          sprites: [beachGrass1, beachGrass2, beachGrass3, beachGrass4, beachGrass5, beachGrass6]
+        - neighbor: [river]
+          sprites: [beachRiver1, beachRiver2, beachRiver3, beachRiver4, beachRiver5, beachRiver6]
+        - neighbor: [sea, ocean]
+          sprites: [beachSea1, beachSea2, beachSea3, beachSea4, beachSea5, beachSea6]
+  debrisFrequency: 0.7
+  debris:
+    - bush1
+    - bush2
+    - rocks1
+    - rocks2
+    - stones
+    - dirt
+    - dirt2
+    - dirtRoad
+- id: desert
+  title: desertTitle
+  influencable: true
+  layer: 2
+  sprites: 
+    base: desert
+    border:
+      - desertGrass1
+      - desertGrass2
+      - desertGrass3
+      - desertGrass4
+      - desertGrass5
+      - desertGrass6
+  spriteRules:
+    - sprite: desert
+      rules:
+        - neighbor: [grass, forest, jungle, swamp]
+          sprites: [desertGrass1, desertGrass2, desertGrass3, desertGrass4, desertGrass5, desertGrass6]
+  debrisFrequency: 0.7
+  debris:
+    - rocks1
+    - rocks2
+    - dirt
+    - dirt2
+    - plateau
+    - stump
+    - stones
+    - dirtRoad
+    - dirtRoad2
+    - dirtRoad3
+    - bigRock
+- id: river
+  title: riverTitle
+  influencable: true
+  layer: 2
+  sprites: 
+    base: river
+    border:
+      - riverGrass1
+      - riverGrass2
+      - riverGrass3
+      - riverGrass4
+      - riverGrass5
+      - riverGrass6
+      - riverSea1
+      - riverSea2
+      - riverSea3
+      - riverSea4
+      - riverSea5
+      - riverSea6
+  spriteRules:
+    - sprite: river
+      rules:
+        - neighbor: [grass, forest, jungle, swamp]
+          sprites: [riverGrass1, riverGrass2, riverGrass3, riverGrass4, riverGrass5, riverGrass6]
+        - neighbor: [sea, ocean]
+          sprites: [riverSea1, riverSea2, riverSea3, riverSea4, riverSea5, riverSea6]
+  debrisFrequency: 0.45
+  debris:
+    - rocks1
+    - rocks2
+    - stones
+    - bigRock
+- id: sea
+  title: seaTitle
+  influencable: false
+  layer: 2
+  sprites: 
+    base: sea
+  debrisFrequency: 0.4
+  debris:
+    - shipwreck1
+    - shipwreck2
+    - islet
+    - bigRock
+    - rocks1
+    - rocks2
+- id: road
+  title: roadTitle
+  influencable: true
+  layer: 2
+  sprites: 
+    base: road
+    alt:
+      - roadBridge
+      - roadBridgeWooden
+  debrisFrequency: 0.5
+  debris:
+    - dirt

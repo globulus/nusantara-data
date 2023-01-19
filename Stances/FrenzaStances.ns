@@ -1,0 +1,38 @@
+stance DeployAutoturret {
+  speed = ["=", 1]
+  movementType = "immovable"
+}
+
+stance PackAutoturret {
+  attack = ["=", 0]
+}
+
+stance Overtime {
+  speed = ["*", 2]
+  regeneration => ["-", Math.max(1, @unit.health * 0.4)]
+
+  isEnabled => [[@unit.owner.hasUpgrade("intensiveIndustrialization"), "Get Intensive industrialization upgrade!"]]
+}
+
+stance Snipe {
+  speed = ["=", 1]
+  movementType = "immovable"
+  attackRange = ["=", 3]
+  attack = ["*", 3]
+  attackCount = ["=", 1]
+  defense = ["=", 0]
+  retaliationCount = ["=", 0]
+  removedSkills = ["poisonedBlades"]
+
+  isEnabled => [[@unit.owner.hasUpgrade("sniperSchool"), "Get Sniper school upgrade!"]]
+}
+
+stance Howitzer {
+  speed = ["-", 1]
+  attackRange = ["+", 1]
+  attack = ["+", 10]
+  retaliationCount = ["=", 0]
+
+  isEnabled => [[@unit.owner.hasUpgrade("differentialMachines"), "Get Differential machines upgrade!"]]
+}
+

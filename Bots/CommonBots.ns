@@ -1,0 +1,94 @@
+
+REJECTED_ACTION = [
+  considerations: [
+    [condition: true, score: -1]
+  ]
+]
+
+ai ValueAi {
+  awake {
+    @movesSoFar = 0
+  }
+
+  sumScores(scoreConditions) => scoreConditions.reduce(0, => $0 + if $1.condition() $1.score else 0)
+
+  update {
+    @movesSoFar += 1
+    if @movesSoFar > this::maxMoves ?? Int.max {
+      Console.println("Max moves exceeded")
+      return false
+    }
+    actions = @computeActions()
+    # Console.println(actions)
+    if !actions.isEmpty {
+      scoreActions = actions.map(fn (action) => [
+        score: sumScores(action.considerations),
+        run: action::run
+      ])
+      # Console.println(scoreActions)
+      highestScoreAction = scoreActions.maxBy(=> $0.score)
+      Console.println(highestScoreAction)
+      if highestScoreAction.score > 0 {
+        highestScoreAction.run()
+        return true
+      }
+    }
+    return false
+  }
+}
+
+fn skillIsEnabled(skill, caster) {
+  enabledConditions = skill?.isEnabled(caster)
+  return enabledConditions.all(=> $0.0) ?? true
+}
+
+fn skillCanBeCast(player, caster, skillId) {
+  skill = caster.skills.first(=> $0.skillId == skillId)
+  if skill == null {
+    return false
+  }
+  cost = skill?.cost(caster)
+  if !player.canPay(cost) || caster.ap < cost?.ap ?? 0 {
+    return false
+  }
+  return skillIsEnabled(skill, caster)
+}
+
+fn castFirstTargetableSkill(player, caster, skills, targetsPredicate = null) {
+  for skill in skills.keys {
+    if skillCanBeCast(player, caster, skill) {
+      targets = Game.castTargets(caster.coordinates, caster, skill)
+      if !targets.isEmpty {
+        # if skill == "sabotage" {
+        #   a = 5 # BP
+        # }
+        target = targetsPredicate(targets) ?? targets.randomItem
+        return [
+          considerations: [
+            [condition: true, score: skills.(skill)]
+          ],
+          run: fn {
+            Console.println("Casting $skill")
+            Server.cast(caster, target.coordinates, skill)
+          }
+        ]
+      }
+    }
+  }
+  return null
+}
+
+fn sum(list) => list.reduce(0, => $0 + $1)
+
+fn average(list) => sum(list) * 1.0 / list.size
+
+fn totalCountForUnitType(id) => \
+  Game.currentPlayer.ownedUnits.count(=> $0.type.id == id) + Game.currentPlayer.hand.count(=> $0.type.id == id)
+
+fn totalCountForSpellType(id) => Game.currentPlayer.hand.count(=> $0.type.id == id)
+
+fn totalCountForUpgradeType(id) => \
+  Game.currentPlayer.upgradeTree.allUpgrades.count(=> $0.type.id == id) + Game.currentPlayer.hand.count(=> $0.type.id == id)
+
+fn totalCountForUpgradeKind(kind) => \
+  Game.currentPlayer.upgradeTree.allUpgrades.count(=> $0.type.kind == kind) + Game.currentPlayer.hand.count(=> $0.type.kind == kind)

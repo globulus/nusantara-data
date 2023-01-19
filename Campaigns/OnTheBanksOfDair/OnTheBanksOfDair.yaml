@@ -1,0 +1,11 @@
+id: onTheBanksOfDair
+title: onTheBanksOfDairTitle
+description: onTheBanksOfDairDescription
+image: ../../Factions/Frenza/Images/voltTank
+difficulties:
+  - normal
+  - hard
+scenarios:
+  - id: CalamityOnTheHorizon
+    image: ../../Factions/Frenza/Images/rifleman
+    loadingText: calamityOnTheHorizonLoadingText

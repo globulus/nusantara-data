@@ -1,0 +1,14 @@
+- id: building
+  title: buildingTitle
+- id: mech
+  title: mechTitle
+- id: invulnerable
+  title: invulnerableTitle
+- id: organic
+  title: organicTitle
+- id: beastman
+  title: beastmanTitle
+- id: airship
+  title: airshipTitle
+- id: eldritch
+  title: eldritchTitle

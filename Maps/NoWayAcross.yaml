@@ -1,0 +1,1265 @@
+id: NoWayAcross
+title: No Way Across
+description: Prep your navy and airforce!
+size: 11
+kind: Hexagonal
+maxPlayers: 4
+defaultTerrain: grass
+hexes:
+- c:
+  - -10
+  - 0
+  - 10
+  t: forest
+  s: forestLush
+  content: site
+- c:
+  - -10
+  - 1
+  - 9
+  t: forest
+  s: forestLush
+  content: creepCampSmall
+- c:
+  - -10
+  - 2
+  - 8
+  s: grassDark
+- c:
+  - -10
+  - 3
+  - 7
+  s: grassDark
+- c:
+  - -10
+  - 4
+  - 6
+  s: grassBlue
+- c:
+  - -10
+  - 5
+  - 5
+  s: grassBlue
+- c:
+  - -10
+  - 6
+  - 4
+  t: forest
+  s: forestLush
+  content: creepCampSmall
+- c:
+  - -10
+  - 7
+  - 3
+  t: forest
+  s: forestLush
+  content: site
+- c:
+  - -10
+  - 8
+  - 2
+  t: beach
+- c:
+  - -10
+  - 9
+  - 1
+  t: sea
+- c:
+  - -10
+  - 10
+  - 0
+  t: sea
+- c:
+  - -9
+  - 2
+  - 7
+  startingLocation: 1
+- c:
+  - -9
+  - 4
+  - 5
+  s: grassDirt
+- c:
+  - -9
+  - 7
+  - 2
+  t: beach
+- c:
+  - -9
+  - 8
+  - 1
+  t: sea
+- c:
+  - -9
+  - 9
+  - 0
+  t: sea
+- c:
+  - -9
+  - 10
+  - -1
+  t: sea
+- c:
+  - -8
+  - -2
+  - 10
+  t: forest
+  s: forestLush
+  content: beastDen
+- c:
+  - -8
+  - 3
+  - 5
+  s: grassDark
+- c:
+  - -8
+  - 6
+  - 2
+  t: beach
+- c:
+  - -8
+  - 7
+  - 1
+  t: sea
+- c:
+  - -8
+  - 8
+  - 0
+  t: sea
+- c:
+  - -8
+  - 9
+  - -1
+  t: sea
+- c:
+  - -8
+  - 10
+  - -2
+  t: beach
+- c:
+  - -7
+  - -3
+  - 10
+  t: beach
+- c:
+  - -7
+  - 1
+  - 6
+  s: grassDark
+  content: beastDen
+- c:
+  - -7
+  - 2
+  - 5
+  s: grassDark
+  content: goldMine
+- c:
+  - -7
+  - 4
+  - 3
+  t: forest
+  s: forestLush
+  content: beastDen
+- c:
+  - -7
+  - 5
+  - 2
+  t: beach
+- c:
+  - -7
+  - 6
+  - 1
+  t: sea
+- c:
+  - -7
+  - 7
+  - 0
+  t: sea
+- c:
+  - -7
+  - 8
+  - -1
+  t: sea
+- c:
+  - -7
+  - 9
+  - -2
+  t: beach
+- c:
+  - -7
+  - 10
+  - -3
+  t: forest
+  s: forestLush
+  content: site
+- c:
+  - -6
+  - -4
+  - 10
+  t: sea
+- c:
+  - -6
+  - -3
+  - 9
+  t: sea
+- c:
+  - -6
+  - -2
+  - 8
+  t: beach
+- c:
+  - -6
+  - 2
+  - 4
+  s: grassDirt
+- c:
+  - -6
+  - 4
+  - 2
+  t: beach
+- c:
+  - -6
+  - 5
+  - 1
+  t: sea
+- c:
+  - -6
+  - 6
+  - 0
+  t: sea
+- c:
+  - -6
+  - 7
+  - -1
+  t: sea
+- c:
+  - -6
+  - 8
+  - -2
+  t: beach
+- c:
+  - -6
+  - 10
+  - -4
+  t: forest
+  s: forestLush
+  content: creepCampSmall
+- c:
+  - -5
+  - -5
+  - 10
+  t: sea
+- c:
+  - -5
+  - -4
+  - 9
+  t: sea
+- c:
+  - -5
+  - -3
+  - 8
+  t: sea
+- c:
+  - -5
+  - -2
+  - 7
+  t: sea
+- c:
+  - -5
+  - -1
+  - 6
+  t: beach
+- c:
+  - -5
+  - 3
+  - 2
+  t: beach
+- c:
+  - -5
+  - 4
+  - 1
+  t: sea
+- c:
+  - -5
+  - 5
+  - 0
+  t: sea
+- c:
+  - -5
+  - 6
+  - -1
+  t: sea
+- c:
+  - -5
+  - 7
+  - -2
+  t: beach
+- c:
+  - -5
+  - 9
+  - -4
+  s: grassDark
+- c:
+  - -4
+  - -6
+  - 10
+  t: sea
+- c:
+  - -4
+  - -5
+  - 9
+  t: sea
+- c:
+  - -4
+  - -4
+  - 8
+  t: sea
+- c:
+  - -4
+  - -3
+  - 7
+  t: sea
+- c:
+  - -4
+  - -2
+  - 6
+  t: sea
+- c:
+  - -4
+  - -1
+  - 5
+  t: sea
+- c:
+  - -4
+  - 0
+  - 4
+  t: beach
+- c:
+  - -4
+  - 1
+  - 3
+  t: beach
+  content: creepCampLarge
+- c:
+  - -4
+  - 2
+  - 2
+  t: beach
+- c:
+  - -4
+  - 3
+  - 1
+  t: sea
+- c:
+  - -4
+  - 4
+  - 0
+  t: sea
+- c:
+  - -4
+  - 5
+  - -1
+  t: sea
+- c:
+  - -4
+  - 6
+  - -2
+  t: beach
+- c:
+  - -4
+  - 7
+  - -3
+  t: forest
+  s: forestLush
+  content: beastDen
+- c:
+  - -4
+  - 10
+  - -6
+  s: grassDark
+- c:
+  - -3
+  - -7
+  - 10
+  t: beach
+- c:
+  - -3
+  - -6
+  - 9
+  t: sea
+- c:
+  - -3
+  - -5
+  - 8
+  t: sea
+- c:
+  - -3
+  - -4
+  - 7
+  t: sea
+- c:
+  - -3
+  - -3
+  - 6
+  t: sea
+- c:
+  - -3
+  - -2
+  - 5
+  t: sea
+- c:
+  - -3
+  - -1
+  - 4
+  t: sea
+- c:
+  - -3
+  - 0
+  - 3
+  t: sea
+- c:
+  - -3
+  - 1
+  - 2
+  t: beach
+- c:
+  - -3
+  - 2
+  - 1
+  t: sea
+- c:
+  - -3
+  - 3
+  - 0
+  t: sea
+- c:
+  - -3
+  - 4
+  - -1
+  t: sea
+- c:
+  - -3
+  - 5
+  - -2
+  t: beach
+- c:
+  - -3
+  - 8
+  - -5
+  s: grassDirt
+- c:
+  - -2
+  - -8
+  - 10
+  t: forest
+  s: forestLush
+  content: beastDen
+- c:
+  - -2
+  - -6
+  - 8
+  t: beach
+- c:
+  - -2
+  - -5
+  - 7
+  t: sea
+- c:
+  - -2
+  - -4
+  - 6
+  t: sea
+- c:
+  - -2
+  - -3
+  - 5
+  t: sea
+- c:
+  - -2
+  - -2
+  - 4
+  t: sea
+- c:
+  - -2
+  - -1
+  - 3
+  t: sea
+- c:
+  - -2
+  - 0
+  - 2
+  t: sea
+- c:
+  - -2
+  - 1
+  - 1
+  t: sea
+- c:
+  - -2
+  - 2
+  - 0
+  t: sea
+- c:
+  - -2
+  - 3
+  - -1
+  t: sea
+- c:
+  - -2
+  - 4
+  - -2
+  t: beach
+- c:
+  - -2
+  - 6
+  - -4
+  s: grassDirt
+- c:
+  - -2
+  - 7
+  - -5
+  content: goldMine
+- c:
+  - -2
+  - 9
+  - -7
+  t: beach
+  startingLocation: 3
+- c:
+  - -2
+  - 10
+  - -8
+  s: grassDark
+- c:
+  - -1
+  - -5
+  - 6
+  t: beach
+- c:
+  - -1
+  - -4
+  - 5
+  t: sea
+- c:
+  - -1
+  - -3
+  - 4
+  t: sea
+- c:
+  - -1
+  - -2
+  - 3
+  t: sea
+- c:
+  - -1
+  - -1
+  - 2
+  t: sea
+- c:
+  - -1
+  - 0
+  - 1
+  t: sea
+- c:
+  - -1
+  - 1
+  - 0
+  t: sea
+- c:
+  - -1
+  - 2
+  - -1
+  t: sea
+- c:
+  - -1
+  - 3
+  - -2
+  t: beach
+- c:
+  - -1
+  - 4
+  - -3
+  t: beach
+  content: creepCampLarge
+- c:
+  - -1
+  - 7
+  - -6
+  content: beastDen
+- c:
+  - 0
+  - -10
+  - 10
+  t: forest
+  s: forestLush
+  content: site
+- c:
+  - 0
+  - -8
+  - 8
+  s: grassDark
+- c:
+  - 0
+  - -7
+  - 7
+  s: grassDirt
+- c:
+  - 0
+  - -4
+  - 4
+  t: beach
+- c:
+  - 0
+  - -3
+  - 3
+  t: sea
+- c:
+  - 0
+  - -2
+  - 2
+  t: sea
+- c:
+  - 0
+  - -1
+  - 1
+  t: sea
+- c:
+  - 0
+  - 0
+  - 0
+  t: beach
+  content: site
+- c:
+  - 0
+  - 1
+  - -1
+  t: sea
+- c:
+  - 0
+  - 2
+  - -2
+  t: sea
+- c:
+  - 0
+  - 3
+  - -3
+  t: sea
+- c:
+  - 0
+  - 4
+  - -4
+  t: beach
+- c:
+  - 0
+  - 6
+  - -6
+  s: grassBlue
+- c:
+  - 0
+  - 8
+  - -8
+  s: grassDirt
+- c:
+  - 0
+  - 9
+  - -9
+  s: grassBlue
+- c:
+  - 0
+  - 10
+  - -10
+  t: forest
+  s: forestLush
+  content: site
+- c:
+  - 1
+  - -10
+  - 9
+  t: forest
+  s: forestLush
+  content: creepCampSmall
+- c:
+  - 1
+  - -7
+  - 6
+  content: beastDen
+- c:
+  - 1
+  - -6
+  - 5
+  s: grassDirt
+- c:
+  - 1
+  - -4
+  - 3
+  t: beach
+  content: creepCampLarge
+- c:
+  - 1
+  - -3
+  - 2
+  t: beach
+- c:
+  - 1
+  - -2
+  - 1
+  t: sea
+- c:
+  - 1
+  - -1
+  - 0
+  t: sea
+- c:
+  - 1
+  - 0
+  - -1
+  t: sea
+- c:
+  - 1
+  - 1
+  - -2
+  t: sea
+- c:
+  - 1
+  - 2
+  - -3
+  t: sea
+- c:
+  - 1
+  - 3
+  - -4
+  t: sea
+- c:
+  - 1
+  - 4
+  - -5
+  t: sea
+- c:
+  - 1
+  - 5
+  - -6
+  t: beach
+- c:
+  - 1
+  - 9
+  - -10
+  t: forest
+  s: forestLush
+  content: creepCampSmall
+- c:
+  - 2
+  - -9
+  - 7
+  startingLocation: 2
+- c:
+  - 2
+  - -7
+  - 5
+  content: goldMine
+- c:
+  - 2
+  - -4
+  - 2
+  t: beach
+- c:
+  - 2
+  - -3
+  - 1
+  t: sea
+- c:
+  - 2
+  - -2
+  - 0
+  t: sea
+- c:
+  - 2
+  - -1
+  - -1
+  t: sea
+- c:
+  - 2
+  - 0
+  - -2
+  t: sea
+- c:
+  - 2
+  - 1
+  - -3
+  t: sea
+- c:
+  - 2
+  - 2
+  - -4
+  t: sea
+- c:
+  - 2
+  - 3
+  - -5
+  t: sea
+- c:
+  - 2
+  - 4
+  - -6
+  t: sea
+- c:
+  - 2
+  - 5
+  - -7
+  t: sea
+- c:
+  - 2
+  - 6
+  - -8
+  t: beach
+- c:
+  - 2
+  - 8
+  - -10
+  t: forest
+  s: forestLush
+  content: beastDen
+- c:
+  - 3
+  - -10
+  - 7
+  s: grassBlue
+- c:
+  - 3
+  - -9
+  - 6
+  s: grassDark
+- c:
+  - 3
+  - -5
+  - 2
+  t: beach
+- c:
+  - 3
+  - -4
+  - 1
+  t: sea
+- c:
+  - 3
+  - -3
+  - 0
+  t: sea
+- c:
+  - 3
+  - -2
+  - -1
+  t: sea
+- c:
+  - 3
+  - -1
+  - -2
+  t: beach
+- c:
+  - 3
+  - 0
+  - -3
+  t: sea
+- c:
+  - 3
+  - 1
+  - -4
+  t: sea
+- c:
+  - 3
+  - 2
+  - -5
+  t: sea
+- c:
+  - 3
+  - 3
+  - -6
+  t: sea
+- c:
+  - 3
+  - 4
+  - -7
+  t: sea
+- c:
+  - 3
+  - 5
+  - -8
+  t: sea
+- c:
+  - 3
+  - 6
+  - -9
+  t: sea
+- c:
+  - 3
+  - 7
+  - -10
+  t: beach
+- c:
+  - 4
+  - -10
+  - 6
+  s: grassBlue
+- c:
+  - 4
+  - -9
+  - 5
+  s: grassDirt
+- c:
+  - 4
+  - -6
+  - 2
+  t: beach
+- c:
+  - 4
+  - -5
+  - 1
+  t: sea
+- c:
+  - 4
+  - -4
+  - 0
+  t: sea
+- c:
+  - 4
+  - -3
+  - -1
+  t: sea
+- c:
+  - 4
+  - -2
+  - -2
+  t: beach
+- c:
+  - 4
+  - -1
+  - -3
+  t: beach
+  content: creepCampLarge
+- c:
+  - 4
+  - 0
+  - -4
+  t: beach
+- c:
+  - 4
+  - 1
+  - -5
+  t: sea
+- c:
+  - 4
+  - 2
+  - -6
+  t: sea
+- c:
+  - 4
+  - 3
+  - -7
+  t: sea
+- c:
+  - 4
+  - 4
+  - -8
+  t: sea
+- c:
+  - 4
+  - 5
+  - -9
+  t: sea
+- c:
+  - 4
+  - 6
+  - -10
+  t: sea
+- c:
+  - 5
+  - -8
+  - 3
+  t: forest
+  s: forestLush
+  content: beastDen
+- c:
+  - 5
+  - -7
+  - 2
+  t: beach
+- c:
+  - 5
+  - -6
+  - 1
+  t: sea
+- c:
+  - 5
+  - -5
+  - 0
+  t: sea
+- c:
+  - 5
+  - -4
+  - -1
+  t: sea
+- c:
+  - 5
+  - -3
+  - -2
+  t: beach
+- c:
+  - 5
+  - 1
+  - -6
+  t: beach
+- c:
+  - 5
+  - 2
+  - -7
+  t: sea
+- c:
+  - 5
+  - 3
+  - -8
+  t: sea
+- c:
+  - 5
+  - 4
+  - -9
+  t: sea
+- c:
+  - 5
+  - 5
+  - -10
+  t: sea
+- c:
+  - 6
+  - -10
+  - 4
+  t: forest
+  s: forestLush
+  content: creepCampSmall
+- c:
+  - 6
+  - -8
+  - 2
+  t: beach
+- c:
+  - 6
+  - -7
+  - 1
+  t: sea
+- c:
+  - 6
+  - -6
+  - 0
+  t: sea
+- c:
+  - 6
+  - -5
+  - -1
+  t: sea
+- c:
+  - 6
+  - -4
+  - -2
+  t: beach
+- c:
+  - 6
+  - -2
+  - -4
+  s: grassDirt
+- c:
+  - 6
+  - 2
+  - -8
+  t: beach
+- c:
+  - 6
+  - 3
+  - -9
+  t: sea
+- c:
+  - 6
+  - 4
+  - -10
+  t: sea
+- c:
+  - 7
+  - -10
+  - 3
+  t: forest
+  s: forestLush
+  content: site
+- c:
+  - 7
+  - -9
+  - 2
+  t: beach
+- c:
+  - 7
+  - -8
+  - 1
+  t: sea
+- c:
+  - 7
+  - -7
+  - 0
+  t: sea
+- c:
+  - 7
+  - -6
+  - -1
+  t: sea
+- c:
+  - 7
+  - -5
+  - -2
+  t: beach
+- c:
+  - 7
+  - -2
+  - -5
+  content: goldMine
+- c:
+  - 7
+  - -1
+  - -6
+  s: grassDark
+  content: beastDen
+- c:
+  - 7
+  - 3
+  - -10
+  t: beach
+- c:
+  - 8
+  - -10
+  - 2
+  t: beach
+- c:
+  - 8
+  - -9
+  - 1
+  t: sea
+- c:
+  - 8
+  - -8
+  - 0
+  t: sea
+- c:
+  - 8
+  - -7
+  - -1
+  t: sea
+- c:
+  - 8
+  - -6
+  - -2
+  t: beach
+- c:
+  - 8
+  - -5
+  - -3
+  t: forest
+  s: forestLush
+  content: beastDen
+- c:
+  - 8
+  - -3
+  - -5
+  s: grassBlue
+- c:
+  - 8
+  - -1
+  - -7
+  s: grassDirt
+- c:
+  - 8
+  - 2
+  - -10
+  t: forest
+  s: forestLush
+  content: beastDen
+- c:
+  - 9
+  - -10
+  - 1
+  t: sea
+- c:
+  - 9
+  - -9
+  - 0
+  t: sea
+- c:
+  - 9
+  - -8
+  - -1
+  t: sea
+- c:
+  - 9
+  - -7
+  - -2
+  t: beach
+- c:
+  - 9
+  - -4
+  - -5
+  s: grassDirt
+- c:
+  - 9
+  - -3
+  - -6
+  s: grassDark
+- c:
+  - 9
+  - -2
+  - -7
+  startingLocation: 4
+- c:
+  - 9
+  - 1
+  - -10
+  s: grassBlue
+- c:
+  - 10
+  - -10
+  - 0
+  t: sea
+- c:
+  - 10
+  - -9
+  - -1
+  t: sea
+- c:
+  - 10
+  - -8
+  - -2
+  t: beach
+- c:
+  - 10
+  - -7
+  - -3
+  t: forest
+  s: forestLush
+  content: site
+- c:
+  - 10
+  - -6
+  - -4
+  t: forest
+  s: forestLush
+  content: creepCampSmall
+- c:
+  - 10
+  - -4
+  - -6
+  s: grassDark
+- c:
+  - 10
+  - -1
+  - -9
+  t: forest
+  s: forestLush
+  content: creepCampSmall
+- c:
+  - 10
+  - 0
+  - -10
+  t: forest
+  s: forestLush
+  content: site

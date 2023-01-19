@@ -1,0 +1,12 @@
+- id: gold
+  title: goldTitle
+  description: goldDescription
+  image: gold
+- id: blood
+  title: bloodTitle
+  description: bloodDescription
+  image: blood
+- id: favor
+  title: favorTitle
+  description: favorDescription
+  image: favor

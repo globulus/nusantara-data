@@ -1,0 +1,5 @@
+id: GreatFlood
+inherits: Blitzkrieg
+title: greatFloodTitle
+description: greatFloodDescription
+winCondition: GreatFlood

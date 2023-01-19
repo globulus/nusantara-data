@@ -1,0 +1,5 @@
+id: Regicide
+inherits: Deathmatch
+title: regicideTitle
+description: regicideDescription
+winCondition: Regicide

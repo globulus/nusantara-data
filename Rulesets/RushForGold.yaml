@@ -1,0 +1,5 @@
+id: RushForGold
+inherits: Blitzkrieg
+title: rushForGoldTitle
+description: rushForGoldDescription
+winCondition: RushForGold
