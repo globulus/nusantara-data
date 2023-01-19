@@ -4,6 +4,14 @@ import "../Effects/CommonEffects"
 scenario DestroyAll {
   onStart {
     updateNeutralContent()
+
+    Game.currentScenario.addObjective([
+      id: "killAll",
+      title: "Destroy all enemies",
+      image: "raider",
+      description: "Crush your enemies and see them driven before you!",
+      state: ObjectiveStates.active
+    ])
   }
 
   onStateChange {
@@ -43,6 +51,14 @@ scenario Regicide {
       }
       bannerLocation.summon("regicideBanner", player)
     }
+
+    Game.currentScenario.addObjective([
+      id: "killBanner",
+      title: "Destroy enemy banner",
+      image: "regicideBanner",
+      description: "Destroy enemy banners without losing your own!",
+      state: ObjectiveStates.active
+    ])
   }
 
   checkVictory {
