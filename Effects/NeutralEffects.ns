@@ -46,7 +46,8 @@ effect AutoAttackAtStartTurn {
       damage = Math.max(1, attack - randomTarget.defense(caster))
       Game.animateAttack(caster, randomTarget)
       randomTarget.takeDamage(damage, caster)
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " auto-attacks " + Game.localizedStr(target.type.id + "Title") + " for $damage", LogLevels.info, caster.coordinates)
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " auto-attacks " \
+        + Game.localizedStr(target.type.id + "Title") + " for $damage.", LogLevels.info, caster.coordinates)
     }
   }
 

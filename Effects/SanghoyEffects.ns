@@ -466,10 +466,12 @@ effect Smite {
   duration(caster) => Math.floor(2 + caster.prowess * 0.5)
 
   run(caster, target) {
-    animateHitOn(target)
-    target.addTempEffect(SmiteModifier(), caster, duration(caster))
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " smites " + Game.localizedStr(target.type.id + "Title") + ", crushing its body and its will to live!", \
-      LogLevels.info, target.coordinates)
+    if !target.hasTempEffect("SmiteModifier") {
+      animateHitOn(target)
+      target.addTempEffect(SmiteModifier(), caster, duration(caster))
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " smites " + Game.localizedStr(target.type.id + "Title") + ", crushing its body and its will to live!", \
+        LogLevels.info, target.coordinates)
+    }
   }
 
   description(caster) => "On attack, add $(SmiteModifier().description(caster)) for duration $(duration(caster))."

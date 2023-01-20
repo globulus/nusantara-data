@@ -13,12 +13,12 @@
   title: buildFactoryTitle
   image: ../Factions/Frenza/Images/factory
   effect: AddCardToHandWithRampingCost
-  params: ["factory", !!int 3, !!int 18, !!int 0, !!int 1, 0.5, !!int 0, !!int 0]
+  params: ["factory", !!int 3, !!int 15, !!int 0, !!int 1, 0.5, !!int 0, !!int 0]
 - id: buildAirfield
   title: buildAirfieldTitle
   image: ../Factions/Frenza/Images/airfield
   effect: AddCardToHandWithRampingCost
-  params: ["airfield", !!int 3, !!int 18, !!int 0, !!int 1, 0.5, !!int 0, !!int 0]
+  params: ["airfield", !!int 3, !!int 15, !!int 0, !!int 1, 0.5, !!int 0, !!int 0]
 - id: buildMagistratesCourt
   title: buildMagistratesCourtTitle
   image: ../Factions/Frenza/Images/magistratesCourt

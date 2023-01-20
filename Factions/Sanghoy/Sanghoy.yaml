@@ -247,7 +247,7 @@ units:
       attack: Sounds/Warchief/Attack
     canInteract: true
     merit: 220
-    h: 70
+    h: 60
     a: 8
     as: 2
     ac: 3

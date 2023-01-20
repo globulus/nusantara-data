@@ -565,7 +565,7 @@ units:
     rc: 2
     d: 5
     r: 2
-    s: 2
+    s: 3
     m: tracks
     projectile: shell
     stances:
