@@ -272,6 +272,7 @@ turtleFormationTitle: Turtle formation
 autoinfectionTitle: Autoinfection
 dismoutToRiflemanTitle: Dismount
 poisonedBladesTitle: Poisoned blades
+sabotageTitle: Sabotage
 strafingRunTitle: Strafing Run
 concussiveGrenadeTitle: Concussive Grenade
 recrewTitle: Recrew
@@ -709,13 +710,13 @@ valiantPromotionFlavor: The Empire is proud of recognizing the vliant efforts of
 paradropDescription: Summon a Rifleman on any revealed cell.
 paradropFlavor: The first time paratroopers were deployed in the colonization effort, several tribes immediatelz surrendered to the might of the flying men.
 endlessExpansionShipmentDescription: Summon a Colonial Hall and some Settlers.
-endlessExpansionShipmentFlavor: '"Every shore touched by the great sea is yours for the taking."'
+endlessExpansionShipmentFlavor: "'Every shore touched by the great sea is yours for the taking.'"
 eradicateThePestShipmentDescription: Summon several Assassins.
 eradicateThePestShipmentFlavor: When rat infestation becomes rampant, experts are called to take care of the matter.
 airSuperiorityShipmentDescription: Summon a Cargo Dirigible and some Assault Airships.
 airSuperiorityShipmentFlavor: This used to mean something, back in the day when nobody knew of Bloodbats.
 emperorsFistShipmentDescription: Summon an Imperial Juggernaut.
-emperorsFistShipmentFlavor: '"I am the hammer of Mankind! I am the fury of a thousand years! Cower now, mongrels, and despair, as my might cannot be matched!"'
+emperorsFistShipmentFlavor: "'I am the hammer of Mankind! I am the fury of a thousand years! Cower now, mongrels, and despair, as my might cannot be matched!'"
 theCullingDescription: For the next 2 turns, whenever your units kill an enemy, they gain Favor.
 scrapyardColossusShipmentTitle: Scrapyard colossus shipment
 
@@ -758,7 +759,7 @@ automatedDefensesTitle: Automated defenses
 automatedDefensesDescription: Enables production of Autoturrets. Add an Autoturret to your hand.
 automatedDefensesFlavor: Enkio Heavy Industries were so confident in their product that they offered a two-year replacement guarantee on all of their defense turret units.
 engineKitsTitle: Engine kits
-engineKitsDescription: Redues production times of Steam Golems, MEVs and Devilhorn Tanks.
+engineKitsDescription: Reduces production times of Steam Golems, MEVs and Devilhorn Tanks.
 engineKitsFlavor: While the idea was initially met with some resistance, shifting production directly to the front-line colonies helps ensure their survival and continous Expansion.
 combatEngineersTitle: Combat engineers
 combatEngineersDescription: Greatly reduces cost of building roads. Allows Devilhorn and Volt Tanks to build Roads.

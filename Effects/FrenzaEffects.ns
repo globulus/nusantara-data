@@ -1168,7 +1168,7 @@ effect AimForTheSun {
     else if caster.hasUpgrade("aimForTheSunL1") 1 \
     else 0
 
-  isEnabled(caster) => [[level(caster) > 0, "You need to invest in AIm for the sun upgrades"]]
+  isEnabled(caster) => [[level(caster) > 0, "You need to invest in Aim for the Sun upgrade!"]]
 
   range(caster) {
     l = level(caster)
