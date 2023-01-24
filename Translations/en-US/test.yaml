@@ -97,6 +97,8 @@ fullHandTitle: Full Hand
 fullHandDescription: Deathmatch but with a larger allowed hand size.
 blitzkriegTitle: Blitzkrieg
 blitzkriegDescription: Start with more units and resources in order to expand faster!
+blitzchessTitle: Blitzchess
+blitzchessDescription: Blitzkrieg with chess timer - only 10 minutes in total!
 wonderRulesetDescription: Research the Wonder upgrade, play it and hold it to win the game!
 otokWithoutTimeoutsTitle: Otok Minus Timeouts
 otokWithoutTimeoutsDescription: Deatmatch, but Otok rounds don't have timeouts.

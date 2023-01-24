@@ -156,7 +156,7 @@ effect Heal {
   check(caster, target) => areAllies(caster, target) && isOrganic(target) && target.hp < target.health - healAmount
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " heals " + Game.localizedStr(target.type.id + "Title") + " for $healthAmount.", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " heals " + Game.localizedStr(target.type.id + "Title") + " for $healAmount.", LogLevels.info, caster.coordinates)
     target.restoreHealth(@healAmount)
     Game.animateVisualFx([
       [

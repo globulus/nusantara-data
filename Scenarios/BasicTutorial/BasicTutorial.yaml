@@ -9,7 +9,7 @@ ruleset:
   inherits: Deathmatch
   randomizedFirstPlayer: false
   autoCameraReposition: false
-  turnLength: 1800
+  timeoutLength: 1800
 players:
   - name: Player
     color: red

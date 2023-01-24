@@ -1,0 +1,6 @@
+id: Blitzchess
+inherits: Blitzkrieg
+title: blitzchessTitle
+description: blitzchessDescription
+timeoutLength: 600
+timerKind: chess

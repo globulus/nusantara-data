@@ -1131,7 +1131,7 @@ effect HorribleMisshapingModifier is AuraModifier {
 
 effect HorribleMisshaping {
   discardedCards = 2
-  duration = 2
+  duration = 3
   trigger = Triggers.cast
   
   range(caster) => Game.grid.size
@@ -1225,7 +1225,7 @@ effect ConvertToForehorn {
     }
     unit = caster.owner.ownedUnits.first(=> $0.type.id == "warrior")
     if unit != null {
-      Game.logEvent(Game.localizedStr(target.type.id + "Title") + "'s hide is now thick, its limbs strong and its forehead horned!", LogLevels.info, unit.coordinates)
+      Game.logEvent(Game.localizedStr(unit.type.id + "Title") + "'s hide is now thick, its limbs strong and its forehead horned!", LogLevels.info, unit.coordinates)
       unit.setType("forehorn")
       unit.restoreHealth(unit.health)
       unit.setActions(0)

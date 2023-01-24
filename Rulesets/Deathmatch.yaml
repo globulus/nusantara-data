@@ -7,7 +7,7 @@ maxTeams: 4
 teamsShareVision: true
 randomizedFirstPlayer: true
 fogOfWar: true
-turnLength: 1200
+timeoutLength: 1200
 maxHandSize: 6
 deterministicCombat: false
 autoCameraReposition: true

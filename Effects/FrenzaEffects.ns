@@ -706,7 +706,7 @@ effect Promoted {
 }
 
 effect ValiantPromotion is TargetableSpell {
-  DURATION = 2
+  DURATION => 2
 
   check(caster, target) => isOrganic(target) && areAllies(caster, target) && !target.hasTempEffect("Promoted")
 
@@ -792,7 +792,7 @@ effect BlazeOfGlory {
 }
 
 effect DisrepairedColossus {
-  CUTOFF_HEALTH_PERCENTAGE = 30
+  CUTOFF_HEALTH_PERCENTAGE = 50
 
   trigger = Triggers.passive
 

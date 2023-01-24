@@ -5,7 +5,7 @@ maxUndos: 0
 teamsShareVision: false
 randomizedFirstPlayer: false
 fogOfWar: true
-turnLength: -1
+timeoutLength: -1
 maxHandSize: 6
 deterministicCombat: false
 autoCameraReposition: false

@@ -2,4 +2,4 @@ id: Quickshot
 inherits: Deathmatch
 title: quickshotTitle
 description: quickshotDescription
-turnLength: 60
+timeoutLength: 60
