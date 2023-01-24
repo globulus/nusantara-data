@@ -15,7 +15,7 @@ fn rampingMorphCost(player, typeId, baseCost, rampCost) {
 effect CollectBlood {
   amount = 1 # gain 1 blood for each attack
 
-  trigger = Triggers.attack
+  trigger = [Triggers.attack, Triggers.retaliate]
 
   run(caster, target) {
     caster.owner.addResources(["u": amount])

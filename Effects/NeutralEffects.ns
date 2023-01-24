@@ -229,7 +229,7 @@ effect PoisonModifier {
 effect VenomStrike {
   init(@damageTaken, @duration)
 
-  trigger => Triggers.attack
+  trigger => [Triggers.attack, Triggers.retaliate]
 
   check(caster, target) => isOrganic(target)
 
@@ -378,7 +378,7 @@ effect RandomSarcomancyModifier is AuraModifier {
 }
 
 effect WingedSerpentSarcomancy {
-  trigger => Triggers.attack
+  trigger => [Triggers.attack, Triggers.retaliate]
 
   check(caster, target) => isOrganic(target)
 

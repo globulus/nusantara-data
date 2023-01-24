@@ -812,7 +812,7 @@ effect LightningArc {
   JUMPS = 2
   DAMAGE = 7
 
-  trigger = Triggers.attack
+  trigger = [Triggers.attack, Triggers.retaliate]
 
   run(caster, target) {
     currentTarget = target
@@ -1054,19 +1054,16 @@ effect RecrewDenburhin is Recrew {
 
 effect DenburhinAttack {
   ANTI_AIR_EXTRA_DAMAGE = 15
-  GROUND_EXTRA_DAMAGE = 12
+  GROUND_EXTRA_DAMAGE = 10
   BUILDING_EXTRA_DAMAGE = 14
 
-  trigger = [Triggers.attack, Triggers.defend]
+  trigger = Triggers.attack
 
   hasAntiAirUpgrade(caster) => caster.hasUpgrade("antiAirTurrets")
   hasAntiGroundUpgrade(caster) => caster.hasUpgrade("bombAutoloader")
   hasAntiBuildingUpgrade(caster) => caster.hasUpgrade("incendiaryPayload")
 
   run(caster, target) {
-    if Game.grid.locate(target).distance(caster.coordinates) > caster.range(CombatTypes.attack, target) {
-      return
-    }
     extraDamage = 0
     if hasAntiAirUpgrade(caster) && target.movementType == "fly" {
       extraDamage += ANTI_AIR_EXTRA_DAMAGE

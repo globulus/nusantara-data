@@ -173,7 +173,7 @@ effect Heal {
 effect DrainAttack {
   init(@healthRestored)
 
-  trigger => Triggers.attack
+  trigger => [Triggers.attack, Triggers.retaliate]
 
   check(caster, target) => isOrganic(target)
 
@@ -463,7 +463,7 @@ effect ChampionXpModifier is AuraModifier {
 }
 
 effect ChampionAttack {
-  trigger => [Triggers.attack, Triggers.defend, Triggers.kill]
+  trigger => [Triggers.attack, Triggers.retaliate, Triggers.kill]
 
   run(caster, target) {
     championGainXp(caster, 10)
