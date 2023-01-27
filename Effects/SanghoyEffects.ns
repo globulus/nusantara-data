@@ -154,7 +154,7 @@ effect MorphToBeastlord is Morph {
 
   isEnabled(caster) => [[caster.owner.hasUpgrade("reignOfBeastlords"), "You must have Reign of Beastlords upgrade"]]
 
-  check(caster, target) => target.type.id in ["warchief"]
+  check(caster, target) => target.type.id in ["raider", "warchief"]
 }
 
 effect MorphToForehorn is Morph {
@@ -1000,7 +1000,7 @@ effect ConvertToBeastlord {
 
 effect ClawToClawModifier is AuraModifier {
   run(caster, target) => [
-    regeneration: ["+", 3],
+    regeneration: ["+", 5],
     speed: ["+", 1]
   ]
 

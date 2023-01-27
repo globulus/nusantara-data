@@ -30,7 +30,8 @@ scenario DestroyAll {
     activePlayers = Game.activePlayers
     # Console.println("Elapsed time: " + (Console.clock() - time))
     # Console.println(activePlayers)
-    return if activePlayers.size == 1 {
+    return if activePlayers.size == 1 \
+        || (activePlayers.size > 1 && activePlayers.all(=> $0.team == activePlayers.0.team)) {
       activePlayers.0
     } else {
       null

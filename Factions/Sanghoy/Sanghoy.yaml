@@ -126,7 +126,7 @@ units:
       cast: Sounds/Thrall/Cast
     merit: 50
     h: 20
-    s: 2
+    s: 3
     m: walk
     stances:
       - Offense
@@ -266,6 +266,7 @@ units:
     skills:
       - collectBlood
       - leadershipAura
+      - clawToClawAura
       - leaveCorpse
   - id: mantlet
     title: mantletTitle

@@ -1,0 +1,5 @@
+id: ThinLines
+inherits: Blitzkrieg
+title: thinLinesTitle
+description: thinLinesDescription
+movementBlockers: enemy

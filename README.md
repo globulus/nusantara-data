@@ -151,6 +151,8 @@ A faction config file describes an object with the following schema:
 * `spells` - list of [spell definitions](#spell).
 * `upgrades` - list of [upgrade definitions](#upgrade).
 
+All factions need to have units. Heroes, spells and upgrades are optional, but only for non-playable factions, such as neutral or campaign factions,
+
 ### Playables
 Units, heroes, spells and upgrades are all *playables*, meaning they share a set of properties. Here's a list of those properties:
 * `id` **(required)**
@@ -169,7 +171,7 @@ Units, heroes, spells and upgrades are all *playables*, meaning they share a set
 * `requiredUpgrades` (optional) - list of IDs for [upgrades](#upgrade) that need to be slotted for this to be playable from hand.
 
 ### Unit
-A unit is a [playable](#playables) that represents an object on the game board. This includes creatures, buildings, interactable map objects, etc. Here are the list of available properties for a unit type:
+A unit is a [playable](#playables) that represents an object on the game board. This includes creatures, buildings, interactable map objects, etc. Here is the list of available properties for a unit type:
 * `merit` **(required)** - describes the importance of a unit and is used by AIs to decide on valuable targets or build orders. This is also the amount of XP a Hero gains when killing a unit. There's no good rule what this number should be, as it is based on the relative strengths of other units in the game.
 * `h` **(required)** - represents the maximum health of a unit. It needs to be a positive number.
 * `a` (optional) - attack value for this unit. Units with no attack value (or attack value of zero) cannot attack or retaliate.
@@ -192,7 +194,222 @@ A unit is a [playable](#playables) that represents an object on the game board. 
 * `loadCapacity` (optional) - the number of units this unit can *load*, defaults to 0. Loaded units are gone from the board until unloaded. When a unit does, all of its loaded units die as well (although you can write abilities and effect that mitigate this).
 * `applyTeamColor` (optional) - if this is `false`, the unit won't have its team color applied to the white pixels in its image.
 * `stances` **(required)** - the list of IDs for [stances](#stances). Each unit **must have at least one stance defined**.
-* `skills` (optional) - the list of IDs of [skills](#skill) that this unit has.
+* `skills` (optional) - the list of IDs of [skills](#skills) that this unit has.
 * `canInteract` (optional) - if this is `true`, the unit can interact with Neutral units that have an `interactionEffect` defined.
 * `interactionEffect` (optional) - the ID of an [effect](#effects) that is invoked when another unit tries interacting with this one.
-* `extras` (optional) - 
+* `extras` (optional) - a list of bundled extra data that you can ship with a unit (and, of course, change at runtime). Each *extra* object has the following structure:
+  + `id`
+  + `title` - should be a translatable key.
+  + `image`
+  + `value` - this can be any kind of value - a number, string or boolean - depending on the actual context of the extra itself.
+
+### Hero
+A Hero is a [unit](#unit) with some extra properties. The game supports controlling a single Hero at the time. Here is the list of available properties for a hero type:
+* `v` (optional) - initial Vitality value for this hero, defaults to 0. Has to be a non-negative integer.
+* `f` (optional) - initial Fortitude value for this hero, defaults to 0. Has to be a non-negative integer.
+* `g` (optional) - initial Guard value for this hero, defaults to 0. Has to be a non-negative integer.
+* `p` (optional) - initial Prowess value for this hero, defaults to 0. Has to be a non-negative integer.
+* `vitalityProgression` (optional) - how much vitality does the hero gain by leveling up, defaults to 0. Has to be a non-negative integer.
+* `fortitudeProgression` (optional) - how much vitality does the hero gain by leveling up, defaults to 0. Has to be a non-negative integer.
+* `guardProgression` (optional) - how much vitality does the hero gain by leveling up, defaults to 0. Has to be a non-negative integer.
+* `prowessProgression` (optional) - how much vitality does the hero gain by leveling up, defaults to 0. Has to be a non-negative integer.
+* `upgradeTree` **(required)** - this hero's [upgrade tree](#upgrade-tree), indicating skills that become available by leveling up.
+
+### Spell
+A Spell is a [playable](#playables) that holds a single [skill](#skills) which is executed when the spell is played (cast) from the hand. Here is the list of available properties for a spell type:
+* `skill` **(required)** - the ID of the [skill](#skills) invoked when this is played.
+
+### Upgrade
+An Upgrade is a [playable](#playable) that can be slotted in an [upgrade tree](#upgrade-tree), be it a Faction or a Hero one. Upgrades have skills that are executed when they're played (for the `summon` trigger), passively or at start/end of turn. Here is the list of available properties for an upgrade type:
+* `kind` **(required)** - the kind of the upgrade which determines which tree can it go into and which slots can it occupy. There are three upgrade kinds:
+  + `minor` - minor slots in a faction upgrade tree.
+  + `major` - major slots in a faction upgrade tree.
+  + `hero` - slots in a hero upgrade tree.
+* `skills` (optional) - the list of [skill](#skills) IDs associated with this upgrade.
+
+## Upgrade Tree
+Upgrade trees are properties of both factions (via [rulesets](#rulesets)) and [heroes](#hero). An upgrade tree is, well, a tree structure, which consists of nodes. Those nodes can have other nodes as their subnodes, etc.
+
+Nodes are described by their `type` property, which is the ID of the [upgrade](#upgrade) that can be slotted at that node. Each node can only have a single type.
+
+A node can have multiple parents (as shown below with the *buildWonder* upgrade), as long as all of them are at the same depth of the tree. The engine will automatically resolve the tree and merge all of those subnodes into a single node with multiple parents.
+
+Example upgrade tree:
+```yaml
+nodes:
+  - type: obsidianWeapons
+  - type: slaveAuctions
+  - type: strengthInUnity
+    subnodes:
+      - type: ironForging
+      - type: ransackers
+      - type: karrish
+        subnodes:
+          - type: thunderousHooves
+          - type: onslaught
+          - type: buildWonder
+      - type: reignOfBeastlords
+        subnodes:
+          - type: eyeToEyeClawToClaw
+          - type: tasteOfManflesh
+          - type: buildWonder
+  - type: ritesOfRogash
+    subnodes:
+      - type: harbingersOfChange
+      - type: theDreamFuel
+      - type: excrescence
+        subnodes: 
+          - type: shapingCorral
+          - type: toTheSkies
+          - type: buildWonder
+      - type: beastmastery
+        subnodes:
+          - type: thickShell
+          - type: daringTamers
+          - type: buildWonder
+```
+
+## Maps
+The **Maps** folder contains map files that can be used and played in the game. You can have as many levels of subfolders as you'd like in this folder, but only the maps at the root level (inside the **Maps** folder itself) will be presented in the dropdown for Custom Games. Likewise, if you have scenario or campaign-specific maps that you don't want listed there, put them in appropriate subfolders. By default, **Scenarios** and **Campaigns** subfolders are already present.
+
+A map file is a YAML document describing an object with the following properties, all of which are required:
+* `id`
+* `title`
+* `description`
+* `size` - the size of the map. For hexagonal maps, it indicated the radius length of the map. E.g, a hexagonal map of size 7 has has 127 cells.
+* `kind` - 0 for hexagonal maps, 1 for rectangular. Only hexagonal maps are supported at the moment.
+* `maxPlayers` - the maximum number of players that can play on this map in a custom game.
+* `defaultTerrain` - the ID of the [terrain](#terrains) that is set as default for cells without the terrain (`t`) property.
+* `hexes` - describes the actual layout of the map, as a list of hexes (cells), all of which have the following properties:
+  + `c` **(required)** - the coordinates of this cell, in Cube Coordinates. This is a list with three integers, describing the X, Y and Z values.
+  + `t` (optional) - the ID of the [terrain](#terrain) at this cell. If omitted, `defaultTerrain` is used.
+  + `s` (optional) - the ID of the terrain sprite used. Set this if you want to use an alternative sprite for your terrain at this cell. Note that this usually interferes with [terrain blending](#terrain-blending).
+  + `content` (optional) - the ID of a [unit type](#unit) that is present on this cell when map loads.
+  + `startingLocation` (optional) - if this cell is a starting location for a player, set this value to the index of that player. E.g, a cell on which the 2nd player starts will have `startingLocation: 2`.
+  + `comment` (optional) - a hidden comment associated with this cell, which can be used by scripts at runtime.
+
+Making and editing maps manually is difficult, so it's highly recommended to use the built-in **Map Editor**, available in the **Tools & Extras** menu in the game.
+
+## Movement Types
+The **MovementTypes** folder contains config (.yaml) files that describe movement types. A movement type describes how a unit's pathing works - if it can move at all, and if yes, how much APs does it spend based on the types of terrain it moves across. It also determines if a movement can trasverse obstacles or if it can be blocked by other units at the map.
+
+You can have as many config files in this folder (or its subfolders) as you'd like, as all are read and merged when data is loaded. Each file needs to be a list of movement type objects, which have the following schema:
+* `id` **(required)**
+* `title` **(required)** - should be a translatable key.
+* `stationary` (optional) - if set to `true`, it indicated that this is a stationary object which doesn't turn towards its target when attacking, retaliating or casting. It has no bearing on the unit's actual ability to move.
+* `costs` **(required)** - a list of movement costs, which describe how many APs does a unit have to spend to move from its current cell to the target one, depending on the terrain of the target cell. The terrain of the origin cell doesn't matter, since the unit is already on it - only the terrain of the destination cell plays a part. The schema of a movement cost is as following:
+  + `terrain` **(required)** - the ID of the [terrain](#terrains) this cost is applied to. You can use a **wildcard**, `*`, to indicate that the cost is applied to all terrains for which there's no other explicitly listed cost.
+  + `mp` **(required)** - how many movement points does the unit have to expend to arrive at the cell with the given territory. If you want to mark that a unit can't move over a certain terrain, put a large number here - 1000 is used in the default data set.
+  + `ignoreObstacles` (optional) - if `true`, the unit will ignore any obstacles on this terrain unless it is the destination hex. For example, flying units can fly over a cell even if there's something on it, but they can't arrive at a cell if it isn't empty.
+
+## Projectiles
+The **Projectiles** folder contains config (.yaml) files that describe projectiles. Projectiles are visual and audible representations of unit attacks: if a unit type has a `projectile` property defined, that projectile will appear whenever the unit attacks or retaliates, for each attack and retaliation.
+
+You can have as many config files in this folder (or its subfolders) as you'd like, as all are read and merged when data is loaded. Each file needs to be a list of projectile objects, which have the following schema:
+* `id` **(required)** - this is the ID specified in the unit type's `projectile` property.
+* `image` **(required)** - relative path to a 32x32px PNG that represents the projectile's sprite.
+* `speed` **(required)** - speed multiplier that affects how fast does the projectile fly from caster to target.
+* `sounds` (optional) - list of sounds that are played based on triggers. All triggers are optional. All sounds are specified as as relative paths to an OGG file. Sounds play only for the currently active player if they can see the action associated with the sound.
+  + `cast` - when the projectile leaves the caster.
+  + `attack` - when the projectile hits the target.
+
+## Resources
+The **Resources** folder contains config (.yaml) files that describe resources. The only customizable resource that players can use is the **unique resource** for their faction - all players have access to **gold** by default. Generation and spending of a resource is a separate matter that is done via [effects](#effects).
+
+You can have as many config files in this folder (or its subfolders) as you'd like, as all are read and merged when data is loaded. Each file needs to be a list of resource objects, which have the following schema (all properties required):
+* `id`
+* `title` - should be a translatable key.
+* `description` - should be a translatable key.
+* `image` - relative path to a 32x32px PNG.
+
+## Rulesets
+The **Rulesets** folder contains config (.yaml) files that describe rulesets, as well as script (.ns) files that describe their initial setup and win conditions.
+
+A ruleset if, as it name says, a set of rules that governs the game. This allows for a wide array of customization of how game mechanics work, which can drastically affect individual games. Rulesets provide a fairly simple way of adding completely new game modes or and replayability to existing ones via small twists that can have a big impact.
+
+Each ruleset should be in its own config file, named according to its ID. Win condition scripts can be spread out over as many script files as needed, since all scripts are compiled at once anyhow.
+
+To reduce clutter, rulesets can copy each other with the `inherits` property and then only override certain other properties.
+
+### Rules
+Here's the full list of ruleset properties:
+* `id` **(required)** - this is usually capitalized (PascalCase).
+* `title` **(required)** - should be a translatable key.
+* `description` **(required)** - should be a translatable key.
+* `inherits` (optional) - the ID of the other ruleset that this ruleset inherits/copies.
+* `playable` (optional) - if `true`, this ruleset will appear as selectable for custom games. Otherwise, it is meant for scenarios/campaigns.
+* `maxTeams` (optional) - the maximum number of teams that players can be distributed into.
+* `teamsShareVision` (optional) - if `true`, players can see everything that their teammates can as well.
+* `fogOfWar` (optional) - if `true`, the map has fog of war, which prevents seeing cells which are out of your sight.
+* `timeoutLength` (optional) - indicates how much time does a player have before the server automatically ends their turn, in *seconds*. If `null` or zero, indicates that players have infinite turns. The actual behavior tightly correlates with the `timerKind` property.
+* `timerKind` (optional) - indicates how do timeouts work. Possible values:
+  + `perTurn` (default) - `timeoutLength` is reset for each turn and the timeout ends the turn. E.g, if `timeoutLength` is 120, each player has 2 minutes to play each of their turns, after which their turn is automatically ended.
+  + `chess` - `timeoutLength` spans the entire game, counting down for each player on their turn. Timeout kicks the user from the game (meaning they lose). E.g, if `timeoutLength` is 600, each player has only 10 minutes in total for everything they wish to play, regardless of how many turns they take. This is akin to how timers work during chess games, hence the game.
+* `maxHandSize` (optional) - the maximum number of playables that a player can have in their hand at any given time. Effectively limits the building queue for a player and limits how fast they can grow and expand.
+* `deterministicCombat` (optional) - if `true`, attack spread (`as`) isn't applied when units attack/retaliate, meaning that the combat is entirely deterministic and can be computed solely based on attack/defense/attack count/retaliation count values of units involved (not counting combat [effects](#effects), which can be coded to have random outcomes).
+* `autoCameraReposition` (optional) - if `true`, the camera will jump to the current player when their turn starts. This is usually set only for scenarios and campaigns.
+* `randomizedFirstPlayer` (optional) - if `true`, the first player (the one which starts on the first turn) is chosen randomly. Othwerise, players always play in the order which is set by the game rules, i.e the first player goes first, the second one second, etc.
+* `winCondition` (optional) - the class name of the [scenario](#scenarios) the game runs in. Each game, even a custom one, runs in a scenario, which responds to game events in order to set the game up, check if anyone won, etc.
+* `factionData` (optional) - determines the setup for each individual faction. It is a map where the key is the faction ID, mapping to the following schema:
+  + `startingData` **(required)** - the initial conditions for each faction when the game starts. Has the following required properties:
+    - `resources` - the resource distribution this factions starts with, as an object with `g` and `u` properties.
+    - `cards` - the [playables](#playables) that start in the player's hand. It is a map, where the key is the playable's ID and the value is the quantity the player starts with.
+    - `units` - a list of [unit](#unit) IDs that will be spawned at the player's starting location. Add an ID multiple times to indicate multiple units of the same type.
+  + `playerEffects`  (optional) - list of class names of [effects](#effects) that are attached to the player at the start of the game.
+  + `upgradeTree` **(required)** - the [faction upgrade tree](#upgrade-tree) for this faction.
+* `bans` (optional) - list of banned skills and stances that can't be used in a game. It has two optional properties:
+  + `skills` - a list of IDs of [skills](#skills) that can't be used in the game.
+  + `stances` - a list of IDs of [stances](#stances) that can't be used in the game.
+* `otokRuleset` (optional) - the set of rules for Otok minigames when played within a Nusantara game with this ruleset. It has the following required properties:
+  + `rounds` - total number of rounds for a game of Otok. This should be an odd integer.
+  + `initialResources` - the amount of gold each player received at the start of the game.
+  + `resourcesPerDraft` - the additional gold each player receives before each draft (including the first one).
+  + `draftDuration` - duration of the draft phase, in seconds.
+  + `combatTurnsPerRound` - the number of combat turns per each round, after which the winner is determined.
+  + `combatTurnDuration` - duration of each combat turn, in seconds.
+
+### Win conditions
+Ruleset win conditions are [scenarios](#scenarios) that govern how does the game go by responding to different in-game events, just like regular scenarios. They're usually placed in script files in the **Rulesets** folder.
+
+The basic `DestroyAll` scenario highlights important event methods that every win condition should have:
+* `onStart` to set the game up, by adding creeps and sites, adding the objective, etc.
+* `onStateChange` to figure out if any player lost all of their units and therefore kick them out of the game.
+* `checkVictory` to see if all remaining players are from the same team and declare the winner.
+
+Just as rulesets can inherit other rulesets, it's common for win conditions to extend each other to reuse script code.
+
+## Scenarios
+
+## Skills
+The **Skills** folder contains config (.yaml) files that describe skills. [Playables](#playables) can have skills, which are shown in the UI and each wraps a single [effect](#effects). Skills can also be banned by [rulesets](#rulesets).
+
+You can have as many config files in this folder (or its subfolders) as you'd like, as all are read and merged when data is loaded. Each file needs to be a list of skill objects, which have the following schema:
+* `id` **(required)**
+* `title` **(required)** - should be a translatable key.
+* `image` **(required)** - relative path to a 64x64px PNG.
+* `effect` **(required)** - the class name of an [effect](#effects) that this skill wraps.
+* `params` (optional) - this is the list of parameters that are passed to the effect `init` method when the skill effect is instantiated. The presence and format of this property depends on the effect and its initializer. The purpose is to allow reuse of effect classes (e.g, reuse of **TrainHero** or **GenerateFavorMonument** effects).
+  
+## Stances
+The **Stances** folder contains config (.yaml) and script (.ns) files that describe stances.
+
+You can have as many config files in this folder (or its subfolders) as you'd like, as all are read and merged when data is loaded. Each file needs to be a list of tag objects, which have the following schema (all properties required):
+* `id` - must correspond to a `stance` class name from scripts, hence it's capitalized (PascalCase).
+* `title` - should be a translatable key.
+* `image` - relative path to a 64x64px PNG.
+
+Units assume stances during gameplay and it alters their stats, which is described by the correspoding `stance` class in the script files, which can implement the following fields/methods:
+* 
+
+## Tags
+The **Tags** folder contains config (.yaml) files that describe tags. A [unit](#unit) can have multiple tags, and tags can be reused between multiple unit types.
+
+You can have as many config files in this folder (or its subfolders) as you'd like, as all are read and merged when data is loaded. Each file needs to be a list of tag objects, which have the following schema (all properties required):
+* `id`
+* `title` - should be a translatable key.
+
+## Terrains
+
+### Terrain Blending
+
+## Translations

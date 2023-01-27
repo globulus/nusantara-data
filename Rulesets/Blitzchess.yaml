@@ -2,5 +2,5 @@ id: Blitzchess
 inherits: Blitzkrieg
 title: blitzchessTitle
 description: blitzchessDescription
-timeoutLength: 600
+timeoutLength: 900
 timerKind: chess

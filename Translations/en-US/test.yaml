@@ -98,7 +98,7 @@ fullHandDescription: Deathmatch but with a larger allowed hand size.
 blitzkriegTitle: Blitzkrieg
 blitzkriegDescription: Start with more units and resources in order to expand faster!
 blitzchessTitle: Blitzchess
-blitzchessDescription: Blitzkrieg with chess timer - only 10 minutes in total!
+blitzchessDescription: Blitzkrieg with a chess timer - only 15 minutes in total!
 wonderRulesetDescription: Research the Wonder upgrade, play it and hold it to win the game!
 otokWithoutTimeoutsTitle: Otok Minus Timeouts
 otokWithoutTimeoutsDescription: Deatmatch, but Otok rounds don't have timeouts.
@@ -112,6 +112,8 @@ barbariansAtTheGatesTitle: Barbarians at the Gates
 barbariansAtTheGatesDescription: Deathmatch where players in the first team start with more resources and upgrades, while players in the second team start with more units.
 robberBaronsTitle: Robber Barons
 robberBaronsDescription: Deathmatch, but the game only lasts 15 rounds. After that, the player with the highest Economic score wins.
+thinLinesTitle: Thin Lines
+thinLinesDescription: Blitzkrieg, but your units can move through allied units.
 
 # Skills
 
