@@ -700,7 +700,20 @@ heroes:
   - id: kagaalu
     title: kagaaluTitle
     description: kagaaluDescription
-    image: Images/kagaalu
+    image: Images/Kagaalu/kagaalu
+    animationFrames:
+      attack:
+        - Images/Kagaalu/kagaaluAttack1
+        - Images/Kagaalu/kagaaluAttack2
+        - Images/Kagaalu/kagaaluAttack3
+      cast:
+        - Images/Kagaalu/kagaaluCast1
+        - Images/Kagaalu/kagaaluCast2
+        - Images/Kagaalu/kagaaluCast3
+      die:
+        - Images/Kagaalu/kagaaluDie1
+        - Images/Kagaalu/kagaaluDie2
+        - Images/Kagaalu/kagaaluDie3
     sounds:
       summon: Sounds/Kagaalu/Summon
       select: Sounds/Kagaalu/Select
@@ -761,7 +774,26 @@ heroes:
   - id: maim
     title: maimTitle
     description: maimDescription
-    image: Images/maim
+    image: Images/Maim/maim
+    animationFrames:
+      move:
+        - Images/Maim/maimMove1
+        - Images/Maim/maimMove2
+        - Images/Maim/maimMove3
+        - Images/Maim/maimMove4
+      attack:
+        - Images/Maim/maimAttack1
+        - Images/Maim/maimAttack2
+        - Images/Maim/maimAttack3
+        - Images/Maim/maimAttack4
+      cast:
+        - Images/Maim/maimCast1
+        - Images/Maim/maimCast2
+        - Images/Maim/maimCast3
+      die:
+        - Images/Maim/maimDie1
+        - Images/Maim/maimDie2
+        - Images/Maim/maimDie3
     sounds:
       summon: Sounds/Maim/Summon
       select: Sounds/Maim/Select
@@ -1005,7 +1037,7 @@ upgrades:
   - id: beastmastery
     title: beastmasteryTitle
     description: beastmasteryDescription
-    image: Images/maim
+    image: Images/Maim/maim
     flavor: beastmasteryFlavor
     kind: major
     skills:

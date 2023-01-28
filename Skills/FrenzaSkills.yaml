@@ -96,7 +96,7 @@
   params: ["vitarron"]
 - id: trainDenburhin
   title: trainDenburhinTitle
-  image: ../Factions/Frenza/Images/denburhin
+  image: ../Factions/Frenza/Images/Denburhin/denburhin
   effect: TrainHero
   params: ["denburhin"]
 - id: trainTofan
@@ -280,7 +280,7 @@
   effect: DenburhinAttack
 - id: theFlagship
   title: theFlagshipTitle
-  image: ../Factions/Frenza/Images/denburhin
+  image: ../Factions/Frenza/Images/Denburhin/denburhin
   effect: TheFlagship
 - id: aimForTheSun
   title: aimForTheSunTitle

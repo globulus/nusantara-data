@@ -719,7 +719,12 @@ heroes:
   - id: denburhin
     title: denburhinTitle
     description: denburhinDescription
-    image: Images/denburhin
+    image: Images/Denburhin/denburhin
+    animationFrames:
+      die:
+        - Images/Denburhin/denburhinDie1
+        - Images/Denburhin/denburhinDie2
+        - Images/Denburhin/denburhinDie3
     sounds:
       summon: Sounds/Denburhin/Summon
       select: Sounds/Denburhin/Select

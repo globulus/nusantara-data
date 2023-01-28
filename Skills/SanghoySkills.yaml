@@ -69,7 +69,7 @@
   effect: TributeToRogash
 - id: trainKagaalu
   title: trainKagaaluTitle
-  image: ../Factions/Sanghoy/Images/kagaalu
+  image: ../Factions/Sanghoy/Images/Kagaalu/kagaalu
   effect: TrainHero
   params: ["kagaalu"]
 - id: trainPyracmon
@@ -79,7 +79,7 @@
   params: ["pyracmon"]
 - id: trainMaim
   title: trainMaimtitle
-  image: ../Factions/Sanghoy/Images/maim
+  image: ../Factions/Sanghoy/Images/Maim/maim
   effect: TrainHero
   params: ["maim"]
 - id: sacrificeOfBlood
