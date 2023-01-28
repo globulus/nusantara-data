@@ -74,7 +74,7 @@
   params: ["kagaalu"]
 - id: trainPyracmon
   title: trainPyracmonTitle
-  image: ../Factions/Sanghoy/Images/pyracmon
+  image: ../Factions/Sanghoy/Images/Pyracmon/pyracmon
   effect: TrainHero
   params: ["pyracmon"]
 - id: trainMaim

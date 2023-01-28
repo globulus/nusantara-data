@@ -621,7 +621,25 @@ heroes:
   - id: pyracmon
     title: pyracmonTitle
     description: pyracmonDescription
-    image: Images/pyracmon
+    image: Images/Pyracmon/pyracmon
+    animationFrames:
+      move:
+        - Images/Pyracmon/pyracmonMove1
+        - Images/Pyracmon/pyracmonMove2
+        - Images/Pyracmon/pyracmonMove3
+        - Images/Pyracmon/pyracmonMove4
+      attack:
+        - Images/Pyracmon/pyracmonAttack1
+        - Images/Pyracmon/pyracmonAttack2
+        - Images/Pyracmon/pyracmonAttack3
+        - Images/Pyracmon/pyracmonAttack4
+      cast:
+        - Images/Pyracmon/pyracmonCast1
+        - Images/Pyracmon/pyracmonCast2
+      die:
+        - Images/Pyracmon/pyracmonDie1
+        - Images/Pyracmon/pyracmonDie2
+        - Images/Pyracmon/pyracmonDie3
     sounds:
       summon: Sounds/Pyracmon/Summon
       select: Sounds/Pyracmon/Select
