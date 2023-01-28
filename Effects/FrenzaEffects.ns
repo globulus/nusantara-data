@@ -706,12 +706,12 @@ effect Promoted {
 }
 
 effect ValiantPromotion is TargetableSpell {
-  DURATION => 2
+  duration => 2
 
   check(caster, target) => isOrganic(target) && areAllies(caster, target) && !target.hasTempEffect("Promoted")
 
   run(caster, target) {
-    target.addTempEffect(Promoted(), caster, DURATION)
+    target.addTempEffect(Promoted(), caster, @duration)
     Game.animateVisualFx([
       [
         type: "boost",
@@ -920,8 +920,8 @@ effect NoxiousCloud {
     }
     for unit in units {
       unit.takeDamage(p.damage, caster)
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Noxious Cloud engulfs " + Game.localizedStr(target.type.id + "Title") \
-        + ", dealing $(p.damage) damage and poisoning it!", LogLevels.info, target.coordinates)
+      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Noxious Cloud engulfs the land, dealing $(p.damage) damage and spreading poison!", \
+        LogLevels.info, target.coordinates)
       if !unit.hasTempEffect("PoisonModifier") {
         unit.addTempEffect(PoisonModifier(poisonDamage), caster, p.poisonDuration)
         Game.animateVisualFx([

@@ -658,7 +658,26 @@ heroes:
   - id: tofan
     title: tofanTitle
     description: tofanDescription
-    image: Images/tofan
+    image: Images/Tofan/tofan
+    animationFrames:
+      move:
+        - Images/Tofan/tofanMove1
+        - Images/Tofan/tofanMove2
+        - Images/Tofan/tofanMove3
+      attack:
+        - Images/Tofan/tofanAttack1
+        - Images/Tofan/tofanAttack2
+        - Images/Tofan/tofanAttack3
+        - Images/Tofan/tofanAttack4
+      cast:
+        - Images/Tofan/tofanCast1
+        - Images/Tofan/tofanCast2
+        - Images/Tofan/tofanCast3
+        - Images/Tofan/tofanCast4
+      die:
+        - Images/Tofan/tofanDie1
+        - Images/Tofan/tofanDie2
+        - Images/Tofan/tofanDie3
     sounds:
       summon: Sounds/Tofan/Summon
       select: Sounds/Tofan/Select
@@ -788,7 +807,26 @@ heroes:
   - id: vitarron
     title: vitarronTitle
     description: vitarronDescription
-    image: Images/vitarron
+    image: Images/Vitarron/vitarron
+    animationFrames:
+      move:
+        - Images/Vitarron/vitarronMove1
+        - Images/Vitarron/vitarronMove2
+        - Images/Vitarron/vitarronMove3
+      attack:
+        - Images/Vitarron/vitarronAttack1
+        - Images/Vitarron/vitarronAttack2
+        - Images/Vitarron/vitarronAttack3
+        - Images/Vitarron/vitarronAttack4
+      cast:
+        - Images/Vitarron/vitarronCast1
+        - Images/Vitarron/vitarronCast2
+        - Images/Vitarron/vitarronCast3
+        - Images/Vitarron/vitarronCast4
+      die:
+        - Images/Vitarron/vitarronDie1
+        - Images/Vitarron/vitarronDie2
+        - Images/Vitarron/vitarronDie3
     sounds:
       summon: Sounds/Vitarron/Summon
       select: Sounds/Vitarron/Select

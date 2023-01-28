@@ -91,7 +91,7 @@
   effect: Airlift
 - id: trainVitarron
   title: trainVitarronTitle
-  image: ../Factions/Frenza/Images/vitarron
+  image: ../Factions/Frenza/Images/Vitarron/vitarron
   effect: TrainHero
   params: ["vitarron"]
 - id: trainDenburhin
@@ -101,7 +101,7 @@
   params: ["denburhin"]
 - id: trainTofan
   title: trainTofanTitle
-  image: ../Factions/Frenza/Images/tofan
+  image: ../Factions/Frenza/Images/Tofan/tofan
   effect: TrainHero
   params: ["tofan"]
 - id: shipEndlessExpansion
