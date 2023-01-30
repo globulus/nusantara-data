@@ -144,7 +144,22 @@ units:
   - id: warrior
     title: warriorTitle
     description: warriorDescription
-    image: Images/warrior
+    image: Images/Warrior/warrior
+    animationFrames:
+      move:
+        - Images/Warrior/warriorMove1
+        - Images/Warrior/warriorMove2
+        - Images/Warrior/warriorMove3
+        - Images/Warrior/warriorMove4
+      attack:
+        - Images/Warrior/warriorAttack1
+        - Images/Warrior/warriorAttack2
+        - Images/Warrior/warriorAttack3
+        - Images/Warrior/warriorAttack4
+      die:
+        - Images/Warrior/warriorDie1
+        - Images/Warrior/warriorDie2
+        - Images/Warrior/warriorDie3
     flavor: warriorFlavor
     sounds:
       summon: Sounds/Warrior/Summon

@@ -1,6 +1,6 @@
 - id: spear
   image: Core/spear
-  speed: 1.0
+  speed: 1.25
   sounds:
     attack: Core/arrowHit
 - id: slash

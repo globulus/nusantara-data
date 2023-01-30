@@ -15,7 +15,7 @@
   params: ["thrall", !!int 1, !!int 3, !!int 0, !!int 1]
 - id: trainWarrior
   title: trainWarriorTitle
-  image: ../Factions/Sanghoy/Images/warrior
+  image: ../Factions/Sanghoy/Images/Warrior/warrior
   effect: AddCardToHandWithRampingCost
   params: ["warrior", !!int 1, !!int 5, !!int 0, !!int 1, 0.2, !!int 0, !!int 0]
 - id: trainShadespear

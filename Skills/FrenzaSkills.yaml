@@ -46,7 +46,7 @@
   effect: ColonialHallExertInfluence
 - id: trainRifleman
   title: trainRiflemanTitle
-  image: ../Factions/Frenza/Images/rifleman
+  image: ../Factions/Frenza/Images/Rifleman/rifleman
   effect: AddCardToHandWithRampingCost
   params: ["rifleman", !!int 2, !!int 8, !!int 0, !!int 1, 0.25, !!int 0, !!int 0]
 - id: trainAssassin
@@ -188,7 +188,7 @@
   effect: UncommonValorUpgrade
 - id: dismoutToRifleman
   title: dismoutToRiflemanTitle
-  image: ../Factions/Frenza/Images/rifleman
+  image: ../Factions/Frenza/Images/Rifleman/rifleman
   effect: DismountToRifleman
 - id: poisonedBlades
   title: poisonedBladesTitle

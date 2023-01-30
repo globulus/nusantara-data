@@ -202,6 +202,7 @@ A unit is a [playable](#playables) that represents an object on the game board. 
   + `title` - should be a translatable key.
   + `image`
   + `value` - this can be any kind of value - a number, string or boolean - depending on the actual context of the extra itself.
+* `animationFrames` (optional) - unit actions can be animate, with extra images acting as animation frames. The number of frames isn't limited. The first frame is always the default `image` frame, so all the other images should be based on it. This property has four optional subproperties, each representing a different animation context - `move`, `attack`, `cast` and `die`. Each subproperty's value should be a list of relative paths to 64x64px PNGs.
 
 ### Hero
 A Hero is a [unit](#unit) with some extra properties. The game supports controlling a single Hero at the time. Here is the list of available properties for a hero type:

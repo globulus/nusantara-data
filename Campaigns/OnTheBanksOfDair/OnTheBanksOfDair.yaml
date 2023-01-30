@@ -7,5 +7,5 @@ difficulties:
   - hard
 scenarios:
   - id: CalamityOnTheHorizon
-    image: ../../Factions/Frenza/Images/rifleman
+    image: ../../Factions/Frenza/Images/Rifleman/rifleman
     loadingText: calamityOnTheHorizonLoadingText

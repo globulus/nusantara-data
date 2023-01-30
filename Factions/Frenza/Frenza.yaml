@@ -256,7 +256,20 @@ units:
   - id: rifleman
     title: riflemanTitle
     description: riflemanDescription
-    image: Images/rifleman
+    image: Images/Rifleman/rifleman
+    animationFrames:
+      move:
+        - Images/Rifleman/riflemanMove1
+        - Images/Rifleman/riflemanMove2
+        - Images/Rifleman/riflemanMove3
+      attack:
+        - Images/Rifleman/riflemanAttack1
+        - Images/Rifleman/riflemanAttack2
+        - Images/Rifleman/riflemanAttack3
+      die:
+        - Images/Rifleman/riflemanDie1
+        - Images/Rifleman/riflemanDie2
+        - Images/Rifleman/riflemanDie3
     flavor: riflemanFlavor
     sounds:
       summon: Sounds/Rifleman/Summon
@@ -320,7 +333,17 @@ units:
   - id: assassin
     title: assassinTitle
     description: assassinDescription
-    image: Images/assassin
+    image: Images/Assassin/assassin
+    animationFrames:
+      attack:
+        - Images/Assassin/assassinAttack1
+        - Images/Assassin/assassinAttack2
+        - Images/Assassin/assassinAttack3
+        - Images/Assassin/assassinAttack4
+      die:
+        - Images/Assassin/assassinDie1
+        - Images/Assassin/assassinDie2
+        - Images/Assassin/assassinDie3
     flavor: assassinFlavor
     sounds:
       summon: Sounds/Assassin/Summon

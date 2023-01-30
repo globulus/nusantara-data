@@ -174,7 +174,7 @@ units:
   - id: rogueWarrior
     title: rogueWarriorTitle
     description: warriorDescription
-    image: ../Sanghoy/Images/warrior
+    image: ../Sanghoy/Images/Warrior/warrior
     flavor: warriorFlavor
     merit: 100
     h: 50
@@ -259,7 +259,7 @@ units:
   - id: deserterSquad
     title: deserterSquadTitle
     description: deserterSquadDescription
-    image: ../Frenza/Images/rifleman
+    image: ../Frenza/Images/Rifleman/rifleman
     flavor: deserterSquadFlavor
     merit: 300
     h: 80
