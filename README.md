@@ -380,6 +380,42 @@ The basic `DestroyAll` scenario highlights important event methods that every wi
 Just as rulesets can inherit other rulesets, it's common for win conditions to extend each other to reuse script code.
 
 ## Scenarios
+The **Scenarios** folder contains scenario config (.yaml) and script (.ns) files. You can have as many scenarios, spread out over as many subfolders. Each scenario should have both a config and a script file in the same folder, which must have the **same name** (different extensions, obviously). Likewise, the `id` in the config file must correspond to the name of the `scenario` class in the script file.
+
+A scenario config file has the following properties:
+* `id` **(required)**
+* `title` **(required)** - should be a translatable key.
+* `description` **(required)** - should be a translatable key.
+* `difficulties` (optional) - array of strings, listing available difficulties for this scenario that the user can choose when starting it.
+* `map` (optional) - ID of the [map](#maps) that this scenario uses. If it is omitted, a map with an ID equal to scenario ID is expected. Not having such a map will result in an error.
+* `ruleset` **(required)** - a [ruleset](#rulesets) object, describing the rules for this scenario. It obviously must have a unique ID and it can also make use of all the other ruleset properties, including `inherits`.
+* `players` **(required)** - list of players for this scenario. Scenario players are hardcoded and can't be altered by the player when starting the scenario. Each player object has the following properties:
+  + `name` **(required)**
+  + `color` **(required)** - available values are `red`, `blue`, `green`, `yellow`, `orange`, `purple`, `cyan` and `black`.
+  + `team` **(required)** - number of the team this player is on.
+  + `faction` **(required)** - ID of the [faction](#factions) this player belongs to.
+  + `ai` (optional) - if set, it should be the ID of a [bot](#bots) that controls this player. Otherwise, the controller is assumed to be the local (human) player (Host).
+
+The corresponding script file contains the `scenario` class. Its purpose is to contains callbacks for various in-game events and modify the game according to the scenario rules. The selected difficulty will be available in the class instance via the `difficulty` field (string).
+
+The only required method is `onCheckVictory`, which should return the winning player if conditions are met. It is invoked after every state update. If no player won yet (or if you'll trigger the victory manually using `Server.win`), return `null`.
+
+Optional methods:
+* `onStart` - called when the game starts, before the first turn. It is also executed before [bot][#bots] `onStart` method.
+* `onFirstRender` - called when the local client renders the scenario for the first time (executed locally, and not on the server).
+* `onTurnStart` - calleed when a new turn starts for another player.
+* `onStateChange` - called after the state changes and it is broadcasted to the clients.
+* `onUnitSelect(unit)` - called when a unit is selected.
+* `onChangeStance(unit, previousStance)` - called when a unit assumes a new stance. Old stance is provided as a string ID.
+* `onChangeAutoCast(unit, skillId, isAutoCast)` - called when auto-cast is set on a unit's skill. Boolean parameter `isAutoCast` tells if auto-cast is active now or not.
+* `onMove(unit, from, to)` - called after a unit moves from one cell to another.
+* `onAttack(attacker, defender)` - called after a unit attacks another one.
+* `onInteract(unit, target)` - called after a unit interacts with another one.
+* `onSkillSelect(unit, skillId)` - called when a skill is selected on a unit.
+* `onSkillCast(unit, skillId)` - called after a unit casts as skill.
+* `onCardSelect(card)` - called when the player selects a playable card in their hand.
+* `onCardPlay(card)` - called after a card is played from hand.
+
 
 ## Skills
 The **Skills** folder contains config (.yaml) files that describe skills. [Playables](#playables) can have skills, which are shown in the UI and each wraps a single [effect](#effects). Skills can also be banned by [rulesets](#rulesets).
@@ -399,8 +435,61 @@ You can have as many config files in this folder (or its subfolders) as you'd li
 * `title` - should be a translatable key.
 * `image` - relative path to a 64x64px PNG.
 
-Units assume stances during gameplay and it alters their stats, which is described by the correspoding `stance` class in the script files, which can implement the following fields/methods:
-* 
+Units assume stances during gameplay and it alters their stats and skills. That behavior which is described by the correspoding `stance` class in the script files.
+
+Every `stance` instance automatically has the `unit` field, which holds a reference to the unit that this stance is applied to. You can use this field to make the stance tailored to different units.
+
+All the fields and methods discussed in this section are **optional**.
+
+Much like an effect, a stance can't be assumed if its `isEnabled` method fails. This method works exactly the same as in [effects](#effects), holding a list of condition-description pairs, all of which have to pass for the stance to be enabled.
+
+To modify a unit's movement type, add the `movementType` method to the `stance` class and have it return the ID of the [movement type](#movement-types) that the unit will have while in this stance:
+```ruby
+movementType => "jungleWalk"
+```
+
+You can modify the following stats by using the corresponding fields/methods:
+* `speed`
+* `sight`
+* `loadCapacity`
+* `attack`
+* `defense`
+* `attackRange`
+* `retaliationRange`
+* `regeneration`
+* `attackCount`
+* `retaliationCount`
+* `retaliationAttackModifier` - how much does a unit's `attack` value change when it's retaliating instead of attacking.
+* `influence` - alters only the `amount` change of influence, not the `kind`.
+
+Also, [heroes](#hero) can also have the following stats modified:
+* `vitality`
+* `fortitude`
+* `guard`
+* `prowess`
+
+Each of the above should return a pair (list with two elements). The first one should be the operator, while the second one is the value. Available operators are:
+* `"+"` - add the value to the stats base value.
+* `"-"` - subtract the value from the stats base value.
+* `"*"` - multiply the stats base value by the value.
+* `"/"` - divide the stats base value by the value.
+* `"%"` - multiply the stats base value by the value, expressed as percentage.
+* `"="` - set the stats value to the value.
+
+Examples:
+```ruby
+stance Camp {
+  attack = ["*", 0.5] # half the attack
+  speed = ["=", 1] # set to 1
+  retaliationCount = ["+", 2] # add retaliations
+  regeneration => ["+", Math.max(1, @unit.health * 0.1)] # increase regeneration by 10% of max health
+}
+```
+
+You can also **add and remove skills** via stances using the `addedSkills` and `removedSkills` methods, both of which should return a list of strings, marking IDs of [skills](#skills) that the unit should gain or lose, respectively:
+```ruby
+removedSkills = ["poisonedBlades"]
+```
 
 ## Tags
 The **Tags** folder contains config (.yaml) files that describe tags. A [unit](#unit) can have multiple tags, and tags can be reused between multiple unit types.
