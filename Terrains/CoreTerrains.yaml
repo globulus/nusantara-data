@@ -4,6 +4,7 @@
   layer: 2
   sprites:
     base: grass
+    useAltAsBase: false
     alt:
       - grassDark
       - grassBlue
@@ -31,6 +32,7 @@
   layer: 2
   sprites:
     base: forest
+    useAltAsBase: true
     alt:
       - forestLush
     mirrorable:
@@ -58,6 +60,7 @@
   layer: 4
   sprites: 
     base: hills
+    useAltAsBase: true
     alt:
       - hillsGreen
   debrisFrequency: 0.5
@@ -205,6 +208,7 @@
   layer: 2
   sprites: 
     base: road
+    useAltAsBase: false
     alt:
       - roadBridge
       - roadBridgeWooden

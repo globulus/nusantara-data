@@ -51,7 +51,7 @@
   params: ["rifleman", !!int 2, !!int 8, !!int 0, !!int 1, 0.25, !!int 0, !!int 0]
 - id: trainAssassin
   title: trainAssassinTitle
-  image: ../Factions/Frenza/Images/assassin
+  image: ../Factions/Frenza/Images/Assassin/assassin
   effect: AddCardToHandWithRampingCost
   params: ["assassin", !!int 2, !!int 10, !!int 0, !!int 1, 0.3, !!int 0, !!int 0]
 - id: trainSteamGolem

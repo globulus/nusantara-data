@@ -15,6 +15,34 @@ In general, modding boils down to modifying **config files** and **scripts**. [V
 1. Script files are written in [NusantaraScript language](https://github.com/globulus/nusantara-script) and their extension is **.ns**. They describe dynamic behaviours at game's runtime, such as effects, scenarios, AI behavior, etc.
   * [VSCode extension for NS files](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 
+Content:
+* [The *data* folder](#the-data-folder)
+* [Meta.yaml](#metayaml)
+* [Bots](#bots)
+* [Campaigns](#campaigns)
+* [Effects](#effects)
+* [Factions](#factions)
+  + [Playables](#playables)
+  + [Unit](#unit)
+  + [Hero](#hero)
+  + [Spell](#spell)
+  + [Upgrade](#upgrade)
+* [Upgrade Tree](#upgrade-tree)
+* [Maps](#maps)
+* [Movement Types](#movement-types)
+* [Projectiles](#projectiles)
+* [Resources](#resources)
+* [Rulesets](#rulesets)
+  + [Rules](#rules)
+  + [Win conditions](#win-conditions)
+* [Scenarios](#scenarios)
+* [Skills](#skills)
+* [Stances](#stances)
+* [Tags](#tags)
+* [Terrains](#terrains)
+  + [Terrain Blending](#terrain-blending)
+* [Translations](#translations)
+
 ## The *data* folder
 At startup, Nusantara loads its content from the **data** folder, which has to be located in its persistent storage location. E.g, on Windows 10, this usually resides at `C:\Users\User\AppData\LocalLow\Globulus\Nusantara\data`. Modding the game involves making changes to its subfolders and files, all of which is discussed in the rest of this document.
 
@@ -499,7 +527,54 @@ You can have as many config files in this folder (or its subfolders) as you'd li
 * `title` - should be a translatable key.
 
 ## Terrains
+The **Terrains** folder contains config (.yaml) files that describe terrains, as well as their sprite files. All terrain sprites are 66x64px PNGs, and they should have a unique name that qualifies as their ID.
+
+You can have as many config files in this folder (or its subfolders) as you'd like, as all are read and merged when data is loaded. Each file needs to be a list of terrain objects, which have the following schema:
+* `id` **(required)**
+* `title` **(required)** - should be a translatable key.
+* `influencable` **(required)** - `true` if players can extert influence over this terrain type. Set to `false` is you don't want to have players, say, summon units on certain terrain types (like watery terrains).
+* `layer` **(required)** - index of the layer in which this terrain is rendered. There are five rendering layers for terrains, 0-4. Most terrains are rendered in layer 2, with some more prominent ones, such as Hills, rendered in layer 4. The layers with higher index are rendered closer to the player/above those in lower layers.
+* `sprites` **(required)** - sprites object for this terrain. Has the following properties:
+  + `base` **(required)** - relative path to the base sprite for this terrain, which is also used for base during [terrain blending](#terrain-blending).
+  + `useAltAsBase` (optional) - if `true`, the game will randomly swap out the base sprite for some terrains with one from the `alt` list. Only select this for terrains that aren't bases for [terrain blending](#terrain-blending).
+  + `alt` (optional) - list of relative paths to alternative sprites for this terrain, available in the map editor.
+  + `mirrorable` (optional) - IDs for terrain sprites that can be mirrored. The game will randomly mirror some terrain horizontally sprites to make the map more lively. If the horizontal orientation of your sprite matters, omit it from this list.
+  + `border` (optional) - IDs for terrain sprites that have border regions where they are blended with another terrain type. The usual naming convention is *baseTerrainBorderTerrainIndex*, where index is 1-6, with 1 being top right side of a cell hex, 2 being the right one, 3 the lower right one, etc. E.g, **beachGrass5** means that the base beach terrain has a slight grass blend on its leftmost edge. Border terrain sprites are a must have for [terrain blending](#terrain-blending) to work.
+* `spriteRules` (optional) - defines rules that govern which `border` sprites to use, depending on the terrain sprites of adjacent cells. It is a list of objects with the following schema (all properties required):
+  + `sprite` - the sprite to consider.
+  + `rules`- list of rules: These have the following schema (all properties required):
+    - `neighbor` - list of terrain IDs that this rule applies to when they're adjacent to the base cell.
+    - `sprites` - list of border sprite IDs for this rule.
+  For clarity, consider these rule. They say that, when the cell has terrain sprite of type *beach*, in the case adjunct cells are of type *grass*, *forest*, *jungle* or *swamp*, we should use *beachGrass1-6* as borders during [terrain blending](#terrain-blending). Otherwise, if the adjunct cell has terrain *river*, use *beachRiver1-6*.
+```yaml
+  spriteRules:
+    - sprite: beach
+      rules:
+        - neighbor: [grass, forest, jungle, swamp]
+          sprites: [beachGrass1, beachGrass2, beachGrass3, beachGrass4, beachGrass5, beachGrass6]
+        - neighbor: [river]
+          sprites: [beachRiver1, beachRiver2, beachRiver3, beachRiver4, beachRiver5, beachRiver6]
+```
+* `debrisFrequency` (optional) - if set, it tells how often (as X : 1) does debris appear on terrain sprites. E.g, if this is 0.4, 40% of cells with that terrain will have debris on them, while 60% will not.
+* `debris` (optional) - list of relative paths towards debris sprites. Debris sprites contain small images that are overlaid on terrain sprites to provide additional content on them. The debris is placed randomly and is there just for the sake of making the map more appealing to look at.
 
 ### Terrain Blending
+Nusantara engine can improve the visual quality of the rendered map by using terrain blending. This process smooths the borders between cells, making it seem as if cells with different terrains are melting together to form a continous transition between the two sprites.
+
+To make terrain blending work, you need to create a variants of the base terrain, called border terrains. These have borders on one of the cell edges (1-6) altered to make it seem as if it's a part of another terrain. Then, at runtime, the game will impose the border terrains onto the base terrain depending on adjacent cells and sprite rules.
+
+E.g, if you have a cell whose sprite is *beach*, and it is surrounded by two *grass* and one *forest* terrains to the right, and three *river* terrains on the left. Terrain blending will read the sprite rules and create a composite terrain sprite, in which 7 sprites will be overlaid on top of each other sequentially - *beach*, *beachGrass1*, *beachGrass2*, *beachGrass3*, *beachRiver4*, *beachRiver5* and *beachRiver6*. In-game, this cell's terrain sprite will be that composite sprite.
+
+Terrain blending happens at game startup and can take a few minutes to complete, but doesn't prevent the player from starting the game. The blended terrain sprites can be stored locally. If you make any changes to your terrain sprites or their rules, make sure to remove the **temp/__blended** folder.
+
+There is a setting in the game called **Terrain Blending Level**. It basically says how many blended terrains to pre-make. E.g, if this value is 3, the game will blend the base terrain with up to and including 3 borders. If you set this level to 6 (max), all terrains will have variants for any combination of adjacent terrains.
 
 ## Translations
+The **Translations** folder contains translations for game data. Each supported locale should be in its own folder, named after its code (e.g, **en-US**). Inside each locale folder, you can have as many YAML files, each of which should contain translatable strings in the key-value format. E.g:
+```yaml
+# Rulesets
+deathmatchTitle: Deathmatch
+deathmatchDescription: Destroy all enemies.
+regicideTitle: Regicide
+regicideDescription: Destroy the enemy banner to defeat them!
+```
