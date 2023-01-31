@@ -15,7 +15,7 @@ In general, modding boils down to modifying **config files** and **scripts**. [V
 1. Script files are written in [NusantaraScript language](https://github.com/globulus/nusantara-script) and their extension is **.ns**. They describe dynamic behaviours at game's runtime, such as effects, scenarios, AI behavior, etc.
   * [VSCode extension for NS files](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 
-Content:
+**Table of contents:**
 * [The *data* folder](#the-data-folder)
 * [Meta.yaml](#metayaml)
 * [Bots](#bots)
@@ -27,7 +27,7 @@ Content:
   + [Hero](#hero)
   + [Spell](#spell)
   + [Upgrade](#upgrade)
-* [Upgrade Tree](#upgrade-tree)
+  + [Upgrade Tree](#upgrade-tree)
 * [Maps](#maps)
 * [Movement Types](#movement-types)
 * [Projectiles](#projectiles)
@@ -256,7 +256,7 @@ An Upgrade is a [playable](#playable) that can be slotted in an [upgrade tree](#
   + `hero` - slots in a hero upgrade tree.
 * `skills` (optional) - the list of [skill](#skills) IDs associated with this upgrade.
 
-## Upgrade Tree
+### Upgrade Tree
 Upgrade trees are properties of both factions (via [rulesets](#rulesets)) and [heroes](#hero). An upgrade tree is, well, a tree structure, which consists of nodes. Those nodes can have other nodes as their subnodes, etc.
 
 Nodes are described by their `type` property, which is the ID of the [upgrade](#upgrade) that can be slotted at that node. Each node can only have a single type.
@@ -578,3 +578,105 @@ deathmatchDescription: Destroy all enemies.
 regicideTitle: Regicide
 regicideDescription: Destroy the enemy banner to defeat them!
 ```
+
+## Script Objects
+Nusantara Scripts interact with the game through script objects. They allow you to query the current game state, as well as to alter it to your wishes. Below is the comprehensive reference for all script objects and their schemas.
+
+### Triggers
+**Triggers** object holds effect triggers as its fields.
+* `startOfTurn`
+* `endOfTurn`
+* `summon`
+* `onDie`
+* `afterDie`
+* `attack`
+* `defend`
+* `retaliate`
+* `kill`
+* `cast`
+* `passive`
+* `aura`
+* `interact`
+
+### Targets
+**Targets** object holds effect targets as its fields.
+* `none`
+* `unit`
+* `cell`
+
+### CombatTypes
+**CombatTypes** object holds combat types as its fields.
+* `attack`
+* `retaliation`
+
+### SoundTypes
+**SoundTypes** object holds sound types as its fields. These are used when playing sounds from the [Game](#game) object.
+* `summon`
+* `select`
+* `attack`
+* `cast`
+* `die`
+
+### PlayerStates
+**PlayerStates** object holds player states as its fields.
+* `active`
+* `inactive`
+
+### ObjectiveStates
+**ObjectiveStates** object holds objective states as its fields.
+* `hidden`
+* `active`
+* `completed`
+* `failed`
+
+### LogLevels
+**LogLevels** object holds log levels as its fields. These can be used to alter the color of the text when it is logged from the [Game](#game) object.
+* `info`
+* `warn`
+* `error`
+* `positive`
+
+### Game
+**Game** object is the centerpiece of scripting, containing all the methods to query and alter the state, either directly or via the objects it returns.
+* `turn` - returns the current turn as `Int`.
+* `currentPlayerIndex` - returns the index of the current player as `Int`.
+* `currentPlayer` - returns the current player as [script player](#script-player).
+* `players` - returns a `List` of all players as [script players](#script-player).
+* `nature` - returns the default Nature/Nusantara passive player as [script player](#script-player).
+* `activePlayers` - returns a `List` of all players whose state is `active` as [script players](#script-player).
+* `currentScenario` - returns the currently active scenario as [script scenario](#script-scenario).
+* `currentCampaign` - returns the currently active campaign as [script campaign](#script-campaign).
+* `data` - returns locally available data as [script data](#script-data).
+* `grid` - returns the [script grid](#script-grid) representing the current state on the board.
+* `unitsInRange(origin, range)` - takes `origin` as either a [script cell](#script-cell) or coordinates list and returns a `List` of [script units](#script-unit) in radius `range` around the `origin`.
+* `castTargets(originCoordinates, caster, skillId)` - takes `originCoordinates` as coordinates list, `caster` as [script unit](#script-unit) and `skillId` as `Str` and returns a `List` or [script cells](#script-cell) on which that unit can cast that skill if it is on those coordinates.
+* `spellTargets(card)` - takes `card` as [script card](#script-card) and assumes it is a [spell](#spell). Finds possible targets for playing that spell, and returns:
+  + `null` if the spell can't be cast.
+  + `true` if the spell doesn't require targetting.
+  + `List` of [script cells](#script-cell) on which the spell can be cast.
+* `combat(attacker, defender)` - takes `attacker` and `defender` as [script units](#script-unit) and makes the former attack the latter, playing out a full combat between them.
+* `animateAttack(attacker, defender)` - takes `attacker` and `defender` as [script units](#script-unit) and plays attack animations between the two.
+
+
+
+### Script Player
+
+### Script Card
+
+### Script Unit
+
+#### Script Hero
+
+### Script Upgrade
+
+### Script Upgrade Tree
+
+### Script Grid
+
+### Script Cell
+
+### Script Scenario
+
+### Script Campaign
+
+### Script Data
