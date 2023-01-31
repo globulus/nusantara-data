@@ -213,7 +213,22 @@ units:
   - id: settler
     title: settlerTitle
     description: settlerDescription
-    image: Images/settler
+    image: Images/Settler/settler
+    animationFrames:
+      move:
+        - Images/Settler/settlerMove1
+        - Images/Settler/settlerMove2
+        - Images/Settler/settlerMove3
+        - Images/Settler/settlerMove4
+      cast:
+        - Images/Settler/settlerCast1
+        - Images/Settler/settlerCast2
+        - Images/Settler/settlerCast3
+        - Images/Settler/settlerCast4
+      die:
+        - Images/Settler/settlerDie1
+        - Images/Settler/settlerDie2
+        - Images/Settler/settlerDie3
     flavor: settlerFlavor
     sounds:
       summon: Sounds/Settler/Summon
