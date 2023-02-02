@@ -656,8 +656,44 @@ Nusantara Scripts interact with the game through script objects. They allow you 
   + `List` of [script cells](#script-cell) on which the spell can be cast.
 * `combat(attacker, defender)` - takes `attacker` and `defender` as [script units](#script-unit) and makes the former attack the latter, playing out a full combat between them.
 * `animateAttack(attacker, defender)` - takes `attacker` and `defender` as [script units](#script-unit) and plays attack animations between the two.
+* `animateVisualFx(fx)` - takes a `List` of `Object`s that describe the visual effects to animate sequentially. Those objects can have the following properties:
+  + `coordinates` **(required)** - a coordinates list at which the effect takes place.
+  + `type` **(required)** - the type of the effect, as `Str`. Possible values are:
+    - `aura`
+    - `blood`
+    - `bonefire`
+    - `boost`
+    - `earn`
+    - `electric`
+    - `explosion`
+    - `hit`
+    - `poison`
+    - `ripple`
+    - `circle`
+  + `color` (optional) - color of the effect, as a `Str` of format *#RRGGBB*. This is only applicable to some effect types.
+* `playSound(sourceCoordinates, sourceTypeId, soundType, waitForEnd)` - plays a sound. It must be one of the pre-loaded sounds from the game's data. The parameters are `sourceCoordinates`, a coordinates list showing where the sound originated, `sourceTypeId` which tells which unit produced the sound, `soundType` which is a [sound type](#soundtypes) value, while `waitForEnd` is a `Bool` indicating if the game should wait for the sound to be played entirely before resuming.
+* `localizedStr(key)` - returns the translated (localized) text based on the provided `Str` key.
+* `describeAsStance(caster, object)` - provides a custom description of a provided object based on its properties, which must match those of a [stance](#stances) instance.
+* `showMessage(message)` - displays the message to the currently active player.
+* `showMessageToAll(message)` - displays the message to all players.
+* `showDialog(portrait, title, content)` - displays the campaign dialog using the following [playable's](#playables) ID (`portrait`) for the portrait image.
+* `logEvent(message, level, positionCoordinates)` - logs the given `message` with the given [log level](#loglevels) to the logs of all players who can see the cell whose coordinates are `positionCoordinates` (if `null`, all players will get this message).
+* `wait(seconds)` - pauses the game for the given `seconds` (as `Float`).
+* `zoomCamera(amount)` - zoom the game to the given `amount` (as `Float`). The limits of this parameter depend on screen and map size.
+* `positionCamera(cellCoordinates)` - positions the camera so that the cell with the given coordinates list is in the center of the screen.
+* `refreshState` - forces the server to compute the current state and send it to all clients. This is sometimes necessary to refresh the game after an objective is changed in a scenario.
+* `lose(player)` - makes the given [script player](#script-player) lose, i.e be deactivated and kicked from the game.
 
-
+### Server
+**Server** object contains methods that also affect the game, but they represent state changes that are normally computed on the server. The reason these are separate from the [Game](#game) methods is that `Game` methods are enqueued on the server, while `Server` methods are computed synchronously.
+* `move(fromCoordinates, toCoordinates, cost)`
+* `changeStance(unit, newStance)`
+* `cast(caster, targetCoordinates, skillId)`
+* `play(card, targetCoordinates, targetId)`
+* `attack(fromCoordinates, toCoordinates, viaCoordinates, cost)`
+* `interact(fromCoordinates, toCoordinates)`
+* `concede(player)`
+* `win(player)`
 
 ### Script Player
 
