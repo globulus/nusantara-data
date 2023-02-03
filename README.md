@@ -16,32 +16,67 @@ In general, modding boils down to modifying **config files** and **scripts**. [V
   * [VSCode extension for NS files](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 
 **Table of contents:**
-* [The *data* folder](#the-data-folder)
-* [Meta.yaml](#metayaml)
-* [Bots](#bots)
-* [Campaigns](#campaigns)
-* [Effects](#effects)
-* [Factions](#factions)
-  + [Playables](#playables)
-  + [Unit](#unit)
-  + [Hero](#hero)
-  + [Spell](#spell)
-  + [Upgrade](#upgrade)
-  + [Upgrade Tree](#upgrade-tree)
-* [Maps](#maps)
-* [Movement Types](#movement-types)
-* [Projectiles](#projectiles)
-* [Resources](#resources)
-* [Rulesets](#rulesets)
-  + [Rules](#rules)
-  + [Win conditions](#win-conditions)
-* [Scenarios](#scenarios)
-* [Skills](#skills)
-* [Stances](#stances)
-* [Tags](#tags)
-* [Terrains](#terrains)
-  + [Terrain Blending](#terrain-blending)
-* [Translations](#translations)
+- [Nusantara Data](#nusantara-data)
+- [Nusantara modding guide](#nusantara-modding-guide)
+  - [The *data* folder](#the-data-folder)
+  - [Meta.yaml](#metayaml)
+  - [Bots](#bots)
+    - [Config files](#config-files)
+    - [Script files](#script-files)
+  - [Campaigns](#campaigns)
+  - [Effects](#effects)
+  - [Factions](#factions)
+    - [Playables](#playables)
+    - [Unit](#unit)
+    - [Hero](#hero)
+    - [Spell](#spell)
+    - [Upgrade](#upgrade)
+    - [Upgrade Tree](#upgrade-tree)
+  - [Maps](#maps)
+  - [Movement Types](#movement-types)
+  - [Projectiles](#projectiles)
+  - [Resources](#resources)
+  - [Rulesets](#rulesets)
+    - [Rules](#rules)
+    - [Win conditions](#win-conditions)
+  - [Scenarios](#scenarios)
+  - [Skills](#skills)
+  - [Stances](#stances)
+  - [Tags](#tags)
+  - [Terrains](#terrains)
+    - [Terrain Blending](#terrain-blending)
+  - [Translations](#translations)
+  - [Script Objects](#script-objects)
+    - [Triggers](#triggers)
+    - [Targets](#targets)
+    - [CombatTypes](#combattypes)
+    - [SoundTypes](#soundtypes)
+    - [PlayerStates](#playerstates)
+    - [ObjectiveStates](#objectivestates)
+    - [LogLevels](#loglevels)
+    - [Game](#game)
+    - [Server](#server)
+    - [Script Player](#script-player)
+    - [Script Resources](#script-resources)
+    - [Script Card](#script-card)
+    - [Script Card Type](#script-card-type)
+      - [Script Unit Type](#script-unit-type)
+      - [Script Hero Type](#script-hero-type)
+      - [Script Spell Type](#script-spell-type)
+      - [Script Upgrade Type](#script-upgrade-type)
+    - [Script Unit](#script-unit)
+      - [Script Hero](#script-hero)
+    - [Script Upgrade](#script-upgrade)
+    - [Script Upgrade Tree](#script-upgrade-tree)
+      - [Script Upgrade Tree Node](#script-upgrade-tree-node)
+    - [Script Spell](#script-spell)
+    - [Script Movement Type](#script-movement-type)
+    - [Script Grid](#script-grid)
+    - [Script Cell](#script-cell)
+    - [Script Scenario](#script-scenario)
+    - [Script Campaign](#script-campaign)
+    - [Script Data](#script-data)
+    - [Script Extras](#script-extras)
 
 ## The *data* folder
 At startup, Nusantara loads its content from the **data** folder, which has to be located in its persistent storage location. E.g, on Windows 10, this usually resides at `C:\Users\User\AppData\LocalLow\Globulus\Nusantara\data`. Modding the game involves making changes to its subfolders and files, all of which is discussed in the rest of this document.
@@ -580,7 +615,7 @@ regicideDescription: Destroy the enemy banner to defeat them!
 ```
 
 ## Script Objects
-Nusantara Scripts interact with the game through script objects. They allow you to query the current game state, as well as to alter it to your wishes. Below is the comprehensive reference for all script objects and their schemas.
+Nusantara Scripts interact with the game through script objects. They allow you to query the current game state, as well as to alter it to your wishes. Below is the comprehensive reference for all script objects and their schemas. In general, use fields are read-only and are used to inspect the state, while methods mutate it - e.g, `player.state` reads the state of that player, but in order to change it, use `player.setState(newState)`.
 
 ### Triggers
 **Triggers** object holds effect triggers as its fields.
@@ -686,26 +721,241 @@ Nusantara Scripts interact with the game through script objects. They allow you 
 
 ### Server
 **Server** object contains methods that also affect the game, but they represent state changes that are normally computed on the server. The reason these are separate from the [Game](#game) methods is that `Game` methods are enqueued on the server, while `Server` methods are computed synchronously.
-* `move(fromCoordinates, toCoordinates, cost)`
-* `changeStance(unit, newStance)`
-* `cast(caster, targetCoordinates, skillId)`
-* `play(card, targetCoordinates, targetId)`
-* `attack(fromCoordinates, toCoordinates, viaCoordinates, cost)`
-* `interact(fromCoordinates, toCoordinates)`
-* `concede(player)`
-* `win(player)`
+* `move(fromCoordinates, toCoordinates, cost)` - moves the unit located at `fromCoordinates` to the empty cell at `toCoordinates` and makes it pay `cost`APs for that.
+* `changeStance(unit, newStance)` - makes the [script unit](#script-unit) change stance to `newStance` (as `Str` ID of the new stance).
+* `cast(caster, targetCoordinates, skillId)` - makes the [script unit](#script-unit) cast the skill with the given ID at the provided coordinates.
+* `play(card, targetCoordinates, targetId)` - plays the provided [script card](#script-card) from its owner's hand at the target coordinates/ID.
+* `attack(fromCoordinates, toCoordinates, viaCoordinates, cost)` - makes the unit at `fromCoordinates` attack the unit at `targetCoordinate`, optionally first moving to `viaCoordinates`, and paying `cost` APs in the process.
+* `interact(fromCoordinates, toCoordinates)` - makes the unit at `fromCoordinates` interact with unit at `toCoordinates`.
+* `concede(player)` - makes the provided [script player](#script-player) concede and become deactivated. Potentially triggers victory checks.
+* `win(player)` - makes the provided [script player](#script-player) win. 
 
 ### Script Player
+In-game players are represented as `Object`s in scripts. Each has the following fields/methods:
+* `id` - `Str`
+* `name` - `Str`
+* `color` - `Str`
+* `state` - returns [player state](#playerstates) `Str`.
+* `setState(newState)` - sets this player's state to the provides [player state](#playerstates).
+* `controller` - `Str` ID of the controller entity for this player (can be `null`).
+* `team` - `Int`
+* `faction` - `Str` ID of the [faction](#factions).
+* `resources` - [script resources](#script-resources) that this player currently owns. Can be `null`.
+* `canAddCards` - `true` if player can add cards to their hand based on the current [ruleset](#rulesets).
+* `hand` - `List` of [script cards](#script-card) that are in this player's hand currently.
+* `upgradeTree` - [script upgrade tree](#script-upgrade-tree) for this player.
+* `hero` - [script hero](#script-hero) that this player controls. Is set even if the Hero is currently dead, otherwise, if this player never had a Hero is `null`.
+* `setHero(hero)` - assigns the provided [script hero](#script-hero) to this player.
+* `currentStats` - returns the stats for this player for the current game. It has the following fields:
+  + `unit` - unit stats. It has the following fields (all `Int`s):
+    - `unitsPlayed`
+    - `unitsDestroyed`
+    - `unitsLost`
+    - `buildingsPlayed`
+    - `buildingsDestroyed`
+    - `buildingsLost`
+    - `largestArmy`
+  + `hero` - hero stats. It has the following fields (all `Int`s):
+    - `casts`
+    - `deaths`
+    - `kills`
+    - `maxLevel`
+    - `xpGained`
+  + `economy` - economy stats. It has the following fields (all `Int`s):
+    - `goldGained`
+    - `goldSpent`
+    - `uniqueGained`
+    - `uniqueSpent`
+    - `influencedCells`
+    - `influencedMap`
+    - `majorUpgrades`
+    - `minorUpgrades`
+    - `techtreeComplete`
+* `addResources(resources)` - adds the provided [script resources](#script-resources) to this player's resource pool.
+* `canPay(cost)` - returns `true` if the provided [script resources](#script-resources) `cost` is not `null` and the player has more resources than it. 
+* `pay(cost)` - makes the player pay the provided [script resources](#script-resources) `cost`.
+* `addToHand(cardTypeId, downtime)` - adds a [playable](#playables) of type `Str` `cardTypeId` to the player's hand, making it unavailable for `Int` `downtime` turns.
+* `removeFromHand(id)` - removes the card with the provided ID as `Str` (card ID, not card type ID) from the player's hand.
+* `isAllyOf(player)` - returns `true` if this player is on the same team as the provides [script player](#script-player).
+* `ownedUnits` - returns a `List` of [script units](#script-unit) on the board owned by this player. Doesn't include the Hero if it is not on the board.
+* `owns(unitId)` - returns `true` if this player owns a unit with the provided `Str` ID.
+* `hasUpgrade(upgradeId)` - returns `true` if this player has an [upgrade type](#upgrade) with the provided `Str` ID slotted in their upgrade tree.
+* `addEffect(effectId)` - adds the effect with the provided ID (class name) to the list of this player's permanent effects.
+* `hasEffect(effectId)` - returns `true` if this player has an effect with the provided ID in their permanents effects.
+* `removeEffect(effectId)` - removes the effect with the provided ID (class name) from the list of this player's permanent effects.
+
+On top of this, players contain `extras`, so they have all the additional [script extras](#script-extras) methods.
+
+### Script Resources
+In scripts, resources and costs are represented as `Object`s with the following optional fields:
+* `g` - `Int` representing amount of Gold.
+* `u` - `Int` representing amount of Unique Resource.
+* `ap` - `Int` representing amount of Action Points.
 
 ### Script Card
+In scripts, cards in player's hand are represented as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `type` - [script card type](#script-card-type) of this card.
+* `downtime` - `Int` representing the number of turns remaining before this card can be played.
+
+### Script Card Type
+[Card types](#playables), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `title` - `Str`
+* `playCost` - [script resources](#script-resources) or `null`.
+* `tags` - `List` of `Str` representing [tag](#tags) IDs, or `null`.
+* `requiresUpgrades` - `List` of `Str` representing [upgrade](#upgrade) IDs, or `null`.
+
+#### Script Unit Type
+On top of all [script card type](#script-card-type) fields/methods, [unit](#unit) types contain the following additional ones:
+* `type` - always returns `"unit"`.
+* `merit` - `Int`
+* `h` - `Int`
+* `a` - `Int`
+* `ac` - `Int`
+* `rc` - `Int`
+* `d` - `Int`
+* `s` - `Int`
+* `reg` - `Int`
+* `m` - `Str` of [movement type](#movement-types) ID.
+* `projectile` - `Str` of [projectile](#projectiles) ID.
+* `sight` - `Int`
+* `loadCapacity` - `Int`
+* `influence` - `Object` with the following fields, or `null` if not set:
+  + `kind` - `Str`
+  + `amount` - `Int`
+* `stances` - `List` of `Str` of registered stances.
+* `skills` - `List` of `Str` of registered skills, or `null`.
+* `canInteract` - `Bool`
+* `interactionEffect` - `Str` ID of interaction effect, or `null`. 
+
+#### Script Hero Type
+On top of all [script unit type](#script-unit-type) fields/methods, [hero](#hero) types contain the following additional ones:
+* `vitality` - `Int`
+* `fortitude` - `Int`
+* `guard` - `Int`
+* `prowess` - `Int`
+* `vitalityProgression` - `Int`
+* `fortitudeProgression` - `Int`
+* `guardProgression` - `Int`
+* `prowessProgression` - `Int`
+
+#### Script Spell Type
+On top of all [script card type](#script-card-type) fields/methods, [spell](#spell) types contain the following additional ones:
+* `type` - always returns `"spell"`.
+* `skills` - `List` of `Str` of IDs of skills associated with this spell type.
+
+#### Script Upgrade Type
+On top of all [script card type](#script-card-type) fields/methods, [upgrade](#upgrade) types contain the following additional ones:
+* `type` - always returns `"upgrade"`.
+* `kind` - `Str` (minor, major, hero).
+* `skills` - `List` of `Str` of IDs of skills associated with this upgrade type.
 
 ### Script Unit
+In-game units are represented as `Object`s in scripts. Note that most stats on units are a result of applying multiple factors to them, like the type base values, stance, active effects, player effects, etc. Each unit object has the following fields/methods:
+* `id` - `Str`
+* `type` - [script unit type](#script-unit-type).
+* `hp` - current HP of the unit as `Int`.
+* `ap` - current AP of the unit as `Int`.
+* `retaliationPoints` - remaining retaliation points of the unit as `Int`.
+* `health` - maximum health of this unit, as `Int`.
+* `speed` - speed of this unit, as `Int`.
+* `sight` - sight of this unit, as `Int`.
+* `loadCapactiy` - load capacity of this unit, as `Int`.
+* `regeneration` - regeneration of this unit, as `Int`.
+* `attackCount` - attack count of this unit, as `Int`.
+* `retaliationCount` - retaliation count of this unit, as `Int`.
+* `influenceAmount` - influence amount of this unit, as `Int`.
+* `movementType` - [movement type](#movement-types) ID of this unit, as `Str`.
+* `attack(type, target)` - attack value when attacking [script unit](#script-unit) `target` using [combat type](#combattypes), as `Int`.
+* `defense(attacker)` - defense value when defending from [script unit](#script-unit) `attacker`, as `Int`.
+* `range(type, target)` - range value when combatting [script unit](#script-unit) `target` using [combat type](#combattypes), as `Int`.
+* `activeStance` - ID of the [stance](#stances) assumed by this unit.
+* `availableStances` - list of IDs of stances that this unit can assume (those whose `isEnabled` is `true`).
+* `skills` - list of effect instances based on this unit's skills.
+* `addSkill(id)`
+* `removeSkill(id)`
+* `owner` - [script player](#script-player) that owns this unit.
+* `setOwner(player)` - sets the owner of this unit to the provided [script player](#script-player).
+* `destroy(attacker)` - destroys the current unit, counting the provided [script unit](#script-unit) as the one that destroyed it (for player stats and XP purposes).
+* `takeDamage(damage, attacker)` - takes `Int` `damage`, potentially destroying the unit, and counting the provided [script unit](#script-unit) as the one that dealt damage/destroyed it (for player stats and XP purposes). Returns `true` if the unit was destroyed.
+* `setHealth(hp)` - sets the current HP to the provided `Int`.
+* `restoreHealth(amount)` - restores `Int` `amount` HP to this unit, capped at its health.
+* `setActions(ap)` - sets the current AP to the provided `Int`.
+* `spendActions(amount)` - subtracts the provided `Int` from current APs. Can't go below zero APs.
+* `restoreActions(amount)` - restores `Int` `amount` AP to this unit, capped at its speed.
+* `tempEffects` - list of effect instances that affect this unit temporarily.
+* `addTempEffect(effect, caster, duration)` -
+* `hasTempEffect(effectId)` -
+* `removeTempEffect(effectId)` -
+* `isBuilding` - `true` if this unit has the `building` tag.
+* `isHero` - `true` if this unit is a Hero.
+* `setType(newTypeId)` - changes the type of this unit. All active and autocast skills, as well as temp effects, are cleared, and the default stance for the new type is assumed. Doesn't work on Heroes.
+* `loadedUnits` - returns a `List` of [script units](#script-unit) currently loaded into this unit.
+* `canLoad` - returns `true` if this unit has fewer units loaded that its load capacity is.
+* `load(unit)` - loads the provided [script unit](#script-unit) from its cell to this unit. Returns `true` if the load was successful.
+* `unload(targetCoordinates)` - unloads the last loaded unit to the cell described by the provided coordinates list. Returns `true` if the unload was successful.
+* `coordinates` - returns coordinates list of the cell this unit is on. It will be `null` if the unit is not currently on the board, e.g, if it's dead or loaded into another unit.
+* `moveTo(coordinates)` - teleports the unit to the cell with the provided coordiantes list. It doesn't make any checks, so it's possible to overwrite an existing unit on the target coordinates.
+* `movementCost(toCoordinates)` - computes the number of APs as `Int` needed for this unit to move to the cell marked with the provided coordinates list. If the unit can't move there, it'll return `1000`.
+* `movementRange` - returns a `List` of [script cells](#script-cell) that this unit can currently move to.
+* `attackRange` - returns a `List` of  `Object`s that describe potential attack targets for this unit. Each object has the following fields:
+  + `targetCell` - [script cell](#script-cell) containing the potential attack target.
+  + `viaCell` - [script cell](#script-cell) that the unit would have to move to in order to attack.
+  + `movementCost` - `Int` describing the number of APs the unit would have to expend to move next to the potential target.
+
+On top of this, units contain `extras`, so they have all the additional [script extras](#script-extras) methods.
 
 #### Script Hero
+On top of all [script unit](#script-unit) fields/methods, hero objects contain the following additional ones:
+* `xp` - `Int`
+* `upgradeTree` - this hero's [script upgrade tree](#script-upgrade-tree).
+* `level` - `Int`
+* `vitality` - `Int`
+* `fortitude` - `Int`
+* `guard` - `Int`
+* `prowess` - `Int`
+* `hasUpgrade(upgradeId)` - returns `true` if this hero has an [upgrade type](#upgrade) with the provided `Str` ID slotted in their upgrade tree.
+* `isAlive` - returns `true` if this hero is present on the board or loaded into another unit.
 
 ### Script Upgrade
+In-game upgrades are represented as `Object`s in scripts, each having the following fields/methods:
+* `id` - `Str`
+* `type` - [script upgrade type](#script-upgrade-type).
+* `owner` - [script player](#script-player) that has this upgrade slotted in their upgrade tree (or their hero's).
 
 ### Script Upgrade Tree
+In-game upgrade trees are represented as `Object`s in scripts, each having the following fields/methods:
+* `nodes` - returns a `List` of root [script upgrade tree nodes](#script-upgrade-tree-node).
+* `allNodes` - returns a `List` of all [script upgrade tree nodes](#script-upgrade-tree-node) in this tree, flattened out.
+* `allUpgrades` - returns a `List` of root [script upgrades](#script-upgrade) slotted in this tree.
+* `emptyNodesForKind(kind)` - returns a `List` of all empty [script upgrade tree nodes](#script-upgrade-tree-node) in which slots of `Str` `kind` (minor, major, hero) can be slotted.
+* `addNode(node)` - adds a new [script upgrade tree node](#script-upgrade-tree-node) at the root level of this tree.
+
+#### Script Upgrade Tree Node
+In-game nodes of upgrade trees are represented as `Object`s in scripts, each having the following fields/methods:
+* `id` - `Str`
+* `upgrade` - [script upgrade](#script-upgrade) slotted into this node, or `null` if the node is empty.
+* `slot(player, trigger)` - slots a new upgrade according to this node's type for the given player, and optionally `trigger` its summon effects. The actual tree used (faction or hero) is determined by node's type.
+* `unslot` - removes the upgrade from this node.
+* `subnodes` - returns a `List` of all [script upgrade tree nodes](#script-upgrade-tree-node) that are direct children of this node.
+* `addSubnode(node)` - adds a new [script upgrade tree node](#script-upgrade-tree-node) as a direct child of this node.
+
+### Script Spell
+In-game spells are represented as `Object`s in scripts, each having the following fields/methods:
+* `id` - `Str`
+* `type` - [script spell type](#script-spell-type).
+* `owner` - [script player](#script-player) that holds this spell in their hand.
+  
+### Script Movement Type
+[Movement types](#movement-types), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `title` - `Str`
+* `stationary` - `Bool`
+* `costs` - `List` of `Object`s with the following fields:
+  + `terrain` - `Str`
+  + `mp` - `Int`
+  + `ignoreObstacles` - `Bool`
 
 ### Script Grid
 
@@ -716,3 +966,16 @@ Nusantara Scripts interact with the game through script objects. They allow you 
 ### Script Campaign
 
 ### Script Data
+
+### Script Extras
+Some objects can have the extras bundle, which can contain any data. All those objects have the following fields/methods:
+* `extras` - all the current extras on the object, as a `List` of `Object`s with the following fields:
+  + `id` - `Str`
+  + `title` - `Str`
+  + `image` - `Str`
+  + `value` - can be of any type, depends on context.
++ `getExtraValue(extraId)` - returns the value for the provided `Str` extra ID, or `null` if it doesn't exist.
++ `addExtra(id, title, image, value)`
++ `updateExtra(id, newValue)`
++ `addOrUpdateExtra(id, title, image, newValue)`
++ `removeExtra(id)`
