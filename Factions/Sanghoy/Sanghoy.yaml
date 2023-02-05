@@ -118,7 +118,21 @@ units:
   - id: thrall
     title: thrallTitle
     description: thrallDescription
-    image: Images/thrall
+    image: Images/Thrall/thrall
+    animationFrames:
+      move:
+        - Images/Thrall/thrallMove1
+        - Images/Thrall/thrallMove2
+        - Images/Thrall/thrallMove3
+      cast:
+        - Images/Thrall/thrallCast1
+        - Images/Thrall/thrallCast2
+        - Images/Thrall/thrallCast3
+        - Images/Thrall/thrallCast4
+      die:
+        - Images/Thrall/thrallDie1
+        - Images/Thrall/thrallDie2
+        - Images/Thrall/thrallDie3
     flavor: thrallFlavor
     sounds:
       summon: Sounds/Thrall/Summon

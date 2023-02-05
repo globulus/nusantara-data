@@ -10,7 +10,7 @@
   params: [!!int 5]
 - id: trainThrall
   title: trainThrallTitle
-  image: ../Factions/Sanghoy/Images/thrall
+  image: ../Factions/Sanghoy/Images/Thrall/thrall
   effect: AddCardToHand
   params: ["thrall", !!int 1, !!int 3, !!int 0, !!int 1]
 - id: trainWarrior

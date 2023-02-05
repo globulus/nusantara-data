@@ -535,16 +535,16 @@ effect WingedSerpentNestInteraction {
       }
       4 || 5 { # eat a delicious omelette
         Game.showMessage("The nest contains two freshly laid eggs. You take it to make delicious omelette for your troops!")
+        vfx = []
         for unit in Game.unitsInRange(casterLocation, 1).where(=> target.owner.id == $0.owner.id) {
-          Game.animateVisualFx([
-            [
-              type: "boost",
-              coordinates: unit.coordinates,
-              color: "#800080"
-            ]
+          vfx.add([
+            type: "boost",
+            coordinates: unit.coordinates,
+            color: "#800080"
           ])
           unit.restoreHealth(5)
         }
+        Game.animateVisualFx(vfx)
       }
       6 { # find a tame winged serpent
         Game.showMessage("In the nest, you find a winged serpent cub, waiting for its mother to return. You snatch it, confident in your ability to tame and subject it to your will!")
@@ -584,16 +584,16 @@ effect BrokenTotemInteraction {
           ]
         ])
         nearbyUnits = Game.unitsInRange(casterLocation, 1).where(=> target.owner.id == $0.owner.id)
+        vfx = []
         for unit in nearbyUnits {
-          Game.animateVisualFx([
-            [
-              type: "poison",
-              coordinates: unit.coordinates,
-              color: "#006400"
-            ]
+          vfx.add([
+            type: "poison",
+            coordinates: unit.coordinates,
+            color: "#006400"
           ])
           unit.takeDamage(6, caster)
         }
+        Game.animateVisualFx(vfx)
       }
       17 { # study to become a Warlock
         caster.destroy(caster)
@@ -721,44 +721,44 @@ effect BlessingOfRogash {
         1 {
           Game.logEvent("The wounds of your troops suddenly heal, restoring $HP_RESTORED to $UNITS_COUNT of them!", \
             LogLevels.positive, targets.0.coordinates)
+          vfx = []
           for unit in targets {
             unit.restoreHealth(HP_RESTORED)
-            Game.animateVisualFx([
-              [
-                type: "boost",
-                coordinates: unit.coordinates,
-                color: "#00FF00"
-              ]
+            vfx.add([
+              type: "boost",
+              coordinates: unit.coordinates,
+              color: "#00FF00"
             ])
           }
+          Game.animateVisualFx(vfx)
         }
         2 {
           Game.logEvent("The flesh of your troops begins to change, as if a sarcomanctic ritual was performed on $UNITS_COUNT of them!", \
             LogLevels.positive, targets.0.coordinates)
+          vfx = []
           for unit in targets {
             unit.addTempEffect(NeutralSarcomancyModifier(), source: unit, duration: INFINITY)
-            Game.animateVisualFx([
-              [
-                type: "boost",
-                coordinates: unit.coordinates,
-                color: "#FF0000"
-              ]
+            vfx.add([
+              type: "boost",
+              coordinates: unit.coordinates,
+              color: "#FF0000"
             ])
           }
+          Game.animateVisualFx(vfx)
         }
         3 {
           Game.logEvent("$UNITS_COUNT of your troops suddenly feed invigorated to do more, with extra $AP_EXTRA actions this turn!", \
             LogLevels.positive, targets.0.coordinates)
+          vfx = []
           for unit in targets {
             unit.setActions(unit.speed + AP_EXTRA)
-            Game.animateVisualFx([
-              [
-                type: "boost",
-                coordinates: unit.coordinates,
-                color: "#0000FF"
-              ]
+            vfx.add([
+              type: "boost",
+              coordinates: unit.coordinates,
+              color: "#0000FF"
             ])
           }
+          Game.animateVisualFx(vfx)
         }
       }
     }

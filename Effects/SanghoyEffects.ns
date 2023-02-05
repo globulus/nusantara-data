@@ -298,7 +298,9 @@ effect Amalgamation {
       [
         type: "blood",
         coordinates: otherTarget.coordinates
-      ],
+      ]
+    ])
+    Game.animateVisualFx([
       [
         type: "boost",
         coordinates: target.coordinates,
@@ -556,16 +558,16 @@ effect SacrificeOfHealth is Sacrifice {
       .where(=> areAllies(caster, $0) && !$0.isBuilding)
     Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sacrifices " + Game.localizedStr(target.type.id + "Title") + " to restore $hp HP to $(around.size) allies!", \
       LogLevels.info, target.coordinates)
+    vfx = []
     for unit in around {
-      Game.animateVisualFx([
-        [
-          type: "boost",
-          coordinates: target.coordinates,
-          color: "#00FF00"
-        ]
+      vfx.add([
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#00FF00"
       ])
       unit.restoreHealth(hp)
     }
+    Game.animateVisualFx(vfx)
   }
 
   description(caster) => super.description(caster) + " Restore $(healthRestored(caster)) health to all friendly units in radius $radius."
@@ -590,16 +592,16 @@ effect SacrificeOfVigor is Sacrifice {
       .where(=> areAllies(caster, $0) && !$0.isBuilding)
     Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sacrifices " + Game.localizedStr(target.type.id + "Title") + " to restore $ap AP to $(around.size) allies!", \
       LogLevels.info, target.coordinates)
+    vfx = []
     for unit in around {
-      Game.animateVisualFx([
-        [
-          type: "boost",
-          coordinates: target.coordinates,
-          color: "#0000FF"
-        ]
+      vfx.add([
+        type: "boost",
+        coordinates: target.coordinates,
+        color: "#0000FF"
       ])
       unit.restoreActions(ap)
     }
+    Game.animateVisualFx(vfx)
   }
 
   description(caster) => super.description(caster) + " Restore $(apRestored(caster)) AP to all friendly units in radius $radius."
@@ -712,16 +714,16 @@ effect BeastmastersWarcry {
       .where(=> areAllies(caster, $0) && !$0.isBuilding && !$0.hasTempEffect("BeastmastersWarcryModifier"))
     Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s warcry inspires $(around.size) allies!", \
       LogLevels.info, caster.coordinates)
+    vfx = []
     for unit in around {
-      Game.animateVisualFx([
-        [
-          type: "boost",
-          coordinates: unit.coordinates,
-          color: "#00FF00"
-        ]
+      vfx.add([
+        type: "boost",
+        coordinates: unit.coordinates,
+        color: "#00FF00"
       ])
       unit.addTempEffect(modifier, caster, duration)
     }
+    Game.animateVisualFx(vfx)
   }
   
   description(caster) {
@@ -1047,16 +1049,16 @@ effect BloodToRogash {
     if units.size > 0 {
       Game.logEvent("More, more blood, more fuel for Rogash's dream...", LogLevels.error, units.0.coordinates)
     }
+    vfx = []
     for unit in units {
-      Game.animateVisualFx([
-        [
-          type: "blood",
-          coordinates: unit.coordinates
-        ]
+      vfx.add([
+        type: "blood",
+        coordinates: unit.coordinates
       ])
       unit.takeDamage(damage, caster)
       player.addResources([u: bloodPerUnit])
     }
+    Game.animateVisualFx(vfx)
   }
 
   description(caster) => "Deal $damage to a maximum of $maxUnits lowest HP visible units. Gain $bloodPerUnit Blood for each unit damaged."
@@ -1077,15 +1079,15 @@ effect TheDreamFuel {
     if targets.size > 0 {
       Game.logEvent("More, more blood, more fuel for Rogash's dream...", LogLevels.error, targets.0.coordinates)
     }
+    vfx = []
     for unit in targets {
-      Game.animateVisualFx([
-        [
-          type: "blood",
-          coordinates: unit.coordinates
-        ]
+      vfx.add([
+        type: "blood",
+        coordinates: unit.coordinates
       ])
       unit.takeDamage(damage, caster)
     }
+    Game.animateVisualFx(vfx)
     player.addResources([u: targets.size])
   }
 

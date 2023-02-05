@@ -12,10 +12,10 @@ factionData:
       cards: { }
       units:
         - sanghoyCamp
+        - runestoneOfRogash
         - thrall
         - thrall
         - warrior
-        - runestoneOfRogash
         - shadespear
     upgradeTree:
       nodes:
@@ -53,11 +53,11 @@ factionData:
       cards: { }
       units:
         - colonialHall
+        - magistratesCourt
         - settler
         - settler
         - rifleman
         - assassin
-        - magistratesCourt
     upgradeTree:
       nodes:
         - type: taxCollectors

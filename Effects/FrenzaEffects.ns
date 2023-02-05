@@ -410,17 +410,17 @@ effect PlagueSeedsModifier {
     location = target.coordinates
     if location != null { # didn't die yet, infect others
       units = Game.unitsInRange(location, 1).where(=> isOrganic($0) && !$0.hasTempEffect("PlagueSeedsModifier"))
+      vfx = []
       for unit in units {
-        Game.animateVisualFx([
-          [
-            type: "poison",
-            coordinates: unit.coordinates,
-            color: "#006400"
-          ]
+        vfx.add([
+          type: "poison",
+          coordinates: unit.coordinates,
+          color: "#006400"
         ])
         Game.logEvent(Game.localizedStr(unit.type.id + "Title") + " gets infected with Plague!", LogLevels.warn, unit.coordinates)
         unit.addTempEffect(PlagueSeedsModifier(), caster, PLAGUE_SEEDS_DURATION)
       }
+      Game.animateVisualFx(vfx)
     }
   }
 
@@ -918,21 +918,21 @@ effect NoxiousCloud {
     if target.content != null {
       units.add(target.content)
     }
+    vfx = []
     for unit in units {
       unit.takeDamage(p.damage, caster)
       Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Noxious Cloud engulfs the land, dealing $(p.damage) damage and spreading poison!", \
         LogLevels.info, target.coordinates)
       if !unit.hasTempEffect("PoisonModifier") {
         unit.addTempEffect(PoisonModifier(poisonDamage), caster, p.poisonDuration)
-        Game.animateVisualFx([
-          [
-            type: "poison",
-            coordinates: unit.coordinates,
-            color: "#00FF00"
-          ]
+        vfx.add([
+          type: "poison",
+          coordinates: unit.coordinates,
+          color: "#00FF00"
         ])
       }
     }
+    Game.animateVisualFx(vfx)
   }
 
   description(caster) {
@@ -1656,28 +1656,27 @@ effect UncommonValor {
   isEnabled(caster) => [[caster.hasUpgrade("uncommonValor"), "You must have Uncommon Valor upgrade!"]]
 
   run(caster, target) {
+    vfx = []
     allUnits = caster.ownedUnits.where(=> !$0.isBuilding)
     for unit in allUnits.where(=> $0.hp < $0.health * HP_PERCENTAGE // 100) {
       if !unit.hasTempEffect("VeterancyModifier") {
-        Game.animateVisualFx([
-          [
-            type: "boost",
-            coordinates: unit.coordinates,
-            color: "#800080"
-          ]
+        vfx.add([
+          type: "boost",
+          coordinates: unit.coordinates,
+          color: "#800080"
         ])
         unit.addTempEffect(VeterancyModifier(), unit, INFINITY)
       }
     }
+    Game.animateVisualFx(vfx)
+    vfx = []
     promotionsLeft = PROMOTIONS_COUNT
     for unit in allUnits {
       if !unit.hasTempEffect("Promoted") {
-        Game.animateVisualFx([
-          [
-            type: "boost",
-            coordinates: unit.coordinates,
-            color: "#0000FF"
-          ]
+        vfx.add([
+          type: "boost",
+          coordinates: unit.coordinates,
+          color: "#0000FF"
         ])
         unit.addTempEffect(Promoted(), unit, INFINITY)
         promotionsLeft -= 1
@@ -1686,6 +1685,7 @@ effect UncommonValor {
         }
       }
     }
+    Game.animateVisualFx(vfx)
   }
 
   sprite => "uncommonValor"

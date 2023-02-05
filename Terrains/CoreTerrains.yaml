@@ -35,6 +35,7 @@
     useAltAsBase: true
     alt:
       - forestLush
+      - forestGreen
     mirrorable:
       - forest
       - forestLush
@@ -63,6 +64,8 @@
     useAltAsBase: true
     alt:
       - hillsGreen
+      - hillsSnowy
+      - hillsVolcano
   debrisFrequency: 0.5
   debris:
     - cave
