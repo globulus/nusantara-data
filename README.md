@@ -13,7 +13,7 @@ In general, modding boils down to modifying **config files** and **scripts**. [V
 1. Config files are written in [YAML](https://yaml.org/) and their extension is **.yaml**. They contain "static" data that describes, e.g, all the units in a faction or the contents of a map.
   * [VSCode extension for YAML files](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 1. Script files are written in [NusantaraScript language](https://github.com/globulus/nusantara-script) and their extension is **.ns**. They describe dynamic behaviours at game's runtime, such as effects, scenarios, AI behavior, etc.
-  * [VSCode extension for NS files](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
+  * [VSCode extension for NS files](https://marketplace.visualstudio.com/items?itemName=Globulus.nusantarascript)
 
 **Table of contents:**
 - [Nusantara Data](#nusantara-data)
@@ -57,7 +57,7 @@ In general, modding boils down to modifying **config files** and **scripts**. [V
     - [Game](#game)
     - [Server](#server)
     - [Script Player](#script-player)
-    - [Script Resources](#script-resources)
+    - [Script Cost](#script-cost)
     - [Script Card](#script-card)
     - [Script Card Type](#script-card-type)
       - [Script Unit Type](#script-unit-type)
@@ -70,13 +70,22 @@ In general, modding boils down to modifying **config files** and **scripts**. [V
     - [Script Upgrade Tree](#script-upgrade-tree)
       - [Script Upgrade Tree Node](#script-upgrade-tree-node)
     - [Script Spell](#script-spell)
-    - [Script Movement Type](#script-movement-type)
     - [Script Grid](#script-grid)
     - [Script Cell](#script-cell)
-    - [Script Scenario](#script-scenario)
-    - [Script Campaign](#script-campaign)
-    - [Script Data](#script-data)
     - [Script Extras](#script-extras)
+    - [Script Scenario](#script-scenario)
+      - [Script Scenario Objective](#script-scenario-objective)
+    - [Script Campaign](#script-campaign)
+      - [Script Campaign Scenario Progress](#script-campaign-scenario-progress)
+    - [Script Data](#script-data)
+      - [Script Bot](#script-bot)
+      - [Script Terrain](#script-terrain)
+      - [Script Movement Type](#script-movement-type)
+      - [Script Resource](#script-resource)
+      - [Script Tag](#script-tag)
+      - [Script Skill](#script-skill)
+      - [Script Faction](#script-faction)
+      - [Script Ruleset](#script-ruleset)
 
 ## The *data* folder
 At startup, Nusantara loads its content from the **data** folder, which has to be located in its persistent storage location. E.g, on Windows 10, this usually resides at `C:\Users\User\AppData\LocalLow\Globulus\Nusantara\data`. Modding the game involves making changes to its subfolders and files, all of which is discussed in the rest of this document.
@@ -121,6 +130,18 @@ There is the optional third method, `onGameStart(player)`, which is called just 
 The default bots use the "value AI" approach, where a series of possible decisions are weighted, with the one with the highest core executed for the given run. Again, the framework is flexible enough to allow for implementation of different kinds of AIs for different purposes (build tree, passive, etc.).
 
 ## Campaigns
+The **Campaigns** folder contains campaigns, which are collections of scenarios that are linked and share data. Each campaign should be in its own folder. Within it, the campaign should have a config (.yaml) file with the same name as the folder (e.g, the folder **Campaigns/OnTheBanksOfDair** has a config file **OnTheBanksOfDair.yaml**). The same campaign folder should have subfolders for individual campaign scenarios, each of which should have the config and script file for that scenario. All the rules that apply to other [scenarios](#scenarios) apply to campaign scenarios as well.
+
+The campaign config file describes an object with the following schema:
+* `id` - the ID of the campaign.
+* `title` - should be a translatable key.
+* `description` - should be a translatable key.
+* `image` - relative path to a 128x128px PNG that is the splash screen of this campaign.
+* `difficulties` - list of string IDs of available difficulties for this campaign. The selected difficulty propagates to all of its scenarios.
+* `scenarios` - a list of scenarios for this campaign, which should align with the scenario subfolders. Each item has the following schema:
+  + `id` - ID of the campaign scenario.
+  + `image` - relative path to a 128x128px PNG that is the loading splash screen for this scenario.
+  + `loadingText` - the translatable key of the loading text shown when the scenario is selected.
 
 ## Effects
 The **Effects** folder contains only script files (.ns), which should represent generally define different `effect` classes used in the game. Effects are events that happen based on some trigger, such as start of turn, unit attacking or defending, ability being cast, or just by some unit or upgrade having an ability with an effect attached to it. They can also define temporary effects, which are attached to units and players at runtime. The versatility of effects allows you to do wonders with gameplay, experimenting with weird abilities, auras, attacks, etc.
@@ -771,9 +792,9 @@ In-game players are represented as `Object`s in scripts. Each has the following 
     - `majorUpgrades`
     - `minorUpgrades`
     - `techtreeComplete`
-* `addResources(resources)` - adds the provided [script resources](#script-resources) to this player's resource pool.
-* `canPay(cost)` - returns `true` if the provided [script resources](#script-resources) `cost` is not `null` and the player has more resources than it. 
-* `pay(cost)` - makes the player pay the provided [script resources](#script-resources) `cost`.
+* `addResources(resources)` - adds the provided [script cost](#script-cost) to this player's resource pool.
+* `canPay(cost)` - returns `true` if the provided [script cost](#script-cost) `cost` is not `null` and the player has more resources than it. 
+* `pay(cost)` - makes the player pay the provided [script cost](#script-cost) `cost`.
 * `addToHand(cardTypeId, downtime)` - adds a [playable](#playables) of type `Str` `cardTypeId` to the player's hand, making it unavailable for `Int` `downtime` turns.
 * `removeFromHand(id)` - removes the card with the provided ID as `Str` (card ID, not card type ID) from the player's hand.
 * `isAllyOf(player)` - returns `true` if this player is on the same team as the provides [script player](#script-player).
@@ -786,8 +807,8 @@ In-game players are represented as `Object`s in scripts. Each has the following 
 
 On top of this, players contain `extras`, so they have all the additional [script extras](#script-extras) methods.
 
-### Script Resources
-In scripts, resources and costs are represented as `Object`s with the following optional fields:
+### Script Cost
+In scripts, costs are represented as `Object`s with the following optional fields:
 * `g` - `Int` representing amount of Gold.
 * `u` - `Int` representing amount of Unique Resource.
 * `ap` - `Int` representing amount of Action Points.
@@ -802,7 +823,7 @@ In scripts, cards in player's hand are represented as `Object`s with the followi
 [Card types](#playables), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
 * `id` - `Str`
 * `title` - `Str`
-* `playCost` - [script resources](#script-resources) or `null`.
+* `playCost` - [script cost](#script-cost) or `null`.
 * `tags` - `List` of `Str` representing [tag](#tags) IDs, or `null`.
 * `requiresUpgrades` - `List` of `Str` representing [upgrade](#upgrade) IDs, or `null`.
 
@@ -873,8 +894,8 @@ In-game units are represented as `Object`s in scripts. Note that most stats on u
 * `activeStance` - ID of the [stance](#stances) assumed by this unit.
 * `availableStances` - list of IDs of stances that this unit can assume (those whose `isEnabled` is `true`).
 * `skills` - list of effect instances based on this unit's skills.
-* `addSkill(id)`
-* `removeSkill(id)`
+* `addSkill(id)` - adds the [skill](#skills) with the provided ID to this unit.
+* `removeSkill(id)` - removes the [skill](#skills) with the provided ID from this unit.
 * `owner` - [script player](#script-player) that owns this unit.
 * `setOwner(player)` - sets the owner of this unit to the provided [script player](#script-player).
 * `destroy(attacker)` - destroys the current unit, counting the provided [script unit](#script-unit) as the one that destroyed it (for player stats and XP purposes).
@@ -946,26 +967,37 @@ In-game spells are represented as `Object`s in scripts, each having the followin
 * `id` - `Str`
 * `type` - [script spell type](#script-spell-type).
 * `owner` - [script player](#script-player) that holds this spell in their hand.
-  
-### Script Movement Type
-[Movement types](#movement-types), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
-* `id` - `Str`
-* `title` - `Str`
-* `stationary` - `Bool`
-* `costs` - `List` of `Object`s with the following fields:
-  + `terrain` - `Str`
-  + `mp` - `Int`
-  + `ignoreObstacles` - `Bool`
 
 ### Script Grid
+The **Grid** object represents the game's board, i.e the grid of cells that the game is happening on. It arguably contains most of the game's data. It is an `Object` with the following fields:
+* `size` - `Int` [map](#maps) size.
+* `cells` - `List` of all [script cells](#script-cell).
+* `nonEmptyCells` - `List` of all [script cells](#script-cell) that have units on them.
+* `visibleCells(player)` - `List` of [script cells](#script-cell) that the provided [script player](#script-player) can see (i.e, those not hidden by fog of war).
+* `hiddenCells(player)` - `List` of [script cells](#script-cell) that the provided [script player](#script-player) can't see (i.e, those hidden by fog of war).
+* `cellsAround(coordinates, range, player)` - `List` of [script cells](#script-cell) around the cells with the provided coordinates list in radius `range` that the provided [script player](#script-player) can access.
+* `ringAround(coordinates, range)` - `List` of [script cells](#script-cell) around the cells with the provided coordinates list in radius `range`.
+* `allUnits` - `List` of all [script units](#script-unit) present on the board.
+* `startingLocations` - `List` of coordinates lists of all starting locations, sorted by player index.
+* `locate(unit)` - returns [script cell](#script-cell) which contains the provided unit, or `null` if none do.
+* `elementAt(coordinates)` - returns [script cell](#script-cell) with the provided coordinates list, or `null` if such a cell doesn't exist.
 
 ### Script Cell
+A single cell on the game's [grid](#script-grid) is represented as an `Object` with the following fields:
+* `coordinates` - coordinates list of this cell.
+* `terrain` - `Str` ID of the [terrain](#terrains) on this cell.
+* `influencer` - `Str` ID of the player influencing this cell, or `null` if none do.
+* `isInfluencable` - returns `true` if players can influence this cell based on its terrain type.
+* `hasFogOfWar(player)` - returns `true` if the provided [script player](#script-player) sees fog of war on this cell.
+* `content` - [script unit](#script-unit) located on this cell, or `null` if the cell is empty.
+* `comment` - `Str` indicating a [map hex](#maps) comment.
+* `summon(typeId, player)` - summons a unit of the provided `Str` `typeId`, owned by the provided [script player](#script-player).
+* `setContent(unit)` - sets the content of this cell to the provided [script unit](#script-unit), or empties it if `null` is provided.
+* `setTerrain(terrainId)` - sets the terrain of this cell to be that with the provided `Str` ID.
+* `distance(toCoordinates)` - returns the `Int` distance in number of cells between this cell and the one designated by the provided coordinates list.
+* `equals(otherCell)` - returns `true` if both cells have the same coordinates.
 
-### Script Scenario
-
-### Script Campaign
-
-### Script Data
+On top of this, cells contain `extras`, so they have all the additional [script extras](#script-extras) methods.
 
 ### Script Extras
 Some objects can have the extras bundle, which can contain any data. All those objects have the following fields/methods:
@@ -979,3 +1011,109 @@ Some objects can have the extras bundle, which can contain any data. All those o
 + `updateExtra(id, newValue)`
 + `addOrUpdateExtra(id, title, image, newValue)`
 + `removeExtra(id)`
+
+### Script Scenario
+In-game scenario for this given game is represented as an `Object` in scripts, having the following fields/methods:
+* `scriptId` - `Str` ID (class name) of the script this scenario runs on.
+* `difficulty` - `Str` difficulty this game was started with.
+* `wrapper` - references the actual instance of the script scenario class, allowing you to invoke methods on it.
+* `objectives` - `List` of [script scenario objectives](#script-scenario-objective).
+* `addObjective(objective)` - adds a new objective, provided as an `Object` of type [script scenario objective](#script-scenario-objective).
+* `updateObjective(objectiveId, payload)` - updates the objective whose ID is the provided `Str` with the new fields provided as an `Object` of type [script scenario objective](#script-scenario-objective).
+* `objectiveState(objectiveId)` - returns [objective state](#objectivestates) of the objective whose ID is the provided `Str`.
+* `addRevealedCell(coordinates)` - makes the cell as the provided coordinates permanently revealed for all players.
+* `removeRevealedCell(coordinates)` - removes the cell with the provided coordinates from the list of permanently revealed cells.
+
+On top of this, scenarios contain `extras`, so they have all the additional [script extras](#script-extras) methods.
+
+#### Script Scenario Objective
+A single objective on the game's [scenario](#script-scenario) is represented as an `Object` with the following fields:
+* `id` - `Str`
+* `state` - [objective state](#objectivestates)
+
+When creating objectives, you can also provide the following fields:
+* `title` - should be a translatable string.
+* `description` - should be a translatable string.
+* `image` - ID of a `playable` whose image this objective will use.
+
+### Script Campaign
+In-game campaign for this given game is represented as an `Object` in scripts, and it's a combination of the campaign data and its current progress. The campaign progress is stored on the disk, persisting between game restarts and allowing for tracking of how far did the player get in a campaign, and what achievements did they acquire while doing so. The object has the following fields/methods:
+* `id` - `Str` ID of the currently played campaign.
+* `difficulty` - `Str` difficulty the campaign was started with.
+* `unlockedScenarios` - `List` of `Str` IDs of currently unlocked scenarios for this campaign (i.e, scenarios you can play).
+* `unlock(scenarioId)` - unlocks the campaign scenario with the provided ID, making it playable/selectable from the campaign menu.
+* `progressFor(scenarioId)` - retrieves the [script campaign scenario progress](#script-campaign-scenario-progress) for the provided scenario ID.
+* `reload` - reloads the campaign progress from the disk.
+* `save` - saves the campaign progress to the disk.
+
+#### Script Campaign Scenario Progress
+Each campaign progress file contains progress for the given scenario. It can hold any data, allowing future scenarios to built upon previous one. E.g, if you hero reached level 3 and had a certain set of upgrades chosen, you can store that and then use that as the starting point in a future scenario. Each scenario progress is represented as an `Object` in scripts, having the following fields/methods:
+* `id` - `Str` ID of the campaign scenario this progress is for.
+
+On top of this, campaign scenario progresses contain `extras`, so they have all the additional [script extras](#script-extras) methods.
+
+### Script Data
+You can access the game data using this `Object` which has the following fields/methods:
+* `customGameBots` - `List` of [script bots](#script-bot).
+* `terrains` - `List` of [script terrains](#script-terrain).
+* `movementTypes` - `List` of [script movement types](#script-movement-type).
+* `resources` - `List` of [script resources](#script-resource).
+* `tags` - `List` of [script tags](#script-tag).
+* `skills` - `List` of [script skills](#script-skill).
+* `factions` - `List` of [script factions](#script-faction).
+* `rulesets` - `List` of [script rulesets](#script-ruleset).
+* `find(id)` - returns the [card type](#script-card-type) with the provided `Str` ID, or `null` if it doesn't exist.
+
+#### Script Bot
+[Bots](#bots), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+
+#### Script Terrain
+[Terrains](#terrains), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `title` - `Str`
+* `influencable` - `Bool`
+
+#### Script Movement Type
+[Movement types](#movement-types), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `title` - `Str`
+* `stationary` - `Bool`
+* `costs` - `List` of `Object`s with the following fields:
+  + `terrain` - `Str`
+  + `mp` - `Int`
+  + `ignoreObstacles` - `Bool`
+
+#### Script Resource
+[Resources](#resources), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `title` - `Str`
+
+#### Script Tag
+[Tags](#tags), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `title` - `Str`
+  
+#### Script Skill
+[Skills](#skills), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `title` - `Str`
+* `effect` - `Str` ID (class name) of the skill effect.
+  
+#### Script Faction
+[Factions](#factions), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `name` - `Str`
+* `uniqueResource` - `Str`
+* `units` - `List` of [script unit types](#script-unit-type).
+* `heroes` - `List` of [script hero types](#script-hero-type).
+* `spells` - `List` of [script spell types](#script-spell-type).
+* `upgrades` - `List` of [script upgrade types](#script-upgrade-type).
+
+#### Script Ruleset
+[Rulesets](#rulesets), as defined in the game's data, are represented in scripts as `Object`s with the following fields/methods:
+* `id` - `Str`
+* `name` - `Str`
+* `fogOfWar` - `Bool`
+* `deterministicCombat` - `Bool`
+* `isBanned(id)` - returns `true` if the playable with the given ID is banned.
