@@ -7,7 +7,7 @@ Balance proposals are welcome via PRs.
 [Play Nusantara](https://playnusantara.com)
 
 # Nusantara modding guide
-This document shows how to modify existing and implement new features using the Nusantara engine. Almost all content in the base game is implementable using these methods.
+This document shows how to modify existing and implement new features using the [Nusantara](https://playnusantara.com) engine. Almost all content in the base game is implementable using these methods.
 
 In general, modding boils down to modifying **config files** and **scripts**. [VSCode](https://code.visualstudio.com/) works well enough for both purposes.
 1. Config files are written in [YAML](https://yaml.org/) and their extension is **.yaml**. They contain "static" data that describes, e.g, all the units in a faction or the contents of a map.
@@ -86,6 +86,10 @@ In general, modding boils down to modifying **config files** and **scripts**. [V
       - [Script Skill](#script-skill)
       - [Script Faction](#script-faction)
       - [Script Ruleset](#script-ruleset)
+
+<div style="page-break-after: always; visibility: hidden"> 
+\pagebreak 
+</div>
 
 ## The *data* folder
 At startup, Nusantara loads its content from the **data** folder, which has to be located in its persistent storage location. E.g, on Windows 10, this usually resides at `C:\Users\User\AppData\LocalLow\Globulus\Nusantara\data`. Modding the game involves making changes to its subfolders and files, all of which is discussed in the rest of this document.
