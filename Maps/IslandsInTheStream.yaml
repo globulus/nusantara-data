@@ -1,0 +1,1488 @@
+id: IslandsInTheStream
+title: Islands in the Stream
+description: Time to practice some island hopping!
+size: 12
+kind: Hexagonal
+maxPlayers: 2
+defaultTerrain: grass
+hexes:
+- c:
+  - -11
+  - 0
+  - 11
+  t: river
+- c:
+  - -11
+  - 2
+  - 9
+  t: forest
+- c:
+  - -11
+  - 6
+  - 5
+  t: river
+- c:
+  - -11
+  - 7
+  - 4
+  t: river
+- c:
+  - -11
+  - 8
+  - 3
+  t: forest
+- c:
+  - -11
+  - 9
+  - 2
+  t: forest
+- c:
+  - -11
+  - 11
+  - 0
+  startingLocation: 1
+- c:
+  - -10
+  - -1
+  - 11
+  t: river
+- c:
+  - -10
+  - 0
+  - 10
+  t: road
+  s: roadBridgeWooden
+  content: creepCampSmall
+- c:
+  - -10
+  - 1
+  - 9
+  t: river
+- c:
+  - -10
+  - 4
+  - 6
+  content: creepCampSmall
+- c:
+  - -10
+  - 6
+  - 4
+  t: river
+- c:
+  - -10
+  - 7
+  - 3
+  t: river
+- c:
+  - -9
+  - -2
+  - 11
+  t: swamp
+- c:
+  - -9
+  - -1
+  - 10
+  t: road
+  s: roadBridgeWooden
+- c:
+  - -9
+  - 0
+  - 9
+  t: river
+- c:
+  - -9
+  - 1
+  - 8
+  t: river
+- c:
+  - -9
+  - 2
+  - 7
+  t: beach
+- c:
+  - -9
+  - 3
+  - 6
+  t: forest
+  content: site
+- c:
+  - -9
+  - 4
+  - 5
+  t: forest
+- c:
+  - -9
+  - 5
+  - 4
+  t: beach
+- c:
+  - -9
+  - 6
+  - 3
+  t: river
+- c:
+  - -9
+  - 7
+  - 2
+  t: river
+- c:
+  - -9
+  - 8
+  - 1
+  t: beach
+  content: beastDen
+- c:
+  - -9
+  - 9
+  - 0
+  content: smallGoldMine
+- c:
+  - -9
+  - 11
+  - -2
+  t: forest
+- c:
+  - -8
+  - -1
+  - 9
+  t: river
+- c:
+  - -8
+  - 0
+  - 8
+  t: river
+- c:
+  - -8
+  - 1
+  - 7
+  t: river
+- c:
+  - -8
+  - 2
+  - 6
+  t: river
+- c:
+  - -8
+  - 3
+  - 5
+  t: beach
+- c:
+  - -8
+  - 5
+  - 3
+  t: beach
+- c:
+  - -8
+  - 6
+  - 2
+  t: river
+- c:
+  - -8
+  - 7
+  - 1
+  t: river
+- c:
+  - -8
+  - 8
+  - 0
+  t: beach
+- c:
+  - -8
+  - 9
+  - -1
+  t: beach
+- c:
+  - -8
+  - 11
+  - -3
+  t: forest
+  content: beastDen
+- c:
+  - -7
+  - -2
+  - 9
+  t: jungle
+- c:
+  - -7
+  - -1
+  - 8
+  t: river
+- c:
+  - -7
+  - 0
+  - 7
+  t: river
+- c:
+  - -7
+  - 1
+  - 6
+  t: river
+- c:
+  - -7
+  - 2
+  - 5
+  t: river
+- c:
+  - -7
+  - 3
+  - 4
+  t: beach
+- c:
+  - -7
+  - 5
+  - 2
+  content: creepCampSmall
+- c:
+  - -7
+  - 6
+  - 1
+  t: river
+- c:
+  - -7
+  - 7
+  - 0
+  t: river
+- c:
+  - -7
+  - 8
+  - -1
+  t: river
+- c:
+  - -7
+  - 9
+  - -2
+  t: river
+- c:
+  - -7
+  - 10
+  - -3
+  t: river
+- c:
+  - -7
+  - 11
+  - -4
+  t: river
+- c:
+  - -6
+  - -5
+  - 11
+  t: jungle
+- c:
+  - -6
+  - -4
+  - 10
+  content: site
+- c:
+  - -6
+  - -2
+  - 8
+  t: river
+- c:
+  - -6
+  - -1
+  - 7
+  t: river
+- c:
+  - -6
+  - 0
+  - 6
+  t: beach
+- c:
+  - -6
+  - 1
+  - 5
+  t: river
+- c:
+  - -6
+  - 2
+  - 4
+  t: river
+- c:
+  - -6
+  - 3
+  - 3
+  t: river
+- c:
+  - -6
+  - 4
+  - 2
+  t: river
+- c:
+  - -6
+  - 5
+  - 1
+  t: river
+- c:
+  - -6
+  - 6
+  - 0
+  content: creepCampMedium
+- c:
+  - -6
+  - 7
+  - -1
+  t: beach
+- c:
+  - -6
+  - 8
+  - -2
+  t: beach
+- c:
+  - -6
+  - 10
+  - -4
+  t: beach
+- c:
+  - -6
+  - 11
+  - -5
+  t: river
+- c:
+  - -5
+  - -4
+  - 9
+  content: creepCampMedium
+- c:
+  - -5
+  - -3
+  - 8
+  t: river
+- c:
+  - -5
+  - -2
+  - 7
+  t: river
+- c:
+  - -5
+  - -1
+  - 6
+  t: beach
+- c:
+  - -5
+  - 0
+  - 5
+  content: beastDen
+- c:
+  - -5
+  - 2
+  - 3
+  t: jungle
+- c:
+  - -5
+  - 4
+  - 1
+  content: creepCampLarge
+- c:
+  - -5
+  - 5
+  - 0
+  t: river
+- c:
+  - -5
+  - 7
+  - -2
+  content: site
+- c:
+  - -5
+  - 8
+  - -3
+  t: forest
+- c:
+  - -5
+  - 10
+  - -5
+  t: beach
+- c:
+  - -5
+  - 11
+  - -6
+  t: river
+- c:
+  - -4
+  - -6
+  - 10
+  content: beastDen
+- c:
+  - -4
+  - -5
+  - 9
+  content: smallGoldMine
+- c:
+  - -4
+  - -4
+  - 8
+  t: river
+- c:
+  - -4
+  - -3
+  - 7
+  t: river
+- c:
+  - -4
+  - 0
+  - 4
+  content: smallGoldMine
+- c:
+  - -4
+  - 3
+  - 1
+  t: beach
+- c:
+  - -4
+  - 5
+  - -1
+  t: river
+- c:
+  - -4
+  - 7
+  - -3
+  t: forest
+- c:
+  - -4
+  - 8
+  - -4
+  t: forest
+- c:
+  - -4
+  - 10
+  - -6
+  t: beach
+- c:
+  - -4
+  - 11
+  - -7
+  t: river
+- c:
+  - -3
+  - -8
+  - 11
+  t: river
+- c:
+  - -3
+  - -7
+  - 10
+  t: road
+  s: roadBridgeWooden
+  content: creepCampMedium
+- c:
+  - -3
+  - -6
+  - 9
+  t: river
+- c:
+  - -3
+  - -5
+  - 8
+  t: river
+- c:
+  - -3
+  - -4
+  - 7
+  t: river
+- c:
+  - -3
+  - -3
+  - 6
+  t: jungle
+- c:
+  - -3
+  - -2
+  - 5
+  content: site
+- c:
+  - -3
+  - -1
+  - 4
+  t: jungle
+  content: creepCampMedium
+- c:
+  - -3
+  - 1
+  - 2
+  t: jungle
+- c:
+  - -3
+  - 2
+  - 1
+  t: river
+- c:
+  - -3
+  - 3
+  - 0
+  t: river
+- c:
+  - -3
+  - 4
+  - -1
+  t: river
+- c:
+  - -3
+  - 7
+  - -4
+  t: forest
+- c:
+  - -3
+  - 9
+  - -6
+  content: site
+- c:
+  - -3
+  - 10
+  - -7
+  t: river
+- c:
+  - -3
+  - 11
+  - -8
+  t: river
+- c:
+  - -2
+  - -7
+  - 9
+  t: river
+- c:
+  - -2
+  - -6
+  - 8
+  t: river
+- c:
+  - -2
+  - -5
+  - 7
+  t: river
+- c:
+  - -2
+  - -4
+  - 6
+  t: beach
+- c:
+  - -2
+  - -2
+  - 4
+  t: jungle
+- c:
+  - -2
+  - -1
+  - 3
+  t: swamp
+- c:
+  - -2
+  - 0
+  - 2
+  t: river
+- c:
+  - -2
+  - 1
+  - 1
+  t: river
+- c:
+  - -2
+  - 2
+  - 0
+  t: river
+- c:
+  - -2
+  - 3
+  - -1
+  t: river
+- c:
+  - -2
+  - 4
+  - -2
+  t: road
+  s: roadBridgeWooden
+  content: creepCampLarge
+- c:
+  - -2
+  - 8
+  - -6
+  content: creepCampSmall
+- c:
+  - -2
+  - 9
+  - -7
+  t: river
+- c:
+  - -2
+  - 10
+  - -8
+  t: beach
+- c:
+  - -2
+  - 11
+  - -9
+  t: river
+- c:
+  - -1
+  - -10
+  - 11
+  t: beach
+- c:
+  - -1
+  - -9
+  - 10
+  t: forest
+- c:
+  - -1
+  - -8
+  - 9
+  t: swamp
+- c:
+  - -1
+  - -7
+  - 8
+  t: river
+- c:
+  - -1
+  - -6
+  - 7
+  t: river
+- c:
+  - -1
+  - -5
+  - 6
+  t: river
+- c:
+  - -1
+  - -3
+  - 4
+  t: river
+- c:
+  - -1
+  - -2
+  - 3
+  t: river
+- c:
+  - -1
+  - -1
+  - 2
+  t: river
+- c:
+  - -1
+  - 0
+  - 1
+  t: hills
+  content: site
+- c:
+  - -1
+  - 1
+  - 0
+  t: river
+- c:
+  - -1
+  - 2
+  - -1
+  t: river
+- c:
+  - -1
+  - 3
+  - -2
+  t: beach
+- c:
+  - -1
+  - 4
+  - -3
+  t: river
+- c:
+  - -1
+  - 5
+  - -4
+  t: river
+- c:
+  - -1
+  - 6
+  - -5
+  t: river
+- c:
+  - -1
+  - 7
+  - -6
+  t: river
+- c:
+  - -1
+  - 8
+  - -7
+  t: river
+- c:
+  - -1
+  - 10
+  - -9
+  t: beach
+- c:
+  - -1
+  - 11
+  - -10
+  t: river
+- c:
+  - 0
+  - -11
+  - 11
+  t: river
+- c:
+  - 0
+  - -10
+  - 10
+  t: beach
+- c:
+  - 0
+  - -9
+  - 9
+  t: forest
+- c:
+  - 0
+  - -5
+  - 5
+  t: road
+  s: roadBridgeWooden
+  content: creepCampLarge
+- c:
+  - 0
+  - -4
+  - 4
+  t: river
+- c:
+  - 0
+  - -3
+  - 3
+  t: river
+- c:
+  - 0
+  - -2
+  - 2
+  t: hills
+  content: creepCampMedium
+- c:
+  - 0
+  - -1
+  - 1
+  t: hills
+  content: site
+- c:
+  - 0
+  - 0
+  - 0
+  t: hills
+  content: creepCampMedium
+- c:
+  - 0
+  - 1
+  - -1
+  t: river
+- c:
+  - 0
+  - 2
+  - -2
+  t: jungle
+- c:
+  - 0
+  - 4
+  - -4
+  t: river
+- c:
+  - 0
+  - 5
+  - -5
+  t: river
+- c:
+  - 0
+  - 6
+  - -6
+  content: beastDen
+- c:
+  - 0
+  - 9
+  - -9
+  t: forest
+  content: creepCampSmall
+- c:
+  - 0
+  - 10
+  - -10
+  t: beach
+- c:
+  - 0
+  - 11
+  - -11
+  t: river
+- c:
+  - 1
+  - -11
+  - 10
+  t: river
+- c:
+  - 1
+  - -10
+  - 9
+  t: beach
+- c:
+  - 1
+  - -9
+  - 8
+  content: site
+- c:
+  - 1
+  - -8
+  - 7
+  t: river
+- c:
+  - 1
+  - -7
+  - 6
+  t: river
+- c:
+  - 1
+  - -6
+  - 5
+  t: river
+- c:
+  - 1
+  - -5
+  - 4
+  t: river
+- c:
+  - 1
+  - -4
+  - 3
+  t: river
+- c:
+  - 1
+  - -3
+  - 2
+  t: river
+- c:
+  - 1
+  - -2
+  - 1
+  t: hills
+  content: site
+- c:
+  - 1
+  - -1
+  - 0
+  t: hills
+  content: beastDen
+- c:
+  - 1
+  - 0
+  - -1
+  t: river
+- c:
+  - 1
+  - 1
+  - -2
+  t: swamp
+- c:
+  - 1
+  - 3
+  - -4
+  t: jungle
+- c:
+  - 1
+  - 4
+  - -5
+  t: river
+- c:
+  - 1
+  - 5
+  - -6
+  t: river
+- c:
+  - 1
+  - 6
+  - -7
+  t: swamp
+- c:
+  - 1
+  - 8
+  - -9
+  content: site
+- c:
+  - 1
+  - 9
+  - -10
+  t: forest
+- c:
+  - 1
+  - 10
+  - -11
+  t: beach
+- c:
+  - 2
+  - -11
+  - 9
+  t: river
+- c:
+  - 2
+  - -10
+  - 8
+  content: creepCampSmall
+- c:
+  - 2
+  - -9
+  - 7
+  t: river
+- c:
+  - 2
+  - -6
+  - 4
+  t: beach
+- c:
+  - 2
+  - -5
+  - 3
+  t: river
+- c:
+  - 2
+  - -4
+  - 2
+  t: river
+- c:
+  - 2
+  - -3
+  - 1
+  t: river
+- c:
+  - 2
+  - -2
+  - 0
+  t: river
+- c:
+  - 2
+  - -1
+  - -1
+  t: river
+- c:
+  - 2
+  - 0
+  - -2
+  content: beastDen
+- c:
+  - 2
+  - 1
+  - -3
+  t: jungle
+  content: creepCampMedium
+- c:
+  - 2
+  - 2
+  - -4
+  content: site
+- c:
+  - 2
+  - 3
+  - -5
+  t: river
+- c:
+  - 2
+  - 4
+  - -6
+  t: river
+- c:
+  - 2
+  - 5
+  - -7
+  t: river
+- c:
+  - 2
+  - 6
+  - -8
+  t: river
+- c:
+  - 3
+  - -11
+  - 8
+  t: river
+- c:
+  - 3
+  - -10
+  - 7
+  t: river
+- c:
+  - 3
+  - -8
+  - 5
+  content: site
+- c:
+  - 3
+  - -6
+  - 3
+  t: beach
+- c:
+  - 3
+  - -5
+  - 2
+  t: river
+- c:
+  - 3
+  - -4
+  - 1
+  t: river
+- c:
+  - 3
+  - -3
+  - 0
+  t: river
+- c:
+  - 3
+  - -2
+  - -1
+  t: jungle
+- c:
+  - 3
+  - 0
+  - -3
+  content: smallGoldMine
+- c:
+  - 3
+  - 2
+  - -5
+  t: river
+- c:
+  - 3
+  - 3
+  - -6
+  t: river
+- c:
+  - 3
+  - 4
+  - -7
+  t: jungle
+- c:
+  - 3
+  - 6
+  - -9
+  t: road
+  s: roadBridgeWooden
+  content: creepCampMedium
+- c:
+  - 3
+  - 7
+  - -10
+  t: river
+- c:
+  - 3
+  - 8
+  - -11
+  t: swamp
+- c:
+  - 4
+  - -11
+  - 7
+  t: river
+- c:
+  - 4
+  - -10
+  - 6
+  t: beach
+- c:
+  - 4
+  - -8
+  - 4
+  t: forest
+- c:
+  - 4
+  - -7
+  - 3
+  t: forest
+- c:
+  - 4
+  - -6
+  - 2
+  t: beach
+- c:
+  - 4
+  - -5
+  - 1
+  t: beach
+- c:
+  - 4
+  - -4
+  - 0
+  t: river
+- c:
+  - 4
+  - -3
+  - -1
+  t: beach
+- c:
+  - 4
+  - -1
+  - -3
+  t: jungle
+- c:
+  - 4
+  - 1
+  - -5
+  t: river
+- c:
+  - 4
+  - 2
+  - -6
+  t: river
+- c:
+  - 4
+  - 3
+  - -7
+  content: smallGoldMine
+- c:
+  - 4
+  - 6
+  - -10
+  t: swamp
+- c:
+  - 4
+  - 7
+  - -11
+  t: river
+- c:
+  - 5
+  - -11
+  - 6
+  t: river
+- c:
+  - 5
+  - -10
+  - 5
+  t: beach
+- c:
+  - 5
+  - -8
+  - 3
+  t: forest
+- c:
+  - 5
+  - -7
+  - 2
+  t: forest
+  content: site
+- c:
+  - 5
+  - -4
+  - -1
+  t: river
+- c:
+  - 5
+  - -3
+  - -2
+  content: creepCampLarge
+- c:
+  - 5
+  - -2
+  - -3
+  t: beach
+- c:
+  - 5
+  - -1
+  - -4
+  t: river
+- c:
+  - 5
+  - 0
+  - -5
+  t: river
+- c:
+  - 5
+  - 1
+  - -6
+  t: river
+- c:
+  - 5
+  - 2
+  - -7
+  content: creepCampMedium
+- c:
+  - 5
+  - 3
+  - -8
+  content: beastDen
+- c:
+  - 6
+  - -11
+  - 5
+  t: river
+- c:
+  - 6
+  - -9
+  - 3
+  t: beach
+- c:
+  - 6
+  - -8
+  - 2
+  t: beach
+- c:
+  - 6
+  - -6
+  - 0
+  content: creepCampMedium
+- c:
+  - 6
+  - -5
+  - -1
+  t: river
+- c:
+  - 6
+  - -4
+  - -2
+  t: river
+- c:
+  - 6
+  - -3
+  - -3
+  t: river
+- c:
+  - 6
+  - -2
+  - -4
+  t: river
+- c:
+  - 6
+  - -1
+  - -5
+  t: river
+- c:
+  - 6
+  - 0
+  - -6
+  t: river
+- c:
+  - 6
+  - 1
+  - -7
+  t: swamp
+- c:
+  - 6
+  - 4
+  - -10
+  content: site
+- c:
+  - 7
+  - -11
+  - 4
+  t: river
+- c:
+  - 7
+  - -10
+  - 3
+  t: river
+- c:
+  - 7
+  - -9
+  - 2
+  t: river
+- c:
+  - 7
+  - -8
+  - 1
+  t: river
+- c:
+  - 7
+  - -7
+  - 0
+  t: river
+- c:
+  - 7
+  - -6
+  - -1
+  t: river
+- c:
+  - 7
+  - -5
+  - -2
+  content: beastDen
+- c:
+  - 7
+  - -2
+  - -5
+  t: river
+- c:
+  - 7
+  - -1
+  - -6
+  t: river
+- c:
+  - 7
+  - 0
+  - -7
+  t: river
+- c:
+  - 7
+  - 3
+  - -10
+  t: jungle
+- c:
+  - 8
+  - -11
+  - 3
+  t: forest
+  content: beastDen
+- c:
+  - 8
+  - -9
+  - 1
+  t: beach
+- c:
+  - 8
+  - -8
+  - 0
+  t: beach
+- c:
+  - 8
+  - -7
+  - -1
+  t: river
+- c:
+  - 8
+  - -6
+  - -2
+  t: river
+- c:
+  - 8
+  - -2
+  - -6
+  t: river
+- c:
+  - 8
+  - -1
+  - -7
+  t: river
+- c:
+  - 8
+  - 0
+  - -8
+  t: road
+  s: roadBridgeWooden
+- c:
+  - 8
+  - 1
+  - -9
+  t: swamp
+- c:
+  - 9
+  - -11
+  - 2
+  t: forest
+- c:
+  - 9
+  - -9
+  - 0
+  content: smallGoldMine
+- c:
+  - 9
+  - -8
+  - -1
+  t: beach
+  content: beastDen
+- c:
+  - 9
+  - -7
+  - -2
+  t: river
+- c:
+  - 9
+  - -6
+  - -3
+  t: river
+- c:
+  - 9
+  - -5
+  - -4
+  t: beach
+- c:
+  - 9
+  - -4
+  - -5
+  t: forest
+  content: site
+- c:
+  - 9
+  - -1
+  - -8
+  t: road
+  s: roadBridgeWooden
+  content: creepCampSmall
+- c:
+  - 9
+  - 0
+  - -9
+  t: river
+- c:
+  - 9
+  - 1
+  - -10
+  t: river
+- c:
+  - 9
+  - 2
+  - -11
+  t: beach
+- c:
+  - 10
+  - -7
+  - -3
+  t: river
+- c:
+  - 10
+  - -6
+  - -4
+  t: river
+- c:
+  - 10
+  - -5
+  - -5
+  t: beach
+- c:
+  - 10
+  - -4
+  - -6
+  t: forest
+- c:
+  - 10
+  - -1
+  - -9
+  t: river
+- c:
+  - 10
+  - 0
+  - -10
+  t: river
+- c:
+  - 10
+  - 1
+  - -11
+  t: river
+- c:
+  - 11
+  - -11
+  - 0
+  startingLocation: 2
+- c:
+  - 11
+  - -9
+  - -2
+  t: forest
+- c:
+  - 11
+  - -8
+  - -3
+  t: forest
+- c:
+  - 11
+  - -7
+  - -4
+  t: river
+- c:
+  - 11
+  - -6
+  - -5
+  t: river
+- c:
+  - 11
+  - -2
+  - -9
+  t: forest
+- c:
+  - 11
+  - 0
+  - -11
+  t: river
