@@ -110,15 +110,17 @@ scenario BasicTutorial {
     setCampUnits(Game.nature, Game.grid.cells, "site", ["crumblingLookout"])
 
     # Move Warrior and Lookout around to set the stage up.
-    cellWithLookout = Game.grid.elementAt([0, 6, -6])
-    cellWithWarrior = Game.grid.elementAt([-1, 6, -5])
-    Game.grid.elementAt([-1, 5, -4]).setContent(cellWithLookout.content)
-    cellWithLookout.setContent(cellWithWarrior.content)
-    cellWithWarrior.setContent(null)
+    Game.grid.elementAt([-1, 5, -4]).summon("crumblingLookout", Game.nature)
+    Game.grid.elementAt([0, 6, -6]).summon("warrior", Game.players.0)
+    Game.grid.elementAt([0, 7, -7]).summon("thrall", Game.players.0)
+    Game.grid.elementAt([-1, 6, -5]).setContent(null)
+  }
 
-    Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Welcome to basic tutorial! It'll teach you the basics of playing Nusantara!")
-    Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "We'll start by learning the basic controls. Select the warrior unit by <b>left-clicking</b> on it.")
-    Game.currentScenario.addObjective(OBJECTIVES.selectUnit)
+  onFirstRender {
+    Game \
+      .,showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Welcome to basic tutorial! It'll teach you the basics of playing Nusantara!") \
+      .,showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "We'll start by learning the basic controls. Select the warrior unit by <b>left-clicking</b> on it.") \
+      .currentScenario.addObjective(OBJECTIVES.selectUnit)
   }
 
   checkVictory {
@@ -129,26 +131,26 @@ scenario BasicTutorial {
     if Game.currentScenario.objectiveState(OBJECTIVES.selectUnit.id) == ObjectiveStates.active {
       if unit.type.id == "warrior" {
         Game.currentScenario.updateObjective(OBJECTIVES.selectUnit.id, [state: ObjectiveStates.completed])
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Great job! You can see the unit's stats and abilities on the right-hand side.")
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Great job! You can see the unit's stats and abilities on the right-hand side.")
         # TODO flash panel
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "You can see that a few cells now have a <color=#0000FF>blue</color> overlay on them. " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "You can see that a few cells now have a <color=#0000FF>blue</color> overlay on them. " \
           + "Those are the cells that your unit can move to." \
           + "\nYou can <b>Right-click</b> on the cell to move a unit to it." \
           + "\nNow, move your Warrior towards that big snake!")
         Game.currentScenario.addObjective(OBJECTIVES.moveUnit)
       } else {
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "That's a unit but not a warrior...")
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "That's a unit but not a warrior...")
       }
     } else if Game.currentScenario.objectiveState(OBJECTIVES.buildRunestone.id) == ObjectiveStates.active {
       if unit.type.id == "thrall" {
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Find the 'Build Runestone of Rogash' skill on the right-hand panel." \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Find the 'Build Runestone of Rogash' skill on the right-hand panel." \
           + "\n<b>Right-click</b> the skill to cast it immediately, or left-click to cast with a confirmation prompt.")
       }
     } else if Game.currentScenario.objectiveState(OBJECTIVES.selectWarrior.id) == ObjectiveStates.active && unit.type.id == "warrior" {
       Game.currentScenario.updateObjective(OBJECTIVES.selectWarrior.id, [state: ObjectiveStates.completed])
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "You can see the cell underneath the Crumbling Lookout has <color=#00FF00>green</color> overlay on it. " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "You can see the cell underneath the Crumbling Lookout has <color=#00FF00>green</color> overlay on it. " \
           + "These indicate map objects that you can interact with.")
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "There are many different object interactions that can have both positive and negative outcomes. " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "There are many different object interactions that can have both positive and negative outcomes. " \
           + "Some outcomes are more frequent, while others are very rare (and powerful)." \
           + "\nYou can <b>Right-click</b> on the cell to interact with the object!")
         Game.currentScenario.addObjective(OBJECTIVES.interactWithLookout)
@@ -159,16 +161,16 @@ scenario BasicTutorial {
     if Game.currentScenario.objectiveState(OBJECTIVES.moveUnit.id) == ObjectiveStates.active {
       if unit.type.id == "warrior" && equalCoordinates(to.coordinates, [-1, 6, -5]) {
         Game.currentScenario.updateObjective(OBJECTIVES.moveUnit.id, [state: ObjectiveStates.completed])
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Great job! Moving expends <b>Action Points</b>. " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Great job! Moving expends <b>Action Points</b>. " \
           + "How much depends on the units's movement type and the terrain of the cell. " \
           + "Action Points (AP) are used to move, attack and cast skills.")
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "If your selected unit can <b>attack</b> an enemy unit, " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "If your selected unit can <b>attack</b> an enemy unit, " \
           + "the enemy unit will have a <color=#FF0000>red</color> cell beneath them." \
           + "\nYou can <b>Right-click</b> on the enemy unit to attack it." \
           + "\nNow, attack the King Python with your Warrior!")
         Game.currentScenario.addObjective(OBJECTIVES.attackPython)
       } else if equalCoordinates(from.coordinates, [0, 6, -6]) { # prevents infinite loop
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "That's not what you should be doing. Let's reset the state a bit and you can try again!")
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "That's not what you should be doing. Let's reset the state a bit and you can try again!")
         unit.restoreActions(2)
         Server.move(to.coordinates, from.coordinates, 0)
       }
@@ -179,17 +181,17 @@ scenario BasicTutorial {
     if Game.currentScenario.objectiveState(OBJECTIVES.attackPython.id) == ObjectiveStates.active {
       if attacker.type.id == "warrior" && defender.type.id == "kingPython" {
         Game.currentScenario.updateObjective(OBJECTIVES.attackPython.id, [state: ObjectiveStates.completed])
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Great job! Your warrior took some damage, but the snake got off worse!" \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Great job! Your warrior took some damage, but the snake got off worse!" \
           + "\nNote that attacking <b>spends all remaining APs</b>.")
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "You also gained some <color=red>Blood</color>. Blood is the Sanghoy unique " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "You also gained some <color=red>Blood</color>. Blood is the Sanghoy unique " \
           + "resource, used for magic and shaping. Attacks generate blood, as do some other skills.")
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Now it's time to build your <b>Hero</b>. Heroes are powerful units that " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Now it's time to build your <b>Hero</b>. Heroes are powerful units that " \
           + "become stronger as they gain experience.\nTraining a hero requires you to construct a <i>Runestone of Rogash</i>.")
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "To do that, select your <b>Thrall</b> - that's the petty slave that " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "To do that, select your <b>Thrall</b> - that's the petty slave that " \
           + "does most of the things around here.")
         Game.currentScenario.addObjective(OBJECTIVES.buildRunestone)
       } else {
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Nice attack, but do attack the python with your warrior.")
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Nice attack, but do attack the python with your warrior.")
       }
     }
   }
@@ -197,8 +199,8 @@ scenario BasicTutorial {
   onInteract(caster, target) {
     if Game.currentScenario.objectiveState(OBJECTIVES.interactWithLookout.id) == ObjectiveStates.active {
       Game.currentScenario.updateObjective(OBJECTIVES.interactWithLookout.id, [state: ObjectiveStates.completed])
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Awesome! The Crumbling Lookout is not under your control!")
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "That's it for the tutorial. You can do more melee games to practice against " \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Awesome! The Crumbling Lookout is not under your control!")
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "That's it for the tutorial. You can do more melee games to practice against " \
         + "AI opponents, or jump straight into multiplayer. Have fun!")
       Server.win(caster.owner)
     }
@@ -208,9 +210,9 @@ scenario BasicTutorial {
     if Game.currentScenario.objectiveState(OBJECTIVES.changeStance.id) == ObjectiveStates.active {
       if unit.type.id == "warrior" && unit.activeStance.name == "Camp" {
         Game.currentScenario.updateObjective(OBJECTIVES.changeStance.id, [state: ObjectiveStates.completed])
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Great! Stances change your units' parameters and add versatility to them, " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Great! Stances change your units' parameters and add versatility to them, " \
           + "allowing them to adapt to the battlefield and fill multiple roles. Use them often!")
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Now, move your Thrall east until you find a <b>Gold Mine</b>. " \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Now, move your Thrall east until you find a <b>Gold Mine</b>. " \
         + "This might require more than one turn! Then, move your Thrall next to it and select the <b>Mine Gold</b> skill.")
         Game.currentScenario.addObjective(OBJECTIVES.selectMineGold)
       }
@@ -221,32 +223,32 @@ scenario BasicTutorial {
      if Game.currentScenario.objectiveState(OBJECTIVES.buildRunestone.id) == ObjectiveStates.active {
        if skillId == "buildRunestoneOfRogash" {
         Game.currentScenario.updateObjective(OBJECTIVES.buildRunestone.id, [state: ObjectiveStates.completed])
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Great job! Casting that skill added a 'Runestone of Rogash' to your " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Great job! Casting that skill added a 'Runestone of Rogash' to your " \
           + "<b>build queue</b> in the left-hand side. Items in the build queue need some time to get ready. " \
           + "The '1' over your Runestone indicates that it'll be available for use in <b>1 turn</b>.")
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Since there's not much left to do, might as well <b>end your turn</b>. " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Since there's not much left to do, might as well <b>end your turn</b>. " \
           + "You can do that by pressing the 'End Turn' button, or hitting 'E'." \
           + "\nThe current turn and the remaining time you have in your turn are shown besides the button.")
         Game.currentScenario.addObjective(OBJECTIVES.endTurn)
        } else {
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "That's not the skill that you should've casted!")
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "That's not the skill that you should've casted!")
         Game.currentPlayer.addResources([g: 10])
       }
      } else if Game.currentScenario.objectiveState(OBJECTIVES.mineGold.id) == ObjectiveStates.active && skillId == "mineGold" {
         Game.currentScenario.updateObjective(OBJECTIVES.mineGold.id, [state: ObjectiveStates.completed])
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Nice! Your Thrall mined some gold for you. Note that you can set " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Nice! Your Thrall mined some gold for you. Note that you can set " \
           + "<color=green>autocast</color> on any skill by pressing the mouse wheel on it. Autocast skills trigger automatically " \
           + "at the end of the turn, if the unit has enough AP.")
         Game.currentPlayer.addResources([g: 10])
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Now, go to your Runestone and train a Hero. You can choose any hero " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Now, go to your Runestone and train a Hero. You can choose any hero " \
           + "you like. Heroes differ in stats, skills and their upgrade trees, so choose wisely!")
         Game.currentScenario.addObjective(OBJECTIVES.trainHero)
      } else if Game.currentScenario.objectiveState(OBJECTIVES.trainHero.id) == ObjectiveStates.active \
         && skillId in ["trainKagaalu", "trainMaim", "trainPyracmon"] {
         Game.currentScenario.updateObjective(OBJECTIVES.trainHero.id, [state: ObjectiveStates.completed])
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Heroes gain experience and level up as you kill enemy units. The map has " \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Heroes gain experience and level up as you kill enemy units. The map has " \
           + "several creep sites which you can attack with impunity to make your hero stronger.")
-        Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Leveling a hero up will add a <b>Hero Upgrade</b> to your build queue." \
+        Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Leveling a hero up will add a <b>Hero Upgrade</b> to your build queue." \
           + "\nClicking on it will open the <b>upgrade tree</b>, in which you can then slot the upgrade to gain its benefits.")
         Game.currentScenario.addObjective(OBJECTIVES.playHeroUpgrade)
     }
@@ -255,9 +257,9 @@ scenario BasicTutorial {
   onStateChange {
      if Game.currentScenario.objectiveState(OBJECTIVES.endTurn.id) == ObjectiveStates.active && Game.turn == 2 {
       Game.currentScenario.updateObjective(OBJECTIVES.endTurn.id, [state: ObjectiveStates.completed])
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Now it's just turn again. You gained some gold from your camp, and " \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Now it's just turn again. You gained some gold from your camp, and " \
         + "your units' AP are refreshed.")
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Your Runestone of Rogash is now ready to be played." \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Your Runestone of Rogash is now ready to be played." \
         + "\n<b>Left-click</b> on it in the build queue to select it for playing.")
       Game.currentScenario.addObjective(OBJECTIVES.selectRunestoneCard)
      }
@@ -267,10 +269,10 @@ scenario BasicTutorial {
     if Game.currentScenario.objectiveState(OBJECTIVES.selectRunestoneCard.id) == ObjectiveStates.active \
         && card.type.id == "runestoneOfRogash" {
       Game.currentScenario.updateObjective(OBJECTIVES.selectRunestoneCard.id, [state: ObjectiveStates.completed])
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Notice that some cells have a checkered overlay of your color. " \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Notice that some cells have a checkered overlay of your color. " \
         + "These cells are <b>under your influence</b>.\nInfluence is projected by some buildings, like the Sanghoy camp, " \
         + "or War Council. You can only play units from the build queue onto your cells!")
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Click a cell under your influence to place your Runestone on it!")
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Click a cell under your influence to place your Runestone on it!")
       Game.currentScenario.addObjective(OBJECTIVES.playRunestone)
     }
   }
@@ -278,21 +280,23 @@ scenario BasicTutorial {
   onCardPlay(card) {
     if Game.currentScenario.objectiveState(OBJECTIVES.playRunestone.id) == ObjectiveStates.active \
         && card.type.id == "runestoneOfRogash" {
+      Game.refreshState()
       Game.currentScenario.updateObjective(OBJECTIVES.playRunestone.id, [state: ObjectiveStates.completed])
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Awesome! When units are first played, their <b>AP is empty</b>, " \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Awesome! When units are first played, their <b>AP is empty</b>, " \
         + "meaning they have to wait a turn to come online.")
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Besides units, your build queue can also contain <b>spells</b>. " \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Besides units, your build queue can also contain <b>spells</b>. " \
         + "Those cards are basically targetted effects and can be played on any valid target cell.")
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "To help your Warrior heal, you should put it in the <b>Camp Stance</b>. " \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "To help your Warrior heal, you should put it in the <b>Camp Stance</b>. " \
           + "You can find all the available stances for the unit on the right-hand side.")
       Game.currentScenario.addObjective(OBJECTIVES.changeStance)
     } else if Game.currentScenario.objectiveState(OBJECTIVES.playHeroUpgrade.id) == ObjectiveStates.active \
         && card.type.type == "upgrade" {
+      Game.refreshState()
       Game.currentScenario.updateObjective(OBJECTIVES.playHeroUpgrade.id, [state: ObjectiveStates.completed])
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Great! There are two kinds of upgrades - <b>hero</b> and <b>general</b>. " \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Great! There are two kinds of upgrades - <b>hero</b> and <b>general</b>. " \
         + "General upgrades can be major and minor, and are researched at your buildings. Make sure to slot these whenever you can " \
         + "to gain their benefits and unlock more powerful units and technologies!")
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Lastly, it's time to learn how to <b>interact</b> with map objects. Select your Warrior again.")
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Lastly, it's time to learn how to <b>interact</b> with map objects. Select your Warrior again.")
       Game.currentScenario.addObjective(OBJECTIVES.selectWarrior)
     }
   }
@@ -300,7 +304,7 @@ scenario BasicTutorial {
   onSkillSelect(caster, skillId) {
     if Game.currentScenario.objectiveState(OBJECTIVES.selectMineGold.id) == ObjectiveStates.active && skillId == "mineGold" {
       Game.currentScenario.updateObjective(OBJECTIVES.selectMineGold.id, [state: ObjectiveStates.completed])
-      Game.showDialog(DEFAULT_PORTRAIT, DEFAULT_TITLE, "Mining gold is a targetted skill. Its valid targets will appear with a " \
+      Game.showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Mining gold is a targetted skill. Its valid targets will appear with a " \
         + "<color=#0000FF>blue</color> overlay on their cell. Then, <b>left-click</b> on the valid target to cast the skill.")
       Game.currentScenario.addObjective(OBJECTIVES.mineGold)
     }

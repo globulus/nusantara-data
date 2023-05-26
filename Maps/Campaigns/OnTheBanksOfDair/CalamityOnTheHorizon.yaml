@@ -2,7 +2,7 @@ id: CalamityOnTheHorizon
 title: Calamity on the Horizon
 description: Campaign01
 size: 20
-kind: 0
+kind: Hexagonal
 maxPlayers: 4
 defaultTerrain: grass
 hexes:
@@ -68,6 +68,21 @@ hexes:
   t: hills
 - c:
   - -18
+  - 2
+  - 16
+  s: grassDirt
+- c:
+  - -18
+  - 3
+  - 15
+  s: grassDirt
+- c:
+  - -18
+  - 4
+  - 14
+  s: grassDirt
+- c:
+  - -18
   - 9
   - 9
   t: river
@@ -133,6 +148,18 @@ hexes:
   t: river
 - c:
   - -17
+  - 2
+  - 15
+  s: grassDirt
+  content: rogueWarrior
+- c:
+  - -17
+  - 3
+  - 14
+  s: grassDirt
+  content: rogueWarrior
+- c:
+  - -17
   - 10
   - 7
   t: river
@@ -186,6 +213,7 @@ hexes:
   - -1
   - 17
   t: river
+  content: rogueWarrior
 - c:
   - -16
   - 7
@@ -261,6 +289,7 @@ hexes:
   - 1
   - 14
   t: jungle
+  content: titheCollector
 - c:
   - -15
   - 2
@@ -466,6 +495,7 @@ hexes:
   - 1
   - 12
   t: jungle
+  content: carnivora
 - c:
   - -13
   - 2
@@ -653,6 +683,12 @@ hexes:
   t: swamp
 - c:
   - -11
+  - -3
+  - 14
+  s: grassBlue
+  content: carnivora
+- c:
+  - -11
   - -1
   - 12
   t: river
@@ -682,6 +718,7 @@ hexes:
   - 6
   - 5
   t: forest
+  content: carnivora
 - c:
   - -11
   - 7
@@ -720,6 +757,11 @@ hexes:
   t: river
 - c:
   - -11
+  - 14
+  - -3
+  content: thrall
+- c:
+  - -11
   - 15
   - -4
   t: forest
@@ -743,6 +785,16 @@ hexes:
   - -8
   - 18
   t: swamp
+- c:
+  - -10
+  - -6
+  - 16
+  content: carnivora
+- c:
+  - -10
+  - -3
+  - 13
+  s: grassBlue
 - c:
   - -10
   - -1
@@ -804,6 +856,11 @@ hexes:
   - 13
   - -3
   t: river
+- c:
+  - -10
+  - 14
+  - -4
+  content: thrall
 - c:
   - -10
   - 15
@@ -842,6 +899,12 @@ hexes:
   content: millepede
 - c:
   - -9
+  - -3
+  - 12
+  s: grassBlue
+  content: raider
+- c:
+  - -9
   - 2
   - 7
   t: river
@@ -897,6 +960,11 @@ hexes:
   t: river
 - c:
   - -9
+  - 13
+  - -4
+  content: sanghoyCamp
+- c:
+  - -9
   - 15
   - -6
   t: forest
@@ -910,6 +978,7 @@ hexes:
   - 18
   - -9
   t: beach
+  content: titheCollector
 - c:
   - -9
   - 19
@@ -930,6 +999,16 @@ hexes:
   - -7
   - 15
   content: fangedAmalgam
+- c:
+  - -8
+  - -4
+  - 12
+  s: grassBlue
+- c:
+  - -8
+  - -1
+  - 9
+  content: warrior
 - c:
   - -8
   - 0
@@ -1037,6 +1116,7 @@ hexes:
   - -3
   - 10
   t: jungle
+  content: ironBoar
 - c:
   - -7
   - -1
@@ -1094,9 +1174,15 @@ hexes:
   t: river
 - c:
   - -7
+  - 10
+  - -3
+  content: raider
+- c:
+  - -7
   - 12
   - -5
   t: forest
+  content: warrior
 - c:
   - -7
   - 13
@@ -1107,6 +1193,7 @@ hexes:
   - 14
   - -7
   t: forest
+  content: raider
 - c:
   - -7
   - 15
@@ -1168,6 +1255,7 @@ hexes:
   - -4
   - 10
   t: jungle
+  content: ironBoar
 - c:
   - -6
   - -3
@@ -1275,6 +1363,16 @@ hexes:
   t: swamp
 - c:
   - -5
+  - -11
+  - 16
+  content: carnivora
+- c:
+  - -5
+  - -10
+  - 15
+  s: grassBlue
+- c:
+  - -5
   - -7
   - 12
   t: jungle
@@ -1288,6 +1386,11 @@ hexes:
   - -5
   - 10
   t: jungle
+- c:
+  - -5
+  - -3
+  - 8
+  content: raider
 - c:
   - -5
   - -2
@@ -1401,6 +1504,16 @@ hexes:
   t: river
 - c:
   - -4
+  - -11
+  - 15
+  s: grassBlue
+- c:
+  - -4
+  - -10
+  - 14
+  s: grassBlue
+- c:
+  - -4
   - -8
   - 12
   t: jungle
@@ -1414,6 +1527,11 @@ hexes:
   - -6
   - 10
   t: jungle
+- c:
+  - -4
+  - -4
+  - 8
+  content: crumblingLookout
 - c:
   - -4
   - -3
@@ -1541,6 +1659,7 @@ hexes:
   - -8
   - 11
   t: jungle
+  content: carnivora
 - c:
   - -3
   - -7
@@ -1576,6 +1695,7 @@ hexes:
   - 0
   - 3
   t: forest
+  content: carnivora
 - c:
   - -3
   - 1
@@ -1623,6 +1743,7 @@ hexes:
   - 11
   - -8
   t: forest
+  content: warrior
 - c:
   - -3
   - 12
@@ -1888,6 +2009,7 @@ hexes:
   - 10
   - -9
   t: jungle
+  content: carnivora
 - c:
   - -1
   - 11
@@ -1953,6 +2075,16 @@ hexes:
   content: thrall
 - c:
   - 0
+  - -12
+  - 12
+  s: grassDirt
+- c:
+  - 0
+  - -11
+  - 11
+  s: grassDirt
+- c:
+  - 0
   - -7
   - 7
   t: river
@@ -1971,6 +2103,7 @@ hexes:
   - -4
   - 4
   t: forest
+  content: warrior
 - c:
   - 0
   - -3
@@ -2123,6 +2256,7 @@ hexes:
   - -3
   - 2
   t: forest
+  content: warCouncil
 - c:
   - 1
   - -2
@@ -2143,6 +2277,11 @@ hexes:
   - 1
   - -2
   t: river
+- c:
+  - 1
+  - 2
+  - -3
+  content: raider
 - c:
   - 1
   - 4
@@ -2393,9 +2532,19 @@ hexes:
   t: river
 - c:
   - 3
+  - 1
+  - -4
+  content: crumblingLookout
+- c:
+  - 3
   - 3
   - -6
   t: jungle
+- c:
+  - 3
+  - 5
+  - -8
+  content: warrior
 - c:
   - 3
   - 6
@@ -2528,6 +2677,16 @@ hexes:
   t: forest
 - c:
   - 4
+  - 11
+  - -15
+  content: carnivora
+- c:
+  - 4
+  - 12
+  - -16
+  s: grassDirt
+- c:
+  - 4
   - 14
   - -18
   t: beach
@@ -2540,7 +2699,13 @@ hexes:
   - 5
   - -18
   - 13
+  s: grassDirt
   content: raider
+- c:
+  - 5
+  - -17
+  - 12
+  s: grassDirt
 - c:
   - 5
   - -15
@@ -2646,6 +2811,11 @@ hexes:
   - -15
   t: forest
 - c:
+  - 5
+  - 12
+  - -17
+  s: grassDirt
+- c:
   - 6
   - -19
   - 13
@@ -2654,6 +2824,7 @@ hexes:
   - 6
   - -18
   - 12
+  s: grassDirt
   content: sanghoyCamp
 - c:
   - 6
@@ -2766,6 +2937,7 @@ hexes:
   - 7
   - -18
   - 11
+  s: grassDirt
   content: warrior
 - c:
   - 7
@@ -2861,6 +3033,11 @@ hexes:
   t: jungle
 - c:
   - 7
+  - 6
+  - -13
+  s: grassDirt
+- c:
+  - 7
   - 8
   - -15
   t: jungle
@@ -2916,6 +3093,7 @@ hexes:
   - -12
   - 4
   t: beach
+  content: crumblingLookout
 - c:
   - 8
   - -11
@@ -2974,6 +3152,11 @@ hexes:
   content: tonkaa
 - c:
   - 8
+  - 6
+  - -14
+  s: grassDark
+- c:
+  - 8
   - 8
   - -16
   t: forest
@@ -3013,11 +3196,13 @@ hexes:
   - -13
   - 4
   t: forest
+  content: warCouncil
 - c:
   - 9
   - -12
   - 3
   t: forest
+  content: warrior
 - c:
   - 9
   - -11
@@ -3145,6 +3330,7 @@ hexes:
   - -4
   - -6
   t: jungle
+  content: carnivora
 - c:
   - 10
   - -1
@@ -3175,6 +3361,7 @@ hexes:
   - 8
   - -18
   t: jungle
+  content: titheCollector
 - c:
   - 11
   - -19
@@ -3230,6 +3417,11 @@ hexes:
   - -9
   - -2
   t: river
+- c:
+  - 11
+  - -3
+  - -8
+  s: grassDirt
 - c:
   - 11
   - -1
@@ -3319,6 +3511,11 @@ hexes:
   content: warCouncil
 - c:
   - 12
+  - -8
+  - -4
+  content: warrior
+- c:
+  - 12
   - -6
   - -6
   t: jungle
@@ -3352,6 +3549,7 @@ hexes:
   - 4
   - -16
   t: jungle
+  content: carnivora
 - c:
   - 12
   - 5
@@ -3598,6 +3796,11 @@ hexes:
   t: jungle
 - c:
   - 15
+  - -5
+  - -10
+  s: grassDirt
+- c:
+  - 15
   - -3
   - -12
   t: jungle
@@ -3646,6 +3849,11 @@ hexes:
   - -14
   - -2
   t: river
+- c:
+  - 16
+  - -11
+  - -5
+  s: grassDirt
 - c:
   - 16
   - -10
@@ -3752,6 +3960,11 @@ hexes:
   - -2
   - -15
   t: jungle
+- c:
+  - 17
+  - 0
+  - -17
+  content: warrior
 - c:
   - 17
   - 1

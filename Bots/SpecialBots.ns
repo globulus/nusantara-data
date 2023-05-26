@@ -8,6 +8,10 @@ ai PassiveAi { # pretty much does nothing
 
 
 ai TerritorialAi is MeleeAi { # will attack enemies in range, but won't move, build or collect resources
+  init {
+    @maxMoves = 4
+  }
+
   approachScoreForEnemy => 0.8
   approachScoreForCreep => -1
   collectGold(minersAtGoldSource, knownGoldSources, goldConsiderations) => REJECTED_ACTION
@@ -22,7 +26,7 @@ ai TerritorialAi is MeleeAi { # will attack enemies in range, but won't move, bu
   upgradeHero(hero, playableCards) => REJECTED_ACTION
   buildUnitProducer(builders, unitProducers, producerWeights, buildSkills) => REJECTED_ACTION
   trainUnit(unitProducers, trainUnitSkills, hero, heroProducer) => REJECTED_ACTION
-  explore => REJECTED_ACTION
+  explore(player) => REJECTED_ACTION
   changeStance(hero, soldiers, enemies) => REJECTED_ACTION
   interact(player) => REJECTED_ACTION
   concede(player, playableCards, miners, hero, heroProducer, unitProducers, soldiers) => REJECTED_ACTION

@@ -4,7 +4,9 @@ import "../Effects/CommonEffects"
 scenario DestroyAll {
   onStart {
     updateNeutralContent()
+  }
 
+  onFirstRender {
     Game.currentScenario.addObjective([
       id: "killAll",
       title: "Destroy all enemies",

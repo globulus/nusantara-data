@@ -12,14 +12,14 @@ scenario CalamityOnTheHorizon {
       id: "trainWarriors",
       title: "Muster for battle",
       image: "warrior",
-      description: "Collect gold and train $WARRIORS_TO_TRAIN warriors.",
+      description: "Collect gold and train $WARRIORS_TO_TRAIN warriors. Tonkaa must survive.",
       state: ObjectiveStates.active
     ],
     investigateThunder: [
       id: "investigateThunder",
       title: "Ominous rumbling",
       image: "raider",
-      description: "Take Tonkaa and two warriors to the western shore to investigate the source of the thunder.",
+      description: "Take Tonkaa and two warriors to the western shore to investigate the source of the thunder. Tonkaa must survive.",
       state: ObjectiveStates.active
     ],
     findKagaalu: [
@@ -46,6 +46,7 @@ scenario CalamityOnTheHorizon {
   ]
 
   onStart {
+    Server.setTimeoutEnabled(false)
     players = Game.players
     kagaaluPlayer = players.1
     startingLocations = Game.grid.startingLocations
@@ -73,58 +74,89 @@ scenario CalamityOnTheHorizon {
 
   campCoordinates => Game.currentPlayer.ownedUnits.first(=> $0.type.id == "sanghoyCamp").coordinates
   westernShoreCoordinates => Game.grid.cells.first(=> $0?.comment == "westernShore").coordinates
-  swampCell => Game.grid.cells.first(=> $0?.comment == "swamp")
 
   playBombardmentSound {
     Game.playSound(campCoordinates(), "ironclad", SoundTypes.attack, true)
   }
 
-  onFirstRender {
-    Game.,positionCamera(campCoordinates()) \
-      .,zoomCamera(8) \
-      .wait(1.5)
-    for _ in 2.times {
-      playBombardmentSound()
+  makeCreepsAttackPlayer {
+    if Game.campaign.difficulty == "hard" {
+      # Console.println("Creeeps attacking player")
+      playerId = Game.players.0.id
+      for creep in Game.nature.ownedUnits \
+          .where(=> $0.type.a > 0) {
+          # .take(15) {
+        creepCoordinates = creep.coordinates
+        target = Game.grid.ringAround(creepCoordinates, 1) \
+          .first(=> $0.content?.owner?.id == playerId)
+        if target != null {
+          # Console.println("Creeeps attacking player unit $(target.content.type.id)")
+          Server.attack(creepCoordinates, target.coordinates, creepCoordinates, 0)
+        }
+      }
     }
-    Game.,wait(1.5) \
-      .,showDialog(TONKA_PORTRAIT, TONKAA_TITLE, "What was that?")
-    playBombardmentSound()
-    Game.,showDialog(TONKA_PORTRAIT, TONKAA_TITLE, "The thunder seems to be coming from the shore, but the skies are clear?") \
-      .,showDialog(TONKA_PORTRAIT, TONKAA_TITLE, "We should train more warriors and investigate. You mongrels, move out! My men need those provisions!") \
-      .,showDialog("thrall", "thrall", "No, not the whip!") \
-      .currentScenario.addObjective(OBJECTIVES.trainWarriors)
-    Game.refreshState()
+  }
+
+  onFirstRender {
+    if Game.currentScenario.objectives.isEmpty {
+      Server.setTimeoutEnabled(false)
+      Game.,positionCamera(campCoordinates()) \
+        .,zoomCamera(8) \
+        .wait(1.0)
+      for _ in 2.times {
+        playBombardmentSound()
+      }
+      Game.,wait(1.0) \
+        .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Did you hear that?")
+      playBombardmentSound()
+      Game.,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Thunders rumble on the seas, yet the skies are clear?") \
+        .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "We should train more warriors and investigate. You mongrels, move out! My men need those provisions!") \
+        .,showDialog("thrall", Game.players.0.id, "Thrall", "No, not the whip!") \
+        .currentScenario.addObjective(OBJECTIVES.trainWarriors)
+      Game.refreshState()
+      Server.setTimeoutEnabledOnUserAction(true)
+    }
+  }
+
+  onTurnStart {
+    makeCreepsAttackPlayer()
   }
 
   onCardPlay(card) {
     if Game.currentScenario.objectiveState(OBJECTIVES.trainWarriors.id) == ObjectiveStates.active \
         && card.type.id == "warrior" \
         && Game.currentPlayer.ownedUnits.count(=> $0.type.id == "warrior") >= WARRIORS_TO_TRAIN {
+      Server.setTimeoutEnabled(false)
       Game.currentScenario.updateObjective(OBJECTIVES.trainWarriors.id, [state: ObjectiveStates.completed])
+      Game.refreshState()
       playBombardmentSound()
-      Game.,showDialog(TONKA_PORTRAIT, TONKAA_TITLE, "Waanru, Uim, with me! We need to go to the shore and see if our fishers are in danger!") \
-          .,showDialog(TONKA_PORTRAIT, TONKAA_TITLE, "$ORMU_TITLE, you stay here and watch for intruders!") \
+      Game.,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Waanru, Uim, with me! We need to go to the shore and see if our fishermen are in danger!") \
+          .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "$ORMU_TITLE, you stay here and watch for intruders!") \
           .currentScenario.,addObjective(OBJECTIVES.investigateThunder) \
             .addRevealedCell(westernShoreCoordinates())
+      Server.setTimeoutEnabledOnUserAction(true)
     }
   }
 
   onMove(unit, from, to) {
     if Game.currentPlayerIndex == 0 {
+      visibleCells = Game.grid.visibleCells(Game.currentPlayer)
       if Game.currentScenario.objectiveState(OBJECTIVES.investigateThunder.id) == ObjectiveStates.active \
-          && Game.grid.visibleCells(Game.currentPlayer).any(=> $0.content?.type?.id in ["rifleman", "settler", "ironclad"]) {
-        Game.showDialog(TONKA_PORTRAIT, TONKAA_TITLE, "What the...?")
+          && visibleCells.any(=> $0.content?.type?.id in ["rifleman", "settler", "ironclad"]) {
+        Server.setTimeoutEnabled(false)
+        Game.currentScenario.updateObjective(OBJECTIVES.investigateThunder.id, [state: ObjectiveStates.completed])
+        Game.,refreshState() \
+          .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "What the...?")
         playBombardmentSound()
         for unit in Game.unitsInRange(westernShoreCoordinates(), 8).where(=> $0.owner.id == Game.currentPlayer.id) {
           unit.destroy(unit)
         }
-        Game.currentScenario.updateObjective(OBJECTIVES.investigateThunder.id, [state: ObjectiveStates.completed])
         Game.,refreshState() \
           .,wait(1.5) \
           .,positionCamera(campCoordinates()) \
           .,zoomCamera(7) \
-          .,showDialog(ORMU_PORTRAIT, ORMU_TITLE, "Thunder again, and Tonkaa is yet to return...")
-        playBombardmentSound()
+          .,showDialog(ORMU_PORTRAIT, Game.players.0.id, ORMU_TITLE, "Thunder again, and Tonkaa is yet to return...")
+        # playBombardmentSound()
         for cell in Game.grid.cellsAround(westernShoreCoordinates(), 4, Game.currentPlayer) {
           Game.currentScenario.addRevealedCell(cell.coordinates)
         }
@@ -135,49 +167,67 @@ scenario CalamityOnTheHorizon {
           .,showMessage("The outsiders are dangerous! Don't go there!") \
           .,wait(1.5) \
           .,positionCamera(campCoordinates()) \
-          .,showDialog(ORMU_PORTRAIT, ORMU_TITLE, "I need to seek council of the great sarcomancer, Kagaalu! His totem lies north, near the edge of the jungle.") \
+          .,showDialog(ORMU_PORTRAIT, Game.players.0.id, ORMU_TITLE, "I need to seek council of the great sarcomancer, Kagaalu! His totem lies north, near the edge of the jungle.") \
           .currentScenario.addObjective(OBJECTIVES.findKagaalu)
         Game.refreshState()
+        Server.setTimeoutEnabledOnUserAction(true)
       } else if Game.currentScenario.objectiveState(OBJECTIVES.findKagaalu.id) == ObjectiveStates.active \
-          && Game.grid.visibleCells(Game.currentPlayer).any(=> $0.content?.type?.id == "kagaalu") {
+          && visibleCells.any(=> $0.content?.type?.id == "kagaalu") {
+        Server.setTimeoutEnabled(false)
         Game.currentScenario.updateObjective(OBJECTIVES.findKagaalu.id, [state: ObjectiveStates.completed])
         Game.,refreshState() \
-          .,showDialog(ORMU_PORTRAIT, ORMU_TITLE, "Great one! Thunders are echoing in the clear sky! Tonkaa went to investigate, but didn't return!") \
-          .,showDialog(KAGAALU_PORTRAIT, KAGAALU_TITLE, "I know! Rogash has spoken to me. These are the outsiders that captured many islands already!") \
-          .,showDialog(KAGAALU_PORTRAIT, KAGAALU_TITLE, "Our tribe is too weak to stop them. We must move and find shelter across the great river Dair.") \
-          .,showDialog(ORMU_PORTRAIT, ORMU_TITLE, "But the far side of the river is controlled by hostile Sanghoy!") \
-          .,showDialog(KAGAALU_PORTRAIT, KAGAALU_TITLE, "We will have to evade them and seek refuge in the swamp of Moheela.")
+          .,positionCamera(Game.grid.cells.first(=> $0.content?.type?.id == "kagaalu").coordinates) \
+          .,zoomCamera(7) \
+          .,showDialog(ORMU_PORTRAIT, Game.players.0.id, ORMU_TITLE, "Great one! Thunders are echoing in the clear sky! Tonkaa went to investigate, but neither him nor our warriors have returned yet.") \
+          .,showDialog(KAGAALU_PORTRAIT, Game.players.1.id, KAGAALU_TITLE, "Yes, I divinated with bones and entrails of beasts for many days now, and Rogash spoke to me.") \
+          .,showDialog(KAGAALU_PORTRAIT, Game.players.1.id, KAGAALU_TITLE, "These are the outsiders that captured many islands already! Their canoes are of iron, their numbers vast.") \
+          .,showDialog(KAGAALU_PORTRAIT, Game.players.1.id, KAGAALU_TITLE, "Our tribe is too weak to stop them. We must move and find shelter across the great river Dair.") \
+          .,showDialog(ORMU_PORTRAIT, Game.players.0.id, ORMU_TITLE, "But the far side of the river is controlled by our enemies, Kaatlaa, Teruu and other tribes that serve the great chieftain Pyracmon!") \
+          .,showDialog(KAGAALU_PORTRAIT, Game.players.1.id, KAGAALU_TITLE, "We will have to evade them and seek refuge in the swamp of Moheela. Let's not waste more time!")
         kagaalu = Game.grid.allUnits.first(=> $0.type.id == "kagaalu")
         kagaalu.setOwner(Game.currentPlayer)
         Game.currentPlayer.setHero(kagaalu)
-        Game.currentScenario.,addRevealedCell(swampCell().coordinates) \
-          .,addObjective(OBJECTIVES.goToSwamp)
+        swampCell = Game.grid.cells.first(=> $0?.comment == "swamp")
+        kagaaluSwampDistance = swampCell.distance(kagaalu.coordinates)
+        northSwampCells = Game.grid.ringAround(swampCell.coordinates, 1) \
+          .where(=> $0.distance(kagaalu.coordinates) > kagaaluSwampDistance)
+        for northSwampCell in northSwampCells {
+          Game.currentScenario.addRevealedCell(northSwampCell.coordinates)
+        }
+        Game.currentScenario.addObjective(OBJECTIVES.goToSwamp)
         Game.,refreshState() \
-          .,showDialog(KAGAALU_PORTRAIT, KAGAALU_TITLE, "Crossing the river won't be easy, but I have hidden a few Canoes somwhere on the shore...") \
+          .,showDialog(KAGAALU_PORTRAIT, Game.players.0.id, KAGAALU_TITLE, "Crossing the river won't be easy, but I have hidden a few Canoes somwhere on the river bank...") \
           .currentScenario.addObjective(OBJECTIVES.findCanoes)
         Game.refreshState()
+        Server.setTimeoutEnabledOnUserAction(true)
       } else if Game.currentScenario.objectiveState(OBJECTIVES.findCanoes.id) == ObjectiveStates.active \
-          && Game.grid.visibleCells(Game.currentPlayer).any(=> $0.content?.type?.id == "canoe") {
+          && visibleCells.any(=> $0.content?.type?.id == "canoe") {
         for unit in Game.grid.allUnits.where(=> $0.type.id == "canoe") {
           unit.setOwner(Game.currentPlayer)
         }
-        Game.showDialog(KAGAALU_PORTRAIT, KAGAALU_TITLE, "There are out canoes!")
+        Game.showDialog(KAGAALU_PORTRAIT, Game.players.0.id, KAGAALU_TITLE, "There are our canoes! Swiftly now!")
         Game.currentScenario.updateObjective(OBJECTIVES.findCanoes.id, [state: ObjectiveStates.completed])
         Game.refreshState()
+      } else if visibleCells.any(=> $0?.comment == "swamp") {
+        Game.currentScenario.updateObjective(OBJECTIVES.goToSwamp.id, [state: ObjectiveStates.completed])
+        Server.win(Game.currentPlayer)
       }
     }
   }
 
-  onStateChange {
-    if Game.currentScenario.objectiveState(OBJECTIVES.goToSwamp.id) == ObjectiveStates.active {
-      if !Game.grid.allUnits.any(=> $0.type.id == "kagaalu") {
-        Game.showMessage("Kagaalu died!")
-        Game.currentScenario.updateObjective(OBJECTIVES.goToSwamp.id, [state: ObjectiveStates.failed])
-        Game.lose(Game.players.0)
-      } else if Game.currentPlayerIndex == 0 && Game.grid.visibleCells(Game.currentPlayer).any(=> $0?.comment == "swamp") {
-        Game.currentScenario.updateObjective(OBJECTIVES.goToSwamp.id, [state: ObjectiveStates.completed])
-        Server.win(Game.currentPlayer)
-      }
+  onDie(unit) {
+    if unit.type.id == "tonkaa" && \
+        (Game.currentScenario.objectiveState(OBJECTIVES.trainWarriors.id) == ObjectiveStates.active \
+          || Game.currentScenario.objectiveState(OBJECTIVES.investigateThunder.id) == ObjectiveStates.active) {
+      Game.showMessage("Tonkaa died!")
+      Game.currentScenario.updateObjective(OBJECTIVES.trainWarriors.id, [state: ObjectiveStates.failed])
+      Game.lose(Game.players.0)
+      Game.refreshState()
+    } else if unit.type.id == "kagaalu" {
+      Game.showMessage("Kagaalu died!")
+      Game.currentScenario.updateObjective(OBJECTIVES.goToSwamp.id, [state: ObjectiveStates.failed])
+      Game.lose(Game.players.0)
+      Game.refreshState()
     }
   }
 

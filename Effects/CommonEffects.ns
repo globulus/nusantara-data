@@ -132,7 +132,7 @@ effect Repair {
   check(caster, target) => areAllies(caster, target) && !isOrganic(target) && target.hp <= target.health - @repairAmount
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " repairs " + Game.localizedStr(target.type.id + "Title") + " for $repairAmount.", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " repars " + Game.localizedStr(target.type.id + "Title") + " for $repairAmount.", LogLevels.info, caster.coordinates)
     target.restoreHealth(@repairAmount)
     Game.animateVisualFx([
       [

@@ -851,6 +851,12 @@ easyAiTitle: Easy AI
 normalAiTitle: Normal AI
 hardAiTitle: Hard AI
 
+# Campaign
+onTheBanksOfDairTitle: On the Banks of Dair
+onTheBanksOfDairDescription: Armies and ambitions collide on the banks of the great river Dair.
+calamityOnTheHorizonTitle: Calamity on the Horizon
+calamityOnTheHorizonLoadingText: One morning, not far from where the mighty river Dair flows into the sea, chieftain Tonkaa is awoken by strange rumble...
+
 # Otok
 
 kanboorTheDevourerTitle: Kanboor, the Devourer
@@ -859,7 +865,6 @@ nepentaTheCarnivoraTitle: Nepenta, the Carnivora
 nepentaFlavor: In the Sanghoy archipelago, even plants have developed a taste for manflesh.
 nubvaatTheExiledProphetTitle: Nubvaat, the Exiled Prophet
 nubvaatFlavor: Her desire to prevent events from her visions from unfolding ultimately drew her to madness.
-calamityOnTheHorizonTitle: Calamity on the Horizon
 calamityOnTheHorizonFlavor: Some chieftains advised against open war, and called for the tribes to unite and retreat to the safety of mountain ranges.
 monsoonTitle: Monsoon
 monsoonFlavor: It'll soon shake your windows and rattle your walls...
