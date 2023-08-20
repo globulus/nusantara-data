@@ -114,9 +114,7 @@ scenario BasicTutorial {
     Game.grid.elementAt([0, 6, -6]).summon("warrior", Game.players.0)
     Game.grid.elementAt([0, 7, -7]).summon("thrall", Game.players.0)
     Game.grid.elementAt([-1, 6, -5]).setContent(null)
-  }
 
-  onFirstRender {
     Game \
       .,showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "Welcome to basic tutorial! It'll teach you the basics of playing Nusantara!") \
       .,showDialog(DEFAULT_PORTRAIT, null, DEFAULT_TITLE, "We'll start by learning the basic controls. Select the warrior unit by <b>left-clicking</b> on it.") \

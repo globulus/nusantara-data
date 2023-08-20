@@ -62,6 +62,25 @@ scenario CalamityOnTheHorizon {
         .where(=> $0.owner.id == Game.nature.id && $0.type.id in ["thrall", "warrior", "raider", "totem", "sanghoyCamp", "warCouncil"]) {
       unit.setOwner(hostileSanghoyPlayer)
     }
+
+    if Game.currentScenario.objectives.isEmpty {
+      Server.setTimeoutEnabled(false)
+      Game.,positionCamera(@campCoordinates()) \
+        .,zoomCamera(8) \
+        .wait(1.0)
+      for _ in 2.times {
+        @playBombardmentSound()
+      }
+      Game.,wait(1.0) \
+        .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Did you hear that?")
+      @playBombardmentSound()
+      Game.,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Thunders rumble on the seas, yet the skies are clear?") \
+        .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "We should train more warriors and investigate. You mongrels, move out! My men need those provisions!") \
+        .,showDialog("thrall", Game.players.0.id, "Thrall", "No, not the whip!") \
+        .currentScenario.addObjective(OBJECTIVES.trainWarriors)
+      Game.refreshState()
+      Server.setTimeoutEnabledOnUserAction(true)
+    }
   }
 
   claimStartingUnits(player, startingLocation, searchRadius, allowedTypes) {
@@ -94,27 +113,6 @@ scenario CalamityOnTheHorizon {
           Server.attack(creepCoordinates, target.coordinates, creepCoordinates, 0)
         }
       }
-    }
-  }
-
-  onFirstRender {
-    if Game.currentScenario.objectives.isEmpty {
-      Server.setTimeoutEnabled(false)
-      Game.,positionCamera(campCoordinates()) \
-        .,zoomCamera(8) \
-        .wait(1.0)
-      for _ in 2.times {
-        playBombardmentSound()
-      }
-      Game.,wait(1.0) \
-        .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Did you hear that?")
-      playBombardmentSound()
-      Game.,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Thunders rumble on the seas, yet the skies are clear?") \
-        .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "We should train more warriors and investigate. You mongrels, move out! My men need those provisions!") \
-        .,showDialog("thrall", Game.players.0.id, "Thrall", "No, not the whip!") \
-        .currentScenario.addObjective(OBJECTIVES.trainWarriors)
-      Game.refreshState()
-      Server.setTimeoutEnabledOnUserAction(true)
     }
   }
 
