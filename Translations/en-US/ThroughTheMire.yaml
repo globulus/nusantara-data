@@ -1,0 +1,89 @@
+# Mission 3: Through the Mire
+throughTheMireTitle: Through the Mire
+throughTheMireDescription: Kagaalu leads a small band north through Moheela swamp, to a camp the tribe's grandfathers left behind.
+throughTheMireLoadingText: The tribe is across the Dair, hiding in the reeds of Moheela. It cannot hide there forever. Kagaalu has seen a Well in the north of the swamp, asleep in an empty camp. If it wakes, the tribe lives.
+
+# Speakers
+mireSpeakerStitcher: Uzhaal the Stitcher
+mireSpeakerShaper: Shaper
+mireSpeakerCaptive: Captive
+
+# Effects and skills
+mireMarchTitle: Marching Light
+mireMarchDescription: Kagaalu's band carries nothing it doesn't need. Its walkers move faster and see further.
+mireRemediesTitle: Swamp Remedies
+mireRemediesDescription: Kagaalu knows the herbs of the swamp. The band's wounds close between fights.
+
+# Objectives
+mireWellTitle: The Well of the Mire
+mireWellDescription: Lead Kagaalu north to the abandoned camp beyond the black mere. Kagaalu must survive.
+mireWellClearDescription: "Drive the beasts from the abandoned camp. Beasts left: {0}. Kagaalu must survive."
+mireWellWakeDescription: Bring Kagaalu next to the Well. Kagaalu must survive.
+mireWellRiteDescription: "Give the Well one of the band: select the Well and use <b>Sacrifice of Blood</b> on a unit next to it. Not on Kagaalu!"
+mireCorralTitle: The shaper's corral
+mireCorralDescription: Kill the shaper at the crossing of the black mere. His beasts will follow Kagaalu.
+mireCaptivesTitle: The slave post
+mireCaptivesDescription: "(Optional) Kill the guards of Pyracmon's slave post, east of the bog, and the captives will join the band. Guards left: {0}."
+mireCaptivesFreedDescription: "(Optional) The captives of Pyracmon's slave post are free. {0} joined the band."
+
+# Hints
+mireHintSwamp: "Every swamp cell costs a walker most of a turn. Grass hummocks are quicker, and beasts like them too."
+mireHintRite: "The Well is yours. Select it and use <b>Sacrifice of Blood</b> on one of the band standing next to it. Not on Kagaalu."
+mireKavourosHint: Kavouros swim the bog and the mere as if they were dry land. Send them ahead.
+
+# Opening
+mireIntro1: The outsiders' iron canoes won't follow us into these reeds. But we can't hide in them forever.
+mireIntro1Crossed: We crossed the Dair, and the outsiders' iron canoes won't follow us into these reeds. But we can't hide in them forever.
+mireIntro2: There's nothing to eat here, and no camp. The children are already sick.
+mireIntro3: There is a camp. Our grandfathers left it when the swamp rose, north of the black mere.
+mireIntro4: Its Well still sleeps. Rogash showed it to me. If it drinks again, the tribe will live.
+mireIntro5: Two ways north. The old causeway in the west is dry, but Uzhaal the Stitcher lives on it with his amalgams.
+mireIntro6: Or straight through the bog. Shorter, but slow going, and the beasts there are hungry.
+mireIntro7: Smoke to the east, past the bog. Pyracmon keeps a slave post there. People from our river villages are in its pens.
+
+# Pyracmon's men
+mireSouthBank1: Behind us! Pyracmon's men, wading across from the south bank.
+mireSouthBank2: They followed our tracks from the river. Cut them down, or they'll hound us all the way north.
+mireSouthBankQuiet1: Nobody follows us from the south bank. I thought Pyracmon's clans would be on our heels by now.
+mireSouthBankQuiet2: The outsiders sent knives into their camps by night. Their warchiefs are dead, and a clan without a warchief stays home.
+mireRidge1: Movement in the jungle ahead.
+mireRidge2: Pyracmon's men. They know where we're going. Keep them off me.
+mirePursuit: Pyracmon's hunters are coming back to the post. We should move.
+
+# The causeway
+mireLair1: Kagaalu. Rogash's favourite, wading through my swamp with a handful of spears.
+mireLair2: Stand aside, Uzhaal. The tribe has no quarrel with you.
+mireLair3: Every tribe has a quarrel with me. Your warriors will make fine amalgams.
+mireLair4: His amalgams live only by his rites. Kill the Stitcher, and they will fall apart.
+mireStitcherFell: The Stitcher is dead. His amalgams will rot where they stand.
+
+# The corral
+mireCorral1: A corral on the crossing. Beasts, and a shaper tending them.
+mireCorral2: The beasts serve whoever shaped them. Kill the shaper, and they will know Rogash's favourite.
+mireCorral3: Kagaalu? Turn back. These beasts are mine.
+mireShaperFell1: Easy now. You know me. You know whose blood I carry.
+mireShaperFell2: They're following you. Like dogs.
+
+# The slave post
+mirePost1: Kagaalu! Rogash sent you! The guards beat us every day.
+mirePost2: Hold on. We'll deal with the guards first.
+mireFreed1: We're free! We thought the outsiders had taken everyone.
+mireFreed2: Rogash kept you for us. Pick up a spear and follow me.
+
+# The camp
+mireCamp1: The camp of our grandfathers. Something has made a nest of it.
+mireCamp2: Beasts. Lots of them.
+mireCampEmpty: The camp of our grandfathers. Empty, and quiet.
+mireRoostCleared: The camp is ours. Bring me to the Well.
+mireRite1: It knows me. It remembers the old rites. Now it wants blood, and not mine.
+mireWakeAlone: There's nobody left to give. Then the Well will drink mine.
+mireWake1: Rogash, take this blood, and wake.
+mireWake2: The Well is awake. With it, the tribe can heal its wounds and shape new warriors.
+mireWake3: Then we bring the tribe here.
+mireWake4: Yes. And we guard this Well with our lives. Without it, the tribe won't last a year.
+
+# Losses
+mireOrmuFell: Ormu has fallen. Tonkaa's last warrior. We go on without him.
+mireKagaaluDied: Kagaalu has fallen in the mire. Without him the Well sleeps, and the tribe is lost.
+mireKagaaluSacrificed: Kagaalu gave himself to the Well. It drinks, but the tribe has lost Rogash's favourite.
+mireWellBroken: The Well is broken. Without it the tribe has nothing to come back to.

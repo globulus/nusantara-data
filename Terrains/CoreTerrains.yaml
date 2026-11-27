@@ -218,3 +218,12 @@
   debrisFrequency: 0.5
   debris:
     - dirt
+# Sheer-sided mesas above the jungle: only fliers can reach the top (every other movement type pays 1000 for it,
+# see MovementTypes). plateau.png is a rock-patch overlay, not a full hex, so it sits as debris on the hills base
+# (debrisFrequency 1: always drawn). Not influencable, like the sea: no territory or buildings up there.
+- id: plateau # campaign terrain (Air Superiority): a mesa only fliers reach
+  title: plateauTitle
+  influencable: false
+  layer: 4
+  sprites:
+    base: mesa

@@ -1,9 +1,10 @@
 id: CalamityOnTheHorizon
 title: calamityOnTheHorizonTitle
-description: calamityOnTheHorizonTitleDescription
+description: calamityOnTheHorizonDescription
 ruleset:
   id: CalamityOnTheHorizonRuleset
   inherits: DefaultCampaign
+  timeoutLength: 30 # cutscenes pause it (see the script)
   factionData:
     sanghoy:
       startingData:
@@ -44,17 +45,17 @@ players:
     color: red
     team: 1
     faction: sanghoy
-  - name: Kagaalu
+  - name: Kagaalu's followers
     color: orange
     team: 1
     faction: sanghoy
     ai: PassiveAi
-  - name: Frenza
+  - name: Outsiders
     color: blue
     team: 2
     faction: frenza
     ai: PassiveAi
-  - name: Hostile Sanghoy
+  - name: Pyracmon's tribes
     color: purple
     team: 3
     faction: sanghoy

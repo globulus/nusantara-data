@@ -1,0 +1,1056 @@
+# On the Banks of Dair, mission 10: The Usurper. The last chapter. The river-mouth colony has burned, and the Emperor
+# recalls his Viceroy to answer for it.
+#
+# Act 1: until the punitive fleet arrives, Vitarron spends what the colonies earn, then raises the banner: his
+#        Insurrection turns every settler into militia and arms a soldier at every Barracks, Factory and Airfield, but
+#        burns the Colonial Halls and their income. If the fleet finds him still the Emperor's Viceroy, he is arrested.
+# Act 2: Denburhin's fleet lands at the ruins of the Landfall colony. Waves of soldiers (and Imperial Juggernauts)
+#        march on the colonies, ironclads patrol the Dair, Denburhin's flagship flies bombing runs at the front and
+#        breaks off to repair offshore when hurt, and the tribes raid both armies. A war chest replaces the Halls'
+#        gold; with no Halls to muster around, new troops march out of the Barracks and Factories that trained them.
+# Act 3: destroy the beachhead's Colonial Hall; Denburhin makes his last stand with the fleet's last marines. Bring
+#        him down too and Vitarron is the Usurper. Defeat: Vitarron falls, is arrested, or loses every building.
+#
+# Map markers (cell comments): parade, bragi, riverColony, beachhead, landing, anchorage, skyfleet, riverMouth (2),
+# riverEast (2), camp (2). Everything that must survive a save is kept in objectives or in scenario extras.
+# Dialogs only reach the human on their own turn, so anything that happens off-turn is queued (see onStateChange).
+scenario TheUsurper {
+  FLEET_TURN_NORMAL = 8 # the fleet arrives at the start of this turn
+  FLEET_TURN_HARD = 7
+  DENBURHIN_DEFAULT_LEVEL = 3 # if Air Superiority wasn't won in this campaign
+  CHASE_RANGE = 3 # a marching soldier goes for the nearest enemy this close, otherwise for its goal
+  SORTIE_REACH = 9 # how far Denburhin flies for a bombing run
+  SORTIE_MIN_HEALTH = 70 # percent of his health he needs to fly a run (before his last stand)
+  RETREAT_BELOW = 35 # percent of his health: below it he breaks off and flies back to the fleet (before his last stand)
+  FLEET_REPAIR = 10 # health the fleet's crews patch on the flagship each round he's back over the sea
+  MAX_RAIDERS = 8
+  FIRST_RAID = 3
+  BANK_REACH = 2 # an ironclad fires on tribesmen this close
+  WATER = ["river", "sea"]
+  SEA = ["sea"]
+  COLONY_TYPES = ["colonialHall", "barracks", "factory", "settler", "rifleman", "vitarron"]
+  TRIBE_TYPES = ["sanghoyCamp", "warchief", "warrior", "thrall", "raider"]
+  # Without the Halls there is no ground to muster on (but the parade ground): new troops march out of the building
+  # that trained them instead, at the start of the Usurper's turn.
+  BARRACKS_TROOPS = ["rifleman", "assassin"]
+  FACTORY_TROOPS = ["steamGolem", "mev", "autoturret"]
+  AIRFIELD_TROOPS = ["assaultAirship", "cargoDirigible"]
+
+  OBJ_BANNER = "banner"
+  OBJ_FLEET = "fleet"
+  OBJ_BEACHHEAD = "beachhead"
+  OBJ_DENBURHIN = "denburhin"
+
+  # Scenario extras
+  KEY_PENDING = "pending" # events waiting for the human's turn, as ",event,event,"
+  KEY_FLEET_TURN = "fleetTurn"
+  KEY_RAISED = "raised" # "yes" once the banner is raised
+  KEY_RAISED_TURN = "raisedTurn"
+  KEY_ARRIVED = "arrived" # "yes" once the fleet has landed
+  KEY_OVER = "over" # "yes" once the mission is decided
+  KEY_VITARRON = "vitarron"
+  KEY_DENBURHIN = "denburhinId"
+  KEY_BEACHHEAD = "beachheadId"
+  KEY_LAST_STAND = "lastStand"
+  KEY_PATROL = "patrol"
+  KEY_MARCHERS = "marchers"
+  KEY_WAVES = "waves"
+  KEY_NEXT_WAVE = "nextWave"
+  KEY_NEXT_SORTIE = "nextSortie"
+  KEY_CAMPS = "camps"
+  KEY_RAIDS = "raids"
+  KEY_NEXT_RAID = "nextRaid"
+  KEY_RAIDERS = "raiders:" # + "usurper" or "empire": who the war band is after
+  KEY_RAID_HITS = "raidHits:" # + side: attacks the tribes made on each side (for the record)
+  # Queued events, in the order they're told to the human.
+  EVENTS = ["fleetWarning", "arrested", "fleetArrived", "wave", "lastWave", "raidUsurper", "raidEmpire", "firstRaidOnEmpire",
+    "sortie", "denburhinBreaksOff", "campFell", "beachheadFell", "denburhinFell"]
+
+  # ------------------------------------------------------------------ setup
+
+  onStart {
+    if Game.currentScenario.objectives.isEmpty { # a loaded game is already set up
+      @setUpMap()
+      @playIntro()
+    }
+  }
+
+  setUpMap {
+    player = @human()
+    navyPlayer = @navy()
+    tribesPlayer = @tribes()
+    natureId = Game.nature.id
+    for unit in Game.grid.allUnits.where(=> $0.owner.id == natureId && $0.coordinates != null) {
+      typeId = unit.type.id
+      if typeId in COLONY_TYPES {
+        unit.setOwner(player)
+      } else if typeId == "ironclad" {
+        unit.setOwner(navyPlayer) # the Resolute, at anchor with the Emperor's letter
+        @addToSet(KEY_PATROL, unit.id)
+      } else if typeId in TRIBE_TYPES {
+        unit.setOwner(tribesPlayer)
+      }
+    }
+    viceroy = @unitOf(player, "vitarron")
+    player.setHero(viceroy)
+    @remember(KEY_VITARRON, viceroy.id)
+    viceroy.levelUpTo(@carriedLevel("IndustrialDevastation", "vitarronLevel", 1))
+    viceroy.setHealth(viceroy.health)
+    @grantInsurrection(viceroy)
+    for camp in @tribeUnits("sanghoyCamp") {
+      @addToSet(KEY_CAMPS, camp.id)
+      # The colonists know where the tribes camp.
+      Game.currentScenario.addRevealedCell(camp.coordinates)
+      for near in Game.grid.ringAround(camp.coordinates, 1) {
+        Game.currentScenario.addRevealedCell(near.coordinates)
+      }
+      if @isHard() {
+        @freeCellNear(camp.coordinates, WATER)?.summon("warrior", tribesPlayer)
+      }
+    }
+    if !@isHard() {
+      player.addResources([g: 10])
+    }
+    @remember(KEY_FLEET_TURN, if @isHard() FLEET_TURN_HARD else FLEET_TURN_NORMAL)
+    @remember(KEY_RAIDS, 0)
+    @remember(KEY_NEXT_RAID, FIRST_RAID)
+    @remember(KEY_WAVES, 0)
+    Game.refreshState()
+  }
+
+  # The mission gives Vitarron the Insurrection upgrade (his hero tree has it under Governance aura).
+  grantInsurrection(viceroy) {
+    if !viceroy.hasUpgrade("insurrection") {
+      node = viceroy.upgradeTree.allNodes.first(=> $0.type == "insurrection")
+      if node != null {
+        node.slot(@human(), true)
+      }
+    }
+  }
+
+  playIntro {
+    @pauseTimer()
+    Game.positionCamera(@markerAt("anchorage"))
+    Game.zoomCamera(8)
+    Game.wait(0.5)
+    @resolveSays("usurpIntro1")
+    Game.positionCamera(@markerAt("bragi"))
+    @captainSays(if @playedDairRunsRed() "usurpIntro2Kagaalu" else "usurpIntro2")
+    @vitarronSays("usurpIntro3")
+    @captainSays("usurpIntro4")
+    @vitarronSays("usurpIntro5")
+    @captainSays("usurpIntro6")
+    @vitarronSays("usurpIntro7")
+    @startObjective(OBJ_FLEET, "usurpFleet", "ironclad", @fleetDescription())
+    @startObjective(OBJ_BANNER, "usurpBanner", "colonialMilitia", null)
+    @say("settler", @human(), "settlerTitle", "usurpEconomyHint")
+    @say("vitarron", @human(), "insurrectionTitle", "usurpInsurrectionHint")
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ events
+
+  onSkillCast(caster, skillId) {
+    if skillId == "insurrection" && caster.owner?.id == @human().id && @recall(KEY_RAISED) != "yes" {
+      @bannerRaised()
+    }
+  }
+
+  onAttack(attacker, defender) {
+    @breakOff(attacker, defender)
+    if attacker != null && defender != null && attacker.owner?.id == @tribes().id {
+      side = @sideOf(defender)
+      if side != null {
+        @remember(KEY_RAID_HITS + side, @recallNumber(KEY_RAID_HITS + side, 0) + 1)
+      }
+    }
+  }
+
+  onDie(unit) {
+    if @isOver() {
+      return
+    }
+    unitId = unit.id
+    if unitId == @recall(KEY_VITARRON) {
+      @defeat("usurpVitarronFell")
+    } else if unit.owner?.id == @human().id && unit.isBuilding && @recall(KEY_RAISED) == "yes" \
+        && @human().ownedUnits.count(=> $0.isBuilding && $0.id != unitId && $0.coordinates != null) == 0 {
+      # The Halls burn with the Insurrection; after it, losing every Barracks, Factory and Airfield ends the rebellion.
+      @defeat("usurpColoniesLost")
+    } else if unitId == @recall(KEY_BEACHHEAD) {
+      @queue("beachheadFell")
+    } else if unitId == @recall(KEY_DENBURHIN) {
+      @queue("denburhinFell")
+    } else if @inSet(KEY_CAMPS, unitId) {
+      @queue("campFell")
+    }
+  }
+
+  onStateChange {
+    if Game.currentPlayerIndex == 0 && (@recall(KEY_PENDING) ?? "") != "" && !@isOver() {
+      events = @recall(KEY_PENDING)
+      @remember(KEY_PENDING, "")
+      @pauseTimer()
+      for event in EVENTS.where(=> ("," + $0 + ",") in events) {
+        if !@isOver() {
+          @announce(event)
+        }
+      }
+      @resumeTimer()
+    }
+  }
+
+  onTurnStart {
+    if @isOver() {
+      return
+    }
+    @countdown()
+    @fleetArrives()
+    @warChest()
+    @marchOut()
+    @marchRaiders()
+    @sendRaids()
+    @marchWaves()
+    @sendWaves()
+    @denburhinActs()
+    @patrolRiver()
+    Game.refreshState()
+  }
+
+  checkVictory => null
+
+  announce(event) {
+    if event == "fleetWarning" {
+      @captainSays("usurpFleetWarning")
+    } else if event == "arrested" {
+      @arrested()
+    } else if event == "fleetArrived" {
+      @fleetArrivedScene()
+    } else if event == "wave" {
+      Game.showMessage(@t("usurpWave"))
+    } else if event == "lastWave" {
+      @captainSays("usurpLastWave")
+    } else if event == "raidUsurper" {
+      Game.showMessage(@t("usurpRaidUsurper"))
+    } else if event == "raidEmpire" {
+      Game.showMessage(@t("usurpRaidEmpire"))
+    } else if event == "firstRaidOnEmpire" {
+      @say("warchief", @tribes(), "warchiefTitle", "usurpTribesWatch")
+    } else if event == "sortie" {
+      Game.showMessage(@t("usurpSortie"))
+    } else if event == "denburhinBreaksOff" {
+      Game.showMessage(@t("usurpBreaksOff"))
+    } else if event == "campFell" {
+      Game.showMessage(@t("usurpCampFell"))
+    } else if event == "beachheadFell" {
+      @beachheadFell()
+    } else if event == "denburhinFell" {
+      @denburhinFell()
+    }
+  }
+
+  # ------------------------------------------------------------------ act 1: the recall
+
+  countdown {
+    if @recall(KEY_ARRIVED) == "yes" {
+      return
+    }
+    left = @turnsLeft()
+    if @isActive(OBJ_FLEET) {
+      Game.currentScenario.updateObjective(OBJ_FLEET, [description: @fleetDescription()])
+    }
+    if left <= 2 && left >= 1 && @recall(KEY_RAISED) != "yes" {
+      @queue("fleetWarning")
+    }
+  }
+
+  bannerRaised {
+    @pauseTimer()
+    @remember(KEY_RAISED, "yes")
+    @remember(KEY_RAISED_TURN, Game.turn)
+    player = @human()
+    @complete(OBJ_BANNER)
+    viceroy = @usurper()
+    if viceroy != null {
+      # The unit keeps its type's name; the colonies' new name for him shows on his panel.
+      viceroy.addOrUpdateExtra("usurpStyle", "usurpStyleLabel", "", @t("vitarronTheUsurperTitle"))
+      Game.positionCamera(viceroy.coordinates)
+    }
+    @usurperSays("usurpBanner1")
+    @captainSays("usurpBanner2")
+    @usurperSays("usurpBanner3")
+    @say("rifleman", player, "lfSpeakerCaptain", "usurpParadeHint")
+    if @recall(KEY_ARRIVED) != "yes" && @isActive(OBJ_FLEET) {
+      Game.currentScenario.updateObjective(OBJ_FLEET, [description: @fleetDescription()])
+    }
+    Game.refreshState()
+    @resumeTimer()
+  }
+
+  # From the turn after the Insurrection, the colonies send a war chest every turn.
+  warChest {
+    if @recall(KEY_RAISED) == "yes" && @recallNumber(KEY_RAISED_TURN, 0) < Game.turn {
+      @human().addResources([g: @warChestGold()])
+    }
+  }
+
+  musterAt(typeId) => if typeId in BARRACKS_TROOPS "barracks" \
+    else if typeId in FACTORY_TROOPS "factory" \
+    else if typeId in AIRFIELD_TROOPS "airfield" \
+    else null
+
+  # After the Insurrection, every ready unit card in the Usurper's hand marches out of a building that trains it.
+  marchOut {
+    if @recall(KEY_RAISED) != "yes" {
+      return
+    }
+    player = @human()
+    for card in player.hand.where(=> $0.downtime == 0) {
+      typeId = card.type.id
+      producerType = @musterAt(typeId)
+      if producerType != null {
+        producer = player.ownedUnits.first(=> $0.type.id == producerType && $0.coordinates != null \
+          && @freeCellNear($0.coordinates, WATER) != null)
+        if producer != null {
+          spot = @freeCellNear(producer.coordinates, WATER)
+          player.removeFromHand(card.id)
+          spot.summon(typeId, player)
+        }
+      }
+    }
+  }
+
+  arrested {
+    @pauseTimer()
+    Game.positionCamera(@markerAt("bragi"))
+    @denburhinSays("usurpArrested1")
+    @vitarronSays("usurpArrested2")
+    @defeat("usurpArrested")
+  }
+
+  # ------------------------------------------------------------------ act 2: the fleet
+
+  fleetArrives {
+    if @recall(KEY_ARRIVED) == "yes" || Game.turn < @fleetTurn() {
+      return
+    }
+    @remember(KEY_ARRIVED, "yes")
+    if @recall(KEY_RAISED) != "yes" {
+      @queue("arrested")
+      return
+    }
+    armyPlayer = @army()
+    navyPlayer = @navy()
+    # The beachhead, on the ashes of the Landfall colony
+    beach = @marker("beachhead")
+    if beach.content == null {
+      hall = beach.summon("colonialHall", armyPlayer)
+      @remember(KEY_BEACHHEAD, hall.id)
+    }
+    @freeCellNear(beach.coordinates, WATER)?.summon("barracks", armyPlayer)
+    # The garrison holds the beachhead (the army's own turn does its fighting)
+    for typeId in @garrisonTypes() {
+      @freeCellNear(beach.coordinates, WATER)?.summon(typeId, armyPlayer)
+    }
+    for seen in Game.grid.cells.where(=> $0.distance(beach.coordinates) <= 2) {
+      Game.currentScenario.addRevealedCell(seen.coordinates)
+    }
+    # Skyfleet's flagship
+    sky = @marker("skyfleet")
+    flagship = sky.summon("denburhin", armyPlayer)
+    if flagship != null {
+      @remember(KEY_DENBURHIN, flagship.id)
+      flagship.levelUpTo(@carriedLevel("AirSuperiority", "denburhinLevel", DENBURHIN_DEFAULT_LEVEL))
+      flagship.setHealth(flagship.health)
+      @undermanned(flagship)
+      # His upgrade cards stay unplayed: his level brings his strength, the mission keeps him beatable.
+      for card in armyPlayer.hand.where(=> $0.type.id == "heroUpgrade") {
+        armyPlayer.removeFromHand(card.id)
+      }
+    }
+    @remember(KEY_NEXT_SORTIE, Game.turn + 1)
+    # The ironclads enter the river: the Resolute and the fleet's own
+    boats = if @isHard() 3 else 2
+    berths = Game.grid.cells.where(=> $0.terrain == "river" && $0.content == null \
+      && $0.distance(@markerAt("riverMouth")) <= 2).take(boats)
+    resolute = @unitsIn(KEY_PATROL).first(=> true)
+    for berth in berths {
+      if resolute != null {
+        Server.move(resolute.coordinates, berth.coordinates, 0)
+        resolute = null
+      } else {
+        @addToSet(KEY_PATROL, berth.summon("ironclad", navyPlayer).id)
+      }
+      Game.currentScenario.addRevealedCell(berth.coordinates)
+    }
+    @landWave()
+    @remember(KEY_NEXT_WAVE, Game.turn + @waveEvery())
+    @queue("fleetArrived")
+  }
+
+  fleetArrivedScene {
+    @complete(OBJ_FLEET)
+    Game.positionCamera(@markerAt("beachhead"))
+    Game.zoomCamera(8)
+    @flagshipSound()
+    @denburhinSays("usurpFleet1")
+    @usurperSays("usurpFleet2")
+    @denburhinSays(if @playedAirSuperiority() "usurpFleet3Air" else "usurpFleet3")
+    @captainSays("usurpFleet4")
+    flagship = @denburhin()
+    if flagship != null && @undermannedPenalty(flagship) > 0 {
+      @captainSays("usurpFleetUndermanned")
+    }
+    @startObjective(OBJ_BEACHHEAD, "usurpBeachhead", "colonialHall", null)
+    @startObjective(OBJ_DENBURHIN, "usurpDenburhin", "denburhin", null)
+    @captainSays("usurpFleet5")
+    Game.positionCamera(@usurper()?.coordinates ?? @markerAt("parade"))
+  }
+
+  garrisonTypes => if @isHard() ["rifleman", "rifleman", "rifleman", "rifleman", "imperialJuggernaut"] \
+    else ["rifleman", "rifleman", "rifleman", "imperialJuggernaut"]
+  lastLandingTypes => if @isHard() ["rifleman", "rifleman", "rifleman", "dragoon", "imperialJuggernaut"] \
+    else ["rifleman", "rifleman", "imperialJuggernaut"]
+  waveEvery => if @isHard() 4 else 5
+  maxWaves => 4
+  maxMarchers => if @isHard() 12 else 9
+  marchSteps => 1
+
+  # Every few turns while the beachhead stands, the boats land a wave on the beach: a rifleman (two on hard) and a
+  # dragoon, and an Imperial Juggernaut with every third wave.
+  sendWaves {
+    if @recall(KEY_NEXT_WAVE) == null || Game.turn < @recallNumber(KEY_NEXT_WAVE, 99) || @beachheadHall() == null {
+      return
+    }
+    @remember(KEY_NEXT_WAVE, Game.turn + @waveEvery())
+    waves = @recallNumber(KEY_WAVES, 0)
+    if waves >= @maxWaves() || @unitsIn(KEY_MARCHERS).count(=> true) >= @maxMarchers() {
+      return
+    }
+    @landWave()
+    @queue(if @recallNumber(KEY_WAVES, 0) >= @maxWaves() "lastWave" else "wave")
+  }
+
+  landWave {
+    waves = @recallNumber(KEY_WAVES, 0) + 1
+    @remember(KEY_WAVES, waves)
+    armyPlayer = @army()
+    band = ["rifleman", "dragoon"]
+    if @isHard() {
+      band.add("rifleman")
+    }
+    if waves % 3 == 0 {
+      band.add("imperialJuggernaut")
+    }
+    landing = @markerAt("landing")
+    for typeId in band {
+      spot = @freeCellNear(landing, WATER)
+      if spot != null {
+        @addToSet(KEY_MARCHERS, spot.summon(typeId, armyPlayer).id)
+      }
+    }
+    Game.refreshState()
+  }
+
+  # The waves march by the script, not by sight: towards the nearest of the Usurper's units in CHASE_RANGE, otherwise
+  # towards his nearest building (and Vitarron once there are none). Next to an enemy they stop; the army's own turn
+  # does the fighting.
+  marchWaves {
+    for soldier in @unitsIn(KEY_MARCHERS) {
+      at = soldier.coordinates
+      if at != null && @nearestEnemyOf(at, 1, @army()) == null {
+        prey = @nearestOf(@human(), at, CHASE_RANGE, false)
+        goal = prey?.coordinates ?? @nearestOf(@human(), at, 99, true)?.coordinates ?? @usurper()?.coordinates
+        @trek(soldier, goal, @marchSteps() + (if soldier.type.id == "dragoon" 1 else 0), WATER)
+      }
+    }
+  }
+
+  # ------------------------------------------------------------------ Denburhin
+
+  sortieEvery => 4
+
+  # While the beachhead stands, Denburhin flies bombing runs at the front every few turns. Once in a fight he stays
+  # in it until he's hurt; then he breaks off (at once, see onAttack) and flies back to the fleet offshore, out of
+  # reach of anything but airships, where the crews patch him up. Once the beachhead falls he has nothing to go back
+  # to: he fights to the end and goes for the Usurper's army.
+  denburhinActs {
+    flagship = @denburhin()
+    if flagship == null || flagship.coordinates == null {
+      return
+    }
+    @undermanned(flagship)
+    inContact = @nearestEnemyOf(flagship.coordinates, 1, @army()) != null
+    if @recall(KEY_LAST_STAND) == "yes" {
+      if !inContact {
+        target = @lastStandTarget()
+        if target != null {
+          @flyToward(flagship, target.coordinates, SORTIE_REACH)
+        }
+      }
+      return
+    }
+    home = @markerAt("skyfleet")
+    if @distance(flagship.coordinates, home) <= 1 {
+      if flagship.hp < flagship.health {
+        flagship.restoreHealth(FLEET_REPAIR)
+      }
+      if @healthPercent(flagship) >= SORTIE_MIN_HEALTH && Game.turn >= @recallNumber(KEY_NEXT_SORTIE, 99) {
+        target = @sortieTarget(flagship)
+        if target != null && @flyToward(flagship, target.coordinates, SORTIE_REACH) {
+          @remember(KEY_NEXT_SORTIE, Game.turn + @sortieEvery())
+          @queue("sortie")
+        }
+      }
+    } else if !inContact || @healthPercent(flagship) < RETREAT_BELOW {
+      @flyToward(flagship, home, 99)
+    }
+  }
+
+  healthPercent(unit) => unit.hp * 100 // Math.max(1, unit.health)
+
+  # Before his last stand, a Denburhin hurt in a fight breaks off at once and flies back to the fleet.
+  breakOff(attacker, defender) {
+    flagship = @denburhin()
+    if flagship == null || @recall(KEY_LAST_STAND) == "yes" || @healthPercent(flagship) >= RETREAT_BELOW {
+      return
+    }
+    if attacker?.id == flagship.id || defender?.id == flagship.id {
+      if @flyToward(flagship, @markerAt("skyfleet"), 99) {
+        @queue("denburhinBreaksOff")
+      }
+    }
+  }
+
+  # Half of Skyfleet's crews were the Viceroy's men and stayed with the colonies: above level 3 the flagship's defense
+  # and attack are brought back to their level-3 values (see TheUsurperEffects). His health and repairs still grow.
+  # (Denburhin's guard and fortitude grow by 2 a level: defense +1 a level, attack +1.6 per point of fortitude.)
+  undermannedPenalty(flagship) => Math.max(0, flagship.level - 3)
+  undermanned(flagship) {
+    penalty = @undermannedPenalty(flagship)
+    if penalty > 0 && !flagship.hasTempEffect("UsurpUndermannedModifier") {
+      attackPenalty = Math.floor((1 + 2 * flagship.level) * 1.6) - Math.floor(7 * 1.6)
+      flagship.addTempEffect(UsurpUndermannedModifier(penalty, attackPenalty), flagship, 99)
+    }
+  }
+
+  # The weakest of the Usurper's soldiers within reach, the ones standing alone first.
+  sortieTarget(flagship) {
+    playerId = @human().id
+    here = Game.grid.elementAt(flagship.coordinates)
+    candidates = Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null && !$0.isBuilding \
+      && here.distance($0.coordinates) <= SORTIE_REACH && @hasFreeNeighbour($0.coordinates))
+    if candidates.isEmpty {
+      return null
+    }
+    return candidates.minBy(=> $0.hp + 15 * @friendsNear($0, 2))
+  }
+
+  # In his last stand he goes for the Usurper's army: whoever stands nearest Vitarron.
+  lastStandTarget {
+    viceroy = @usurper()
+    playerId = @human().id
+    if viceroy == null {
+      return null
+    }
+    center = Game.grid.elementAt(viceroy.coordinates)
+    candidates = Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null && !$0.isBuilding \
+      && @hasFreeNeighbour($0.coordinates))
+    if candidates.isEmpty {
+      return null
+    }
+    return candidates.minBy(=> center.distance($0.coordinates) * 10 + (if $0.id == viceroy.id 5 else 0))
+  }
+
+  friendsNear(unit, radius) {
+    ownerId = unit.owner.id
+    here = Game.grid.elementAt(unit.coordinates)
+    return Game.grid.allUnits.count(=> $0.owner.id == ownerId && $0.id != unit.id && $0.coordinates != null \
+      && here.distance($0.coordinates) <= radius)
+  }
+
+  hasFreeNeighbour(coordinates) => Game.grid.ringAround(coordinates, 1).any(=> $0.content == null)
+
+  # The flagship flies over anything: to the free cell next to goal nearest to it, up to maxCells away.
+  flyToward(flier, goal, maxCells) {
+    origin = flier.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    here = Game.grid.elementAt(origin)
+    if here.distance(goal) <= 1 {
+      return false
+    }
+    options = Game.grid.cells.where(=> $0.content == null && here.distance($0.coordinates) <= maxCells \
+      && $0.distance(goal) >= 1)
+    if options.isEmpty {
+      return false
+    }
+    best = options.minBy(=> $0.distance(goal) * 100 + here.distance($0.coordinates))
+    if best.distance(goal) >= here.distance(goal) {
+      return false
+    }
+    Server.move(origin, best.coordinates, 0)
+    return true
+  }
+
+  # ------------------------------------------------------------------ act 3: the end of the fleet
+
+  beachheadFell {
+    @remember(KEY_LAST_STAND, "yes")
+    if @isActive(OBJ_BEACHHEAD) {
+      @complete(OBJ_BEACHHEAD)
+    }
+    Game.positionCamera(@markerAt("beachhead"))
+    @captainSays("usurpBeachheadFell1")
+    if @denburhin() != null {
+      # His last stand: every marine left in the fleet comes ashore with him.
+      @lastLanding()
+      @denburhinSays("usurpBeachheadFell2")
+      @usurperSays("usurpBeachheadFell3")
+    } else {
+      @victory()
+    }
+  }
+
+  lastLanding {
+    armyPlayer = @army()
+    landing = @markerAt("landing")
+    for typeId in @lastLandingTypes() {
+      spot = @freeCellNear(landing, WATER)
+      if spot != null {
+        @addToSet(KEY_MARCHERS, spot.summon(typeId, armyPlayer).id)
+      }
+    }
+    Game.refreshState()
+  }
+
+  denburhinFell {
+    if @isActive(OBJ_DENBURHIN) {
+      @complete(OBJ_DENBURHIN)
+    }
+    @captainSays("usurpDenburhinFell1")
+    if @beachheadHall() == null {
+      @victory()
+    } else {
+      @usurperSays("usurpDenburhinFell2")
+    }
+  }
+
+  victory {
+    if @isOver() {
+      return
+    }
+    @remember(KEY_OVER, "yes")
+    @pauseTimer()
+    player = @human()
+    Game.positionCamera(@usurper()?.coordinates ?? @markerAt("parade"))
+    @resolveSays("usurpVictory1")
+    @captainSays("usurpVictory2")
+    @usurperSays("usurpVictory3")
+    @captainSays("usurpVictory4")
+    @usurperSays("usurpVictory5")
+    Game.showMessage(@t("usurpEpilogue"))
+    @saveProgress()
+    Server.win(player)
+  }
+
+  # The campaign ends here: nothing to unlock.
+  saveProgress {
+    campaign = Game.campaign
+    if campaign != null {
+      progress = campaign.progressFor("TheUsurper")
+      if progress != null {
+        progress.addOrUpdateExtra("turns", "turns", "", Game.turn)
+        progress.addOrUpdateExtra("vitarronLevel", "vitarronLevel", "", @usurper()?.level ?? 1)
+      }
+      campaign.save()
+    }
+  }
+
+  defeat(lineKey) {
+    @remember(KEY_OVER, "yes")
+    for objectiveId in [OBJ_BANNER, OBJ_FLEET, OBJ_BEACHHEAD, OBJ_DENBURHIN].where(=> @isActive($0)) {
+      @fail(objectiveId)
+    }
+    Game.showMessageToAll(@t(lineKey))
+    Game.lose(@human())
+    Game.refreshState()
+  }
+
+  # ------------------------------------------------------------------ the tribes
+
+  raidEvery => 4
+
+  # Every few turns a war band leaves one of the camps still standing (they take turns). Until the fleet lands they all
+  # go for the colonies; then every second band goes for the Imperial army instead.
+  sendRaids {
+    if @recall(KEY_NEXT_RAID) == null || Game.turn < @recallNumber(KEY_NEXT_RAID, 99) {
+      return
+    }
+    @remember(KEY_NEXT_RAID, Game.turn + @raidEvery())
+    camps = @unitsIn(KEY_CAMPS)
+    if camps.isEmpty || @raidersCount() >= MAX_RAIDERS {
+      return
+    }
+    raids = @recallNumber(KEY_RAIDS, 0) + 1
+    @remember(KEY_RAIDS, raids)
+    camp = camps.(raids % camps.size)
+    side = "usurper"
+    if raids % 2 == 0 && !@empireLandUnits().isEmpty {
+      side = "empire"
+    }
+    band = ["warrior", "warrior"]
+    if @isHard() {
+      band.add("warrior")
+    }
+    if raids % 3 == 0 {
+      band.add("raider")
+    }
+    tribesPlayer = @tribes()
+    sent = false
+    for typeId in band {
+      spot = @freeCellNear(camp.coordinates, WATER)
+      if spot != null {
+        @addToSet(KEY_RAIDERS + side, spot.summon(typeId, tribesPlayer).id)
+        sent = true
+      }
+    }
+    if sent {
+      if side == "empire" {
+        firstOnEmpire = @recall("raidedEmpire") == null
+        @queue(if firstOnEmpire "firstRaidOnEmpire" else "raidEmpire")
+        @remember("raidedEmpire", "yes")
+      } else {
+        @queue("raidUsurper")
+      }
+    }
+  }
+
+  # War bands march by the script towards the nearest unit of the side they're after (the other side if that one has
+  # nobody left on land), wading the river if they must. Next to anyone who isn't of the tribes they stop and fight.
+  marchRaiders {
+    for side in ["usurper", "empire"] {
+      for raider in @unitsIn(KEY_RAIDERS + side) {
+        at = raider.coordinates
+        if at != null && @nearestEnemyOf(at, 1, @tribes()) == null {
+          prey = @nearestOfSide(side, at)
+          if prey == null {
+            prey = @nearestOfSide(if side == "usurper" "empire" else "usurper", at)
+          }
+          if prey != null {
+            @trek(raider, prey.coordinates, 2, SEA)
+          }
+        }
+      }
+    }
+  }
+
+  raidersCount => @unitsIn(KEY_RAIDERS + "usurper").count(=> true) + @unitsIn(KEY_RAIDERS + "empire").count(=> true)
+
+  nearestOfSide(side, origin) {
+    if side == "empire" {
+      return @nearestOf(@army(), origin, 99, false)
+    }
+    return @nearestOf(@human(), origin, 99, false)
+  }
+
+  sideOf(unit) {
+    ownerId = unit.owner?.id
+    if ownerId == @human().id {
+      return "usurper"
+    } else if ownerId == @army().id || ownerId == @navy().id {
+      return "empire"
+    }
+    return null
+  }
+
+  empireLandUnits {
+    armyId = @army().id
+    return Game.grid.allUnits.where(=> $0.owner.id == armyId && $0.coordinates != null && !$0.isBuilding \
+      && !(Game.grid.elementAt($0.coordinates).terrain in WATER))
+  }
+
+  # ------------------------------------------------------------------ the navy
+
+  fireRange => if @isHard() 2 else 1
+  shellDamage => 12
+
+  # The ironclads sail up and down the Dair and shell whatever of the Usurper's comes within reach of the water (and
+  # tribesmen on the banks). They don't hunt: their cells stay revealed and their route is fixed. Before the fleet
+  # arrives the Resolute just rides at anchor.
+  patrolRiver {
+    if @recall(KEY_ARRIVED) != "yes" {
+      return
+    }
+    for boat in @unitsIn(KEY_PATROL) {
+      @patrol(boat)
+    }
+  }
+
+  patrol(boat) {
+    origin = boat.coordinates
+    if origin == null {
+      return
+    }
+    target = @nearestOf(@human(), origin, @fireRange(), false)
+    tribesman = @weakestTribesmanNear(origin, BANK_REACH)
+    if target != null {
+      @shell(boat, target)
+    } else if tribesman != null {
+      boat.setActions(1)
+      Game.combat(boat, tribesman)
+    } else {
+      Game.currentScenario.removeRevealedCell(origin)
+      if !@sail(boat, @patrolGoal(boat), 3) {
+        @turnAround(boat) # blocked: patrol the other way
+      }
+      Game.currentScenario.addRevealedCell(boat.coordinates)
+    }
+  }
+
+  shell(boat, target) {
+    targetAt = target.coordinates
+    Game.animateAttack(boat, target)
+    Game.animateVisualFx([[type: "explosion", coordinates: targetAt]])
+    Game.logEvent(Game.localizedStr("ironcladTitle") + " shells " + Game.localizedStr(target.type.title) + ".", LogLevels.warn, targetAt)
+    target.takeDamage(@shellDamage(), boat)
+  }
+
+  weakestTribesmanNear(origin, maxRange) {
+    tribesId = @tribes().id
+    here = Game.grid.elementAt(origin)
+    near = Game.grid.allUnits.where(=> $0.owner.id == tribesId && $0.coordinates != null && !$0.isBuilding \
+      && here.distance($0.coordinates) <= maxRange)
+    if near.isEmpty {
+      return null
+    }
+    return near.minBy(=> $0.hp)
+  }
+
+  patrolGoal(boat) {
+    directionKey = "heading:" + boat.id
+    heading = @recall(directionKey) ?? "riverEast"
+    if @distance(boat.coordinates, @markerAt(heading)) <= 2 {
+      heading = @turnAround(boat)
+    }
+    return @markerAt(heading)
+  }
+
+  turnAround(boat) {
+    directionKey = "heading:" + boat.id
+    heading = "riverEast"
+    if (@recall(directionKey) ?? "riverEast") == "riverEast" {
+      heading = "riverMouth"
+    }
+    @remember(directionKey, heading)
+    return heading
+  }
+
+  # Boats sail by the river, not by sight: up to steps cells along the open water of the main channel, each one
+  # closer to goal.
+  sail(boat, goal, steps) {
+    origin = boat.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    channel = @markers("riverMouth").map(=> $0.coordinates.2)
+    channel.addAll(@markers("riverEast").map(=> $0.coordinates.2))
+    laneLow = channel.minBy(=> $0)
+    laneHigh = channel.maxBy(=> $0)
+    at = Game.grid.elementAt(origin)
+    for i in 0..steps {
+      nextCell = null
+      nextDistance = at.distance(goal)
+      for water in Game.grid.ringAround(at.coordinates, 1) {
+        row = water.coordinates.2
+        if water.content == null && water.terrain == "river" && row >= laneLow && row <= laneHigh && water.distance(goal) < nextDistance {
+          nextCell = water
+          nextDistance = water.distance(goal)
+        }
+      }
+      if nextCell != null {
+        at = nextCell
+      }
+    }
+    if at.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, at.coordinates, 0)
+    return true
+  }
+
+  # ------------------------------------------------------------------ helpers
+
+  t(key) => Game.localizedStr(key)
+  # Cutscenes stop the turn timer; it starts again with the human's next action.
+  pauseTimer => Server.setTimeoutEnabled(false)
+  resumeTimer => Server.setTimeoutEnabledOnUserAction(true)
+  human => Game.players.0
+  army => Game.players.1
+  navy => Game.players.2
+  tribes => Game.players.3
+  isHard => Game.currentScenario.difficulty == "hard"
+  isOver => @recall(KEY_OVER) == "yes"
+  fleetTurn => @recallNumber(KEY_FLEET_TURN, FLEET_TURN_NORMAL)
+  turnsLeft => Math.max(0, @fleetTurn() - Game.turn)
+  warChestGold => 8
+  usurper => @unitById(@recall(KEY_VITARRON))
+  denburhin => @unitById(@recall(KEY_DENBURHIN))
+  beachheadHall => @unitById(@recall(KEY_BEACHHEAD))
+
+  fleetDescription {
+    if @recall(KEY_RAISED) == "yes" {
+      return @t("usurpFleetRaisedDescription").format([@turnsLeft()])
+    }
+    return @t("usurpFleetDescription").format([@turnsLeft()])
+  }
+
+  # A value an earlier chapter of this campaign saved (null if it wasn't won). Only chapters already unlocked are
+  # asked, so that reading doesn't leave empty progress entries behind for the others.
+  carried(scenarioId, key) {
+    campaign = Game.campaign
+    if campaign == null || !(scenarioId in campaign.unlockedScenarios) {
+      return null
+    }
+    return campaign.progressFor(scenarioId)?.getExtraValue(key)
+  }
+  carriedLevel(scenarioId, key, fallback) => Math.max(1, Math.min(7, Math.round(@carried(scenarioId, key) ?? fallback)))
+  playedAirSuperiority => @carried("AirSuperiority", "denburhinLevel") != null
+  playedDairRunsRed => @carried("TheDairRunsRed", "turns") != null
+
+  say(portrait, owner, titleKey, lineKey) {
+    Game.showDialog(portrait, owner?.id, @t(titleKey), @t(lineKey))
+  }
+  captainSays(lineKey) => @say("rifleman", @human(), "lfSpeakerCaptain", lineKey)
+  resolveSays(lineKey) => @say("ironclad", @navy(), "lfSpeakerNavy", lineKey)
+  denburhinSays(lineKey) => @say("denburhin", @army(), "denburhinTitle", lineKey)
+  vitarronSays(lineKey) => @say("vitarron", @human(), "vitarronTitle", lineKey)
+  usurperSays(lineKey) => @say("vitarron", @human(), "vitarronTheUsurperTitle", lineKey)
+
+  startObjective(objectiveId, keyBase, image, descriptionText) {
+    objective = [
+      id: objectiveId,
+      title: @t(keyBase + "Title"),
+      description: descriptionText ?? @t(keyBase + "Description"),
+      image: image,
+      state: ObjectiveStates.active
+    ]
+    Game.currentScenario.addObjective(objective)
+    Game.refreshState()
+  }
+  complete(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.completed])
+    Game.refreshState()
+  }
+  fail(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.failed])
+    Game.refreshState()
+  }
+  isActive(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.active
+
+  remember(key, value) {
+    Game.currentScenario.addOrUpdateExtra(key, key, "", value)
+  }
+  recall(key) => Game.currentScenario.getExtraValue(key)
+  # A loaded game gives its extras back as strings: numbers are read through this.
+  recallNumber(key, fallback) => Math.round(@recall(key) ?? fallback)
+  queue(event) {
+    pending = @recall(KEY_PENDING) ?? ""
+    if !(("," + event + ",") in pending) {
+      @remember(KEY_PENDING, (if pending == "" "," else pending) + event + ",")
+    }
+  }
+  addToSet(key, unitId) {
+    @remember(key, (@recall(key) ?? ",") + unitId + ",")
+  }
+  inSet(key, unitId) => ("," + unitId + ",") in (@recall(key) ?? "")
+  unitsIn(key) {
+    members = @recall(key) ?? ""
+    return Game.grid.allUnits.where(=> $0.coordinates != null && ("," + $0.id + ",") in members)
+  }
+
+  marker(comment) => Game.grid.cells.first(=> $0.comment == comment)
+  markers(comment) => Game.grid.cells.where(=> $0.comment == comment)
+  markerAt(comment) => @marker(comment).coordinates
+  distance(a, b) => Game.grid.elementAt(a).distance(b)
+  unitOf(player, typeId) => player.ownedUnits.first(=> $0.type.id == typeId && $0.coordinates != null)
+  unitById(unitId) {
+    if unitId == null {
+      return null
+    }
+    return Game.grid.allUnits.first(=> $0.id == unitId && $0.coordinates != null)
+  }
+  tribeUnits(typeId) {
+    tribesId = @tribes().id
+    return Game.grid.allUnits.where(=> $0.owner.id == tribesId && $0.type.id == typeId && $0.coordinates != null)
+  }
+
+  freeCellNear(center, blocked) {
+    for radius in 1...3 {
+      for candidate in Game.grid.ringAround(center, radius) {
+        if candidate.content == null && !(candidate.terrain in blocked) {
+          return candidate
+        }
+      }
+    }
+    return null
+  }
+
+  # The nearest unit of owner within maxRange of origin (buildings only, or anything but).
+  nearestOf(owner, origin, maxRange, buildingsOnly) {
+    if origin == null {
+      return null
+    }
+    ownerId = owner.id
+    here = Game.grid.elementAt(origin)
+    best = null
+    bestDistance = maxRange + 1
+    for candidate in Game.grid.allUnits.where(=> $0.owner.id == ownerId && $0.coordinates != null && $0.isBuilding == buildingsOnly) {
+      candidateDistance = here.distance(candidate.coordinates)
+      if candidateDistance < bestDistance {
+        best = candidate
+        bestDistance = candidateDistance
+      }
+    }
+    return best
+  }
+
+  # Anyone next to origin who is an enemy of player (not nature).
+  nearestEnemyOf(origin, maxRange, player) {
+    natureId = Game.nature.id
+    here = Game.grid.elementAt(origin)
+    return Game.grid.allUnits.first(=> $0.coordinates != null && $0.owner.id != natureId && !player.isAllyOf($0) \
+      && here.distance($0.coordinates) <= maxRange)
+  }
+
+  # Up to steps cells, each one closer to goal, avoiding the blocked terrains (whatever else the terrain: these
+  # soldiers know where they're going).
+  trek(walker, goal, steps, blocked) {
+    origin = walker.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    at = Game.grid.elementAt(origin)
+    for i in 0..steps {
+      nextCell = null
+      nextDistance = at.distance(goal)
+      for land in Game.grid.ringAround(at.coordinates, 1) {
+        if land.content == null && !(land.terrain in blocked) && land.distance(goal) < nextDistance {
+          nextCell = land
+          nextDistance = land.distance(goal)
+        }
+      }
+      if nextCell != null {
+        at = nextCell
+      }
+    }
+    if at.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, at.coordinates, 0)
+    return true
+  }
+
+  flagshipSound => Game.playSound(@markerAt("anchorage"), "ironclad", SoundTypes.attack, true)
+}

@@ -1,0 +1,53 @@
+id: ShapingOfYon
+title: shapingOfYonTitle
+description: shapingOfYonDescription
+ruleset:
+  id: ShapingOfYonRuleset
+  inherits: DefaultCampaign
+  timeoutLength: 60 # a camp to run and a fight every turn; cutscenes pause it (see the script)
+  factionData:
+    sanghoy:
+      startingData:
+        resources:
+          g: 10
+          u: 10
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+    frenza:
+      startingData:
+        resources:
+          g: 0 # no grenades: the waves fight with what they bring
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+  bans:
+    skills:
+      - addMajorUpgrade
+      - buildSanghoyCamp
+      - buildRunestoneOfRogash # Kagaalu can't be revived here: if he falls, the mission is lost
+      - buildSacrificialWell # there is one Well, and it's the one that matters
+      - pillage
+      # the outsiders' base doesn't build or train: the script sends the waves
+      - trainSteamGolem
+      - trainDevilhornTank
+      - trainMEV
+      - trainAutoturret
+      - trainRifleman
+      - trainAssassin
+      - retrofitToVoltWalker
+      - retrofitToVoltTank
+      - buildRoadDevilhornTank
+players:
+  - name: Player
+    color: red
+    team: 1
+    faction: sanghoy
+  - name: Outsiders
+    color: blue
+    team: 2
+    faction: frenza
+    ai: TerritorialAi

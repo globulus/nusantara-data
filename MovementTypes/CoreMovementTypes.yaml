@@ -27,6 +27,8 @@
       mp: 3
     - terrain: sea
       mp: 1000 # impassable
+    - terrain: plateau
+      mp: 1000 # impassable: only fliers reach the top
     - terrain: road
       mp: 2
 - id: riding
@@ -52,6 +54,8 @@
       mp: 3
     - terrain: sea
       mp: 1000 # impassable
+    - terrain: plateau
+      mp: 1000 # impassable: only fliers reach the top
     - terrain: road
       mp: 1
 - id: fly
@@ -83,6 +87,8 @@
       mp: 4
     - terrain: sea
       mp: 1000 # impassable
+    - terrain: plateau
+      mp: 1000 # impassable: only fliers reach the top
 - id: tracks
   title: tracksTitle
   costs:
@@ -106,6 +112,8 @@
       mp: 2
     - terrain: sea
       mp: 1000 # impassable
+    - terrain: plateau
+      mp: 1000 # impassable: only fliers reach the top
     - terrain: road
       mp: 1
 - id: naval

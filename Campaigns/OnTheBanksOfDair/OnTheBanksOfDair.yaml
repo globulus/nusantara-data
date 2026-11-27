@@ -9,3 +9,30 @@ scenarios:
   - id: CalamityOnTheHorizon
     image: CalamityOnTheHorizon/c01
     loadingText: calamityOnTheHorizonLoadingText
+  - id: Landfall
+    image: Landfall/c02
+    loadingText: landfallLoadingText
+  - id: ThroughTheMire
+    image: ThroughTheMire/c03
+    loadingText: throughTheMireLoadingText
+  - id: IndustrialDevastation
+    image: IndustrialDevastation/c04
+    loadingText: industrialDevastationLoadingText
+  - id: ShapingOfYon
+    image: ShapingOfYon/c05
+    loadingText: shapingOfYonLoadingText
+  - id: BattleOfBragi
+    image: BattleOfBragi/c06
+    loadingText: battleOfBragiLoadingText
+  - id: ATurnOfTides
+    image: ATurnOfTides/c07
+    loadingText: aTurnOfTidesLoadingText
+  - id: AirSuperiority
+    image: AirSuperiority/c08
+    loadingText: airSuperiorityLoadingText
+  - id: TheDairRunsRed
+    image: TheDairRunsRed/c09
+    loadingText: theDairRunsRedLoadingText
+  - id: TheUsurper
+    image: TheUsurper/c10
+    loadingText: theUsurperLoadingText

@@ -1,0 +1,823 @@
+# On the Banks of Dair, mission 7: A Turn of Tides.
+#
+# Pyracmon the Unshackled brings his horde into the Dair delta to kill Kagaalu. Three warbands (north bank, south
+# bank, eastern island), each led by a warchief, march on Kagaalu's island one after another; later Pyracmon comes
+# himself with his guard.
+# - Turning the tribes: a warchief who dies within TURN_DISTANCE cells of Kagaalu gives his warband to Kagaalu. One
+#   who dies anywhere else leaves his warband leaderless, and it fights on. Killing Pyracmon turns every warband
+#   still standing and wins the mission.
+# - The tide: every few turns the sea climbs the Dair. The fords (marker "ford") turn from river into deep water and
+#   the mudflats (marker "flat") from swamp into river; a few turns later the water falls again. Each change is
+#   announced a turn ahead and the tide objective counts down to it. Whoever stands in a ford when it floods is swept
+#   to the nearest dry cell and hurt (never killed). At high tide the four landmasses are cut off from each other.
+#
+# Map markers (cell comments): kagaalu, pyracmon, bandNorth, bandSouth, bandEast, ford, flat.
+# Everything that must survive a save is kept in objectives or in scenario extras (strings and numbers only).
+# Dialogs only reach the human on their own turn, so anything that happens off-turn is queued (see onStateChange).
+scenario ATurnOfTides {
+  TURN_DISTANCE = 3 # a warchief who falls this close to Kagaalu gives him his warband
+  BAND_MARKERS = ["bandNorth", "bandSouth", "bandEast"]
+  BAND_CLANS = ["Heron", "Crocodile", "Boar"] # for the text keys
+  BAND_RELEASE_NORMAL = [2, 5, 8] # the turn each warband sets out for Kagaalu's island
+  BAND_RELEASE_HARD = [2, 4, 6]
+  PYRACMON_RELEASE_NORMAL = 13 # Pyracmon comes himself by this turn...
+  PYRACMON_RELEASE_HARD = 10
+  PYRACMON_EARLY_BANDS = 2 # ...or as soon as this many warbands are lost to him
+  FIRST_FLOOD = 4
+  HIGH_TURNS_NORMAL = 3
+  LOW_TURNS_NORMAL = 4
+  HIGH_TURNS_HARD = 2
+  LOW_TURNS_HARD = 4
+  TIDE_DAMAGE_NORMAL = 10
+  TIDE_DAMAGE_HARD = 15
+  MARCH_POINTS_NORMAL = 4 # how far the horde marches between its turns, in walking movement points
+  MARCH_POINTS_HARD = 5
+  CHIEF_EXTRA_POINTS = 2 # the warchiefs ride ahead of their warbands
+  STEP_COSTS = [grass: 2, beach: 2, road: 2, desert: 3, forest: 3, river: 3, jungle: 4, swamp: 4, hills: 4]
+  SWIMMERS = ["naval", "amphibious", "fly"] # movement types the flood doesn't sweep away
+
+  OBJ_PYRACMON = "pyracmon"
+  OBJ_TRIBES = "tribes"
+  OBJ_TIDE = "tide"
+
+  # Scenario extras
+  KEY_KAGAALU = "kagaaluId"
+  KEY_PYRACMON = "pyracmonId"
+  KEY_PYRACMON_STATE = "pyracmonState" # waiting, marching, dead
+  KEY_GUARD = "guard" # Pyracmon's guard, as ",id,id,"
+  KEY_BAND_COUNT = "bandCount" # each warband i: "band:i" (members, the chief included), "chief:i", "bandState:i"
+  KEY_TURNED = "turned" # warbands turned in battle
+  KEY_TIDE = "tide" # low or high
+  KEY_TIDE_TURN = "tideTurn" # the turn the tide turns next
+  KEY_SWEPT_OURS = "sweptOurs"
+  KEY_SWEPT_THEIRS = "sweptTheirs"
+  KEY_FLOODS = "floods"
+  KEY_SEEN_CORPSES = "seenCorpses" # cells where a warchief's death was already accounted for, as ",x:y:z,"
+  KEY_LEADERLESS_TOLD = "leaderlessTold"
+  KEY_PENDING = "pending" # events waiting for the human's turn, as ",event,event,"
+  # Queued events, in the order they're told to the human.
+  EVENTS = ["flooded", "drained", "floodWarning", "drainWarning", "turned", "leaderless", "pyracmonComes", "victory"]
+  # Warband states: waiting (in camp), marching, turning (its chief fell by Kagaalu; joins on the human's turn),
+  # turned, leaderless (its chief fell elsewhere; it marches on), joined (when Pyracmon fell).
+
+  # ------------------------------------------------------------------ setup
+
+  onStart {
+    if Game.currentScenario.objectives.isEmpty { # a loaded game is already set up
+      @setUpMap()
+      @playIntro()
+    }
+  }
+
+  setUpMap {
+    player = @human()
+    horde = @tribes()
+    home = Game.grid.elementAt(Game.grid.startingLocations.0)
+    kagaalu = home.summon("kagaalu", player)
+    player.setHero(kagaalu)
+    kagaalu.levelUpTo(@carriedLevel())
+    @remember(KEY_KAGAALU, kagaalu.id)
+    for i in 0..@warriorCount() {
+      @freeCellNear(home.coordinates).summon("warrior", player)
+    }
+    player.addEffect("SpeedBoost") # Kagaalu's delta warriors know the mud
+    if !@isHard() {
+      player.addEffect("RogashsBlessing") # normal: Kagaalu takes less damage and heals between fights
+    }
+    horde.addEffect("TribalSenses")
+    horde.addEffect("TribalPaths")
+
+    lair = @marker("pyracmon")
+    pyracmon = lair.summon("pyracmon", horde)
+    horde.setHero(pyracmon)
+    pyracmon.levelUpTo(if @isHard() Math.max(3, kagaalu.level + 1) else Math.max(3, kagaalu.level))
+    @remember(KEY_PYRACMON, pyracmon.id)
+    @remember(KEY_PYRACMON_STATE, "waiting")
+    for typeId in @guardUnits() {
+      @addToSet(KEY_GUARD, @freeCellNear(lair.coordinates).summon(typeId, horde).id)
+    }
+    for camp in Game.grid.allUnits.where(=> $0.type.id == "sanghoyCamp") {
+      camp.setOwner(horde)
+      Game.currentScenario.addRevealedCell(camp.coordinates)
+    }
+
+    for index in 0..BAND_MARKERS.size {
+      rally = @marker(BAND_MARKERS.(index))
+      chief = rally.summon("warchief", horde)
+      @remember("chief:" + index, chief.id)
+      @addToSet("band:" + index, chief.id)
+      for typeId in @bandUnits(index) {
+        @addToSet("band:" + index, @freeCellNear(rally.coordinates).summon(typeId, horde).id)
+      }
+      @remember("bandState:" + index, "waiting")
+      Game.currentScenario.addRevealedCell(rally.coordinates) # the scouts found the warbands' camps
+    }
+    @remember(KEY_BAND_COUNT, BAND_MARKERS.size)
+    @remember(KEY_TURNED, 0)
+
+    @remember(KEY_TIDE, "low")
+    @remember(KEY_TIDE_TURN, FIRST_FLOOD)
+    @remember(KEY_FLOODS, 0)
+    index = 0
+    for flat in @markers("flat") {
+      @remember("flatLow:" + index, flat.terrain)
+      index += 1
+    }
+    for ford in @markers("ford") {
+      Game.currentScenario.addRevealedCell(ford.coordinates) # Kagaalu's people watch the fords
+    }
+    Game.refreshState()
+  }
+
+  # Kagaalu's level from the latest chapter he was in and won (the one after it is unlocked): Shaping of Yon, Through
+  # the Mire, Calamity on the Horizon. (progressFor adds an empty entry for a scenario nobody won, so ask only then.)
+  carriedLevel {
+    campaign = Game.campaign
+    if campaign == null {
+      return 1
+    }
+    unlocked = campaign.unlockedScenarios
+    for won in [["ShapingOfYon", "BattleOfBragi"], ["ThroughTheMire", "IndustrialDevastation"], ["CalamityOnTheHorizon", "Landfall"]] {
+      if won.1 in unlocked {
+        level = campaign.progressFor(won.0)?.getExtraValue("kagaaluLevel")
+        if level != null {
+          return level
+        }
+      }
+    }
+    return 1
+  }
+
+  playIntro {
+    @pauseTimer()
+    player = @human()
+    kagaalu = @kagaaluUnit()
+    Game.positionCamera(kagaalu.coordinates)
+    Game.zoomCamera(8)
+    Game.wait(0.5)
+    @say("warrior", player, "tidesSpeakerScout", "tidesIntro1")
+    Game.positionCamera(@marker("pyracmon").coordinates)
+    @say("pyracmon", @tribes(), "pyracmonTitle", "tidesIntro2")
+    Game.positionCamera(kagaalu.coordinates)
+    @kagaaluSays("tidesIntro3")
+    @kagaaluSays("tidesIntro4")
+    @startObjective(OBJ_PYRACMON, "tidesPyracmon", "pyracmon", null)
+    @startObjective(OBJ_TRIBES, "tidesTribes", "warchief", @tribesDescription())
+    @kagaaluSays("tidesIntro5")
+    @startObjective(OBJ_TIDE, "tidesTide", "canoe", @tideDescription())
+    Game.showMessage(@t("tidesHint"))
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ events
+
+  onDie(unit) {
+    if unit.id == @recall(KEY_KAGAALU) {
+      @defeat("tidesKagaaluDied")
+    } else if unit.id == @recall(KEY_PYRACMON) {
+      @pyracmonFell()
+    } else {
+      index = @bandOfChief(unit.id)
+      if index != null {
+        @chiefFell(index, unit)
+      }
+    }
+  }
+
+  onStateChange {
+    @trackChiefs()
+    if Game.currentPlayerIndex == 0 && (@recall(KEY_PENDING) ?? "") != "" {
+      events = @recall(KEY_PENDING)
+      @remember(KEY_PENDING, "")
+      @pauseTimer()
+      for event in EVENTS.where(=> ("," + $0 + ",") in events) {
+        @announce(event)
+      }
+      @resumeTimer()
+    }
+  }
+
+  onTurnStart {
+    if @recall(KEY_PYRACMON_STATE) == "dead" {
+      return # the horde is Kagaalu's; the victory plays on the human's turn
+    }
+    @turnTheTide()
+    @releaseBands()
+    @march()
+    @updateObjective(OBJ_TIDE, @tideDescription())
+  }
+
+  checkVictory => null
+
+  announce(event) {
+    if event == "flooded" {
+      Game.showMessage(@t("tidesFlooded"))
+      ours = @recall(KEY_SWEPT_OURS) ?? 0
+      theirs = @recall(KEY_SWEPT_THEIRS) ?? 0
+      if ours + theirs > 0 {
+        Game.showMessage(@t("tidesSwept").format([ours, theirs]))
+      }
+      if (@recall(KEY_FLOODS) ?? 0) == 1 {
+        @kagaaluSays("tidesFirstFlood")
+      }
+    } else if event == "drained" {
+      Game.showMessage(@t("tidesDrained"))
+    } else if event == "floodWarning" {
+      Game.showMessage(@t("tidesFloodWarning"))
+    } else if event == "drainWarning" {
+      Game.showMessage(@t("tidesDrainWarning"))
+    } else if event == "turned" {
+      for index in 0..@bandCount() {
+        if @bandState(index) == "turning" {
+          @turnBand(index)
+        }
+      }
+    } else if event == "leaderless" {
+      @tellLeaderless()
+    } else if event == "pyracmonComes" {
+      pyracmon = @unitById(@recall(KEY_PYRACMON))
+      if pyracmon != null {
+        Game.positionCamera(pyracmon.coordinates)
+      }
+      @say("pyracmon", @tribes(), "pyracmonTitle", "tidesPyracmonComes")
+      @kagaaluSays("tidesPyracmonComesKagaalu")
+    } else if event == "victory" {
+      @victory()
+    }
+  }
+
+  # ------------------------------------------------------------------ turning the tribes
+
+  bandOfChief(unitId) {
+    for index in 0..@bandCount() {
+      if @recall("chief:" + index) == unitId {
+        return index
+      }
+    }
+    return null
+  }
+
+  chiefFell(index, chief) {
+    if !(@bandState(index) in ["waiting", "marching"]) {
+      return
+    }
+    fellAt = @whereChiefFell(chief.id)
+    kagaalu = @kagaaluUnit()
+    if kagaalu != null && fellAt != null && @distance(kagaalu.coordinates, fellAt) <= TURN_DISTANCE {
+      @setBandState(index, "turning")
+      for member in @unitsIn("band:" + index) {
+        member.setActions(0) # they lower their weapons; they join Kagaalu on the human's turn
+      }
+      @queue("turned")
+    } else {
+      @setBandState(index, "leaderless")
+      @queue("leaderless")
+    }
+  }
+
+  # Where a warchief died: the cell that just got his corpse (LeaveCorpse marks it before onDie runs), otherwise
+  # where he was last seen.
+  whereChiefFell(chiefId) {
+    seen = @recall(KEY_SEEN_CORPSES) ?? ","
+    fresh = Game.grid.cells.where(=> $0.getExtraValue("corpse") == "warchief" && !(("," + @cellKey($0.coordinates) + ",") in seen))
+    lastSeen = null
+    if @recall("chiefX:" + chiefId) != null {
+      lastSeen = [@recall("chiefX:" + chiefId), @recall("chiefY:" + chiefId), @recall("chiefZ:" + chiefId)]
+    }
+    if fresh.isEmpty {
+      return lastSeen
+    }
+    grave = fresh.(0)
+    if lastSeen != null {
+      grave = fresh.minBy(=> $0.distance(lastSeen))
+    }
+    @remember(KEY_SEEN_CORPSES, seen + @cellKey(grave.coordinates) + ",")
+    return grave.coordinates
+  }
+
+  # Remembers where every warchief is (the fallback for whereChiefFell).
+  trackChiefs {
+    for index in 0..@bandCount() {
+      if @bandState(index) in ["waiting", "marching"] {
+        chiefId = @recall("chief:" + index)
+        chief = @unitById(chiefId)
+        if chief != null {
+          at = chief.coordinates
+          @remember("chiefX:" + chiefId, at.0)
+          @remember("chiefY:" + chiefId, at.1)
+          @remember("chiefZ:" + chiefId, at.2)
+        }
+      }
+    }
+  }
+
+  turnBand(index) {
+    player = @human()
+    members = @unitsIn("band:" + index)
+    if members.isEmpty {
+      @setBandState(index, "lost") # nobody left to follow Kagaalu
+      @kagaaluSays("tidesTurnedTooLate")
+      @updateTribes()
+      return
+    }
+    @setBandState(index, "turned")
+    for member in members {
+      member.setOwner(player)
+      member.setActions(0)
+    }
+    turnedSoFar = @turnedCount() + 1
+    @remember(KEY_TURNED, turnedSoFar)
+    Game.refreshState()
+    Game.positionCamera(members.(0).coordinates)
+    clan = BAND_CLANS.(index)
+    @say("warrior", player, "tidesSpeaker" + clan, "tidesTurned" + clan)
+    @kagaaluSays(if turnedSoFar == 1 "tidesTurnedKagaaluFirst" else "tidesTurnedKagaalu")
+    @updateTribes()
+  }
+
+  tellLeaderless {
+    for index in 0..@bandCount() {
+      if @bandState(index) == "leaderless" && @recall("told:" + index) == null {
+        @remember("told:" + index, "yes")
+        if @recall(KEY_LEADERLESS_TOLD) == null {
+          @remember(KEY_LEADERLESS_TOLD, "yes")
+          @kagaaluSays("tidesLeaderlessFirst")
+        } else {
+          Game.showMessage(@t("tidesLeaderless").format([@t("tidesClan" + BAND_CLANS.(index))]))
+        }
+      }
+    }
+    @updateTribes()
+  }
+
+  updateTribes {
+    if !@isActive(OBJ_TRIBES) {
+      return
+    }
+    @updateObjective(OBJ_TRIBES, @tribesDescription())
+    if @turnedCount() == @bandCount() {
+      @complete(OBJ_TRIBES)
+    } else if @bandsBeyondTurning() > 0 {
+      @fail(OBJ_TRIBES) # one of them can no longer be turned
+    }
+  }
+
+  bandsBeyondTurning {
+    beyond = 0
+    for index in 0..@bandCount() {
+      if @bandState(index) in ["leaderless", "lost"] {
+        beyond += 1
+      }
+    }
+    return beyond
+  }
+
+  # Warbands Pyracmon can no longer count on.
+  bandsLost {
+    lost = 0
+    for index in 0..@bandCount() {
+      if @bandState(index) in ["turning", "turned", "lost"] || @unitsIn("band:" + index).isEmpty {
+        lost += 1
+      }
+    }
+    return lost
+  }
+
+  # ------------------------------------------------------------------ Pyracmon
+
+  pyracmonFell {
+    @remember(KEY_PYRACMON_STATE, "dead")
+    hordeId = @tribes().id
+    for foe in Game.grid.allUnits.where(=> $0.owner.id == hordeId && $0.coordinates != null) {
+      foe.setActions(0) # the fight is over
+    }
+    @queue("victory")
+  }
+
+  victory {
+    if !@isActive(OBJ_PYRACMON) {
+      return # already over
+    }
+    @pauseTimer()
+    player = @human()
+    hordeId = @tribes().id
+    # Every warband still standing joins Kagaalu, and so does whatever else followed Pyracmon.
+    joined = 0
+    for index in 0..@bandCount() {
+      state = @bandState(index)
+      if state == "turned" {
+        joined += 1
+      } else if state != "lost" && !@unitsIn("band:" + index).isEmpty {
+        joined += 1
+        @setBandState(index, "joined")
+      }
+    }
+    for foe in Game.grid.allUnits.where(=> $0.owner.id == hordeId && $0.coordinates != null) {
+      foe.setOwner(player)
+    }
+    Game.refreshState()
+    @complete(OBJ_PYRACMON)
+    if @isActive(OBJ_TRIBES) {
+      if @turnedCount() == @bandCount() {
+        @complete(OBJ_TRIBES)
+      } else {
+        @fail(OBJ_TRIBES)
+      }
+    }
+    @complete(OBJ_TIDE)
+    kagaalu = @kagaaluUnit()
+    if kagaalu != null {
+      Game.positionCamera(kagaalu.coordinates)
+    }
+    @kagaaluSays("tidesVictory1")
+    @say("warrior", player, "tidesSpeakerScout", "tidesVictory2")
+    @kagaaluSays("tidesVictory3")
+    @saveProgress(kagaalu, joined)
+    Server.win(player)
+  }
+
+  # What later missions can build on.
+  saveProgress(kagaalu, joined) {
+    campaign = Game.campaign
+    if campaign != null {
+      progress = campaign.progressFor("ATurnOfTides")
+      if progress != null {
+        progress.addOrUpdateExtra("kagaaluLevel", "kagaaluLevel", "", kagaalu?.level ?? 1)
+        progress.addOrUpdateExtra("tribesTurned", "tribesTurned", "", joined)
+        progress.addOrUpdateExtra("turnedInBattle", "turnedInBattle", "", @turnedCount())
+        progress.addOrUpdateExtra("turns", "turns", "", Game.turn)
+      }
+      campaign.unlock("AirSuperiority") # chapter 8
+      campaign.save()
+    }
+  }
+
+  defeat(lineKey) {
+    for objectiveId in [OBJ_PYRACMON, OBJ_TRIBES, OBJ_TIDE].where(=> @isActive($0)) {
+      @fail(objectiveId)
+    }
+    Game.showMessageToAll(@t(lineKey))
+    Game.lose(@human())
+    Game.refreshState()
+  }
+
+  # ------------------------------------------------------------------ the tide
+
+  isHighTide => @recall(KEY_TIDE) == "high"
+  highTurns => if @isHard() HIGH_TURNS_HARD else HIGH_TURNS_NORMAL
+  lowTurns => if @isHard() LOW_TURNS_HARD else LOW_TURNS_NORMAL
+  tideDamage => if @isHard() TIDE_DAMAGE_HARD else TIDE_DAMAGE_NORMAL
+
+  # Runs at the start of every round: the tide turns when its time has come, and a turn before that it's announced.
+  turnTheTide {
+    if Game.turn >= (@recall(KEY_TIDE_TURN) ?? FIRST_FLOOD) {
+      if @isHighTide() {
+        @drain()
+      } else {
+        @flood()
+      }
+    }
+    if Game.turn == (@recall(KEY_TIDE_TURN) ?? FIRST_FLOOD) - 1 {
+      @queue(if @isHighTide() "drainWarning" else "floodWarning")
+    }
+  }
+
+  # High water: the fords become deep water and the mudflats river. Whoever stands in a ford is swept to the nearest
+  # dry cell and hurt.
+  flood {
+    @remember(KEY_TIDE, "high")
+    @remember(KEY_TIDE_TURN, Game.turn + @highTurns())
+    @remember(KEY_FLOODS, (@recall(KEY_FLOODS) ?? 0) + 1)
+    for ford in @markers("ford") {
+      ford.setTerrain("sea")
+    }
+    for flat in @markers("flat") {
+      flat.setTerrain("river")
+    }
+    Game.refreshState() # movement costs and paths follow the new terrain from here on
+    @ripple()
+    playerId = @human().id
+    ours = 0
+    theirs = 0
+    for ford in @markers("ford") {
+      wader = ford.content
+      if wader != null && !(wader.movementType in SWIMMERS) {
+        if wader.owner.id == playerId {
+          ours += 1
+        } else {
+          theirs += 1
+        }
+        @sweep(wader, ford.coordinates)
+      }
+    }
+    @remember(KEY_SWEPT_OURS, ours)
+    @remember(KEY_SWEPT_THEIRS, theirs)
+    @queue("flooded")
+  }
+
+  drain {
+    @remember(KEY_TIDE, "low")
+    @remember(KEY_TIDE_TURN, Game.turn + @lowTurns())
+    for ford in @markers("ford") {
+      ford.setTerrain("river")
+    }
+    index = 0
+    for flat in @markers("flat") {
+      flat.setTerrain(@recall("flatLow:" + index) ?? "swamp")
+      index += 1
+    }
+    Game.refreshState()
+    @ripple()
+    @queue("drained")
+  }
+
+  ripple => Game.animateVisualFx(@markers("ford").map(=> [type: "ripple", coordinates: $0.coordinates, color: "#3366FF"]))
+
+  sweep(wader, from) {
+    shore = @dryCellNear(from)
+    if shore != null {
+      Server.move(from, shore.coordinates, 0)
+    }
+    loss = Math.min(@tideDamage(), wader.hp - 1)
+    if loss > 0 {
+      wader.setHealth(wader.hp - loss)
+    }
+    if wader.coordinates != null {
+      Game.animateVisualFx([[type: "hit", coordinates: wader.coordinates]])
+    }
+  }
+
+  dryCellNear(center) {
+    for radius in 1...3 {
+      for candidate in Game.grid.ringAround(center, radius) {
+        if candidate.content == null && candidate.terrain != "sea" {
+          return candidate
+        }
+      }
+    }
+    return null
+  }
+
+  # ------------------------------------------------------------------ the horde
+
+  marchPoints => if @isHard() MARCH_POINTS_HARD else MARCH_POINTS_NORMAL
+  pyracmonTurn => if @isHard() PYRACMON_RELEASE_HARD else PYRACMON_RELEASE_NORMAL
+
+  releaseBands {
+    releases = if @isHard() BAND_RELEASE_HARD else BAND_RELEASE_NORMAL
+    for index in 0..@bandCount() {
+      if @bandState(index) == "waiting" && Game.turn >= releases.(index) {
+        @setBandState(index, "marching")
+        Game.currentScenario.removeRevealedCell(@marker(BAND_MARKERS.(index)).coordinates)
+      }
+    }
+    if @recall(KEY_PYRACMON_STATE) == "waiting" && (Game.turn >= @pyracmonTurn() || @bandsLost() >= PYRACMON_EARLY_BANDS) {
+      @remember(KEY_PYRACMON_STATE, "marching")
+      @queue("pyracmonComes")
+    }
+  }
+
+  # The horde marches by the script, not by sight (it would stall in the fog of the delta): every marching unit that
+  # isn't already next to one of Kagaalu's goes a few cells along the shortest dry path to Kagaalu. Cut off by the
+  # tide, it waits at the nearest ford instead. Next to an enemy it stops; the horde's own turn does the fighting.
+  march {
+    kagaalu = @kagaaluUnit()
+    if kagaalu == null {
+      return
+    }
+    toKagaalu = @stepsTo([kagaalu.coordinates])
+    toFords = null
+    # the warchiefs first: they ride at the head of their warbands
+    marching = @marchers().sortedBy(=> @marchOrder($0, toKagaalu) - @marchOrder($1, toKagaalu))
+    for marcher in marching {
+      at = marcher.coordinates
+      if at != null && !@nextToPlayer(at) {
+        guide = toKagaalu
+        if toKagaalu.(@cellKey(at)) == null {
+          if toFords == null {
+            toFords = @stepsTo(@markers("ford").map(=> $0.coordinates))
+          }
+          guide = toFords
+        }
+        isChief = marcher.type.id == "warchief"
+        @marchAlong(marcher, guide, @marchPoints() + (if isChief CHIEF_EXTRA_POINTS else 0), if isChief 0 else @behindChief(marcher, guide))
+      }
+    }
+  }
+
+  marchOrder(marcher, guide) => (if marcher.type.id == "warchief" 0 else 1000) + (guide.(@cellKey(marcher.coordinates)) ?? 999)
+
+  # A warband keeps behind its warchief: no closer to Kagaalu than a step behind him.
+  behindChief(member, guide) {
+    for index in 0..@bandCount() {
+      if @bandState(index) == "marching" && ("," + member.id + ",") in (@recall("band:" + index) ?? "") {
+        chief = @unitById(@recall("chief:" + index))
+        if chief != null {
+          chiefSteps = guide.(@cellKey(chief.coordinates))
+          if chiefSteps != null {
+            return chiefSteps + 1
+          }
+        }
+      }
+    }
+    return 0
+  }
+
+  marchers {
+    members = ","
+    for index in 0..@bandCount() {
+      if @bandState(index) in ["marching", "leaderless"] {
+        members = members + (@recall("band:" + index) ?? "")
+      }
+    }
+    if @recall(KEY_PYRACMON_STATE) == "marching" {
+      members = members + "," + @recall(KEY_PYRACMON) + "," + (@recall(KEY_GUARD) ?? "")
+    }
+    hordeId = @tribes().id
+    return Game.grid.allUnits.where(=> $0.coordinates != null && $0.owner.id == hordeId && ("," + $0.id + ",") in members)
+  }
+
+  # Steps from each cell to the nearest of goals over dry land, as a map from @key to a count. Deep water and
+  # buildings block the way; units don't (they move on).
+  stepsTo(goals) {
+    field = [:]
+    frontier = []
+    for goal in goals {
+      field.(@cellKey(goal)) = 0
+      frontier.add(goal)
+    }
+    i = 0
+    while i < frontier.size {
+      here = frontier.(i)
+      nextSteps = field.(@cellKey(here)) + 1
+      for next in Game.grid.ringAround(here, 1) {
+        nextAt = next.coordinates
+        nextKey = @cellKey(nextAt)
+        if field.(nextKey) == null && next.terrain != "sea" && !(next.content?.isBuilding ?? false) {
+          field.(nextKey) = nextSteps
+          frontier.add(nextAt)
+        }
+      }
+      i += 1
+    }
+    return field
+  }
+
+  # Up to points' worth of cells down the guide (each cell costs what it costs a walker), always at least one step
+  # if there is one, and never onto a cell fewer than floor steps from the goal. A marcher may pass through its own
+  # side's units (a warchief rides through his warband) but stops only on an empty cell.
+  marchAlong(walker, guide, points, floor) {
+    origin = walker.coordinates
+    ownerId = walker.owner.id
+    here = Game.grid.elementAt(origin)
+    stop = null
+    budget = points
+    steps = 0
+    while budget > 0 && steps < 8 {
+      best = null
+      bestScore = 99999
+      hereSteps = guide.(@cellKey(here.coordinates)) ?? 9999
+      for next in Game.grid.ringAround(here.coordinates, 1) {
+        nextSteps = guide.(@cellKey(next.coordinates))
+        occupant = next.content
+        if next.terrain != "sea" && nextSteps != null && nextSteps < hereSteps && nextSteps >= floor \
+            && (occupant == null || occupant.owner.id == ownerId) {
+          score = 2 * nextSteps + (if occupant == null 0 else 1) # an empty cell over a crowded one
+          if score < bestScore {
+            best = next
+            bestScore = score
+          }
+        }
+      }
+      if best == null {
+        break
+      }
+      cost = STEP_COSTS.(best.terrain) ?? 2
+      if steps > 0 && cost > budget {
+        break
+      }
+      budget -= cost
+      steps += 1
+      here = best
+      if here.content == null {
+        stop = here
+        if @nextToPlayer(here.coordinates) {
+          break
+        }
+      }
+    }
+    if stop != null {
+      Server.move(origin, stop.coordinates, 0)
+    }
+  }
+
+  nextToPlayer(at) {
+    playerId = @human().id
+    return Game.grid.ringAround(at, 1).any(=> $0.content?.owner?.id == playerId)
+  }
+
+  # ------------------------------------------------------------------ helpers
+
+  t(key) => Game.localizedStr(key)
+  # Cutscenes stop the turn timer; it starts again with the human's next action.
+  pauseTimer => Server.setTimeoutEnabled(false)
+  resumeTimer => Server.setTimeoutEnabledOnUserAction(true)
+  human => Game.players.0
+  tribes => Game.players.1
+  isHard => Game.currentScenario.difficulty == "hard"
+
+  warriorCount => if @isHard() 4 else 5
+  guardUnits => if @isHard() ["warrior", "warrior", "warrior", "raider"] else ["warrior", "warrior", "raider"]
+  bandUnits(index) {
+    band = ["warrior", "warrior"]
+    if index > 0 {
+      band.add("raider")
+    }
+    if @isHard() {
+      band.add("warrior")
+    }
+    return band
+  }
+
+  say(portrait, owner, titleKey, lineKey) {
+    Game.showDialog(portrait, owner?.id, @t(titleKey), @t(lineKey))
+  }
+  kagaaluSays(lineKey) => @say("kagaalu", @human(), "kagaaluTitle", lineKey)
+
+  tribesDescription => @t("tidesTribesDescription").format([TURN_DISTANCE, @turnedCount(), @bandCount()])
+  tideDescription {
+    left = (@recall(KEY_TIDE_TURN) ?? FIRST_FLOOD) - Game.turn
+    if @isHighTide() {
+      return if left <= 1 @t("tidesTideHighSoon") else @t("tidesTideHigh").format([left])
+    }
+    return if left <= 1 @t("tidesTideLowSoon") else @t("tidesTideLow").format([left])
+  }
+
+  startObjective(objectiveId, keyBase, image, descriptionText) {
+    objective = [
+      id: objectiveId,
+      title: @t(keyBase + "Title"),
+      description: descriptionText ?? @t(keyBase + "Description"),
+      image: image,
+      state: ObjectiveStates.active
+    ]
+    Game.currentScenario.addObjective(objective)
+    Game.refreshState()
+  }
+  updateObjective(objectiveId, descriptionText) {
+    if @isActive(objectiveId) {
+      Game.currentScenario.updateObjective(objectiveId, [description: descriptionText])
+      Game.refreshState()
+    }
+  }
+  complete(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.completed])
+    Game.refreshState()
+  }
+  fail(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.failed])
+    Game.refreshState()
+  }
+  isActive(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.active
+
+  remember(key, value) {
+    Game.currentScenario.addOrUpdateExtra(key, key, "", value)
+  }
+  recall(key) => Game.currentScenario.getExtraValue(key)
+  queue(event) {
+    pending = @recall(KEY_PENDING) ?? ""
+    if !(("," + event + ",") in pending) {
+      @remember(KEY_PENDING, (if pending == "" "," else pending) + event + ",")
+    }
+  }
+  addToSet(key, unitId) {
+    @remember(key, (@recall(key) ?? ",") + unitId + ",")
+  }
+  unitsIn(key) {
+    members = @recall(key) ?? ""
+    return Game.grid.allUnits.where(=> $0.coordinates != null && ("," + $0.id + ",") in members)
+  }
+
+  bandCount => @recall(KEY_BAND_COUNT) ?? 0
+  bandState(index) => @recall("bandState:" + index)
+  setBandState(index, state) => @remember("bandState:" + index, state)
+  turnedCount => @recall(KEY_TURNED) ?? 0
+
+  cellKey(at) => "" + at.0 + ":" + at.1 + ":" + at.2
+  marker(comment) => Game.grid.cells.first(=> $0.comment == comment)
+  markers(comment) => Game.grid.cells.where(=> $0.comment == comment)
+  distance(a, b) => Game.grid.elementAt(a).distance(b)
+  unitById(unitId) => Game.grid.allUnits.first(=> $0.id == unitId && $0.coordinates != null)
+  kagaaluUnit => @unitById(@recall(KEY_KAGAALU))
+
+  freeCellNear(center) {
+    for radius in 1...3 {
+      for candidate in Game.grid.ringAround(center, radius) {
+        if candidate.content == null && candidate.terrain != "sea" && candidate.terrain != "river" {
+          return candidate
+        }
+      }
+    }
+    return null
+  }
+}

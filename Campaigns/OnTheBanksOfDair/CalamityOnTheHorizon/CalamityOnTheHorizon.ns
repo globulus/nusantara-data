@@ -1,233 +1,777 @@
+# On the Banks of Dair, mission 1: Calamity on the Horizon.
+#
+# Act 1: Tonkaa leads Waanru and Uim to the western shore while Ormu musters warriors at the camp.
+# Act 2: the outsiders' ironclads kill Tonkaa. Ormu goes north for the sarcomancer Kagaalu while the outsiders march inland.
+# Act 3: Kagaalu leads the tribe across the Dair to Moheela swamp. Ironclads patrol the river and fire on anything on
+#        the water; Kagaalu's hidden canoes make the crossing quick; a landing party guards the north bank.
+#
+# Map markers (cell comments): tonkaaStart, waanruStart, uimStart, westernShore, Boats, Landing site, riverMouth,
+# riverEast, swamp. Everything that must survive a save is kept in objectives or in scenario extras (strings only).
+# Dialogs only reach the human on their own turn, so anything that happens off-turn is deferred (see onStateChange).
 scenario CalamityOnTheHorizon {
-  TONKA_PORTRAIT = "raider"
-  TONKAA_TITLE = "Warchief Tonkaa"
-  ORMU_PORTRAIT = "warrior"
-  ORMU_TITLE = "Ormu"
-  KAGAALU_PORTRAIT = "kagaalu"
-  KAGAALU_TITLE = "Kagaalu"
-  WARRIORS_TO_TRAIN = 3
+  WARRIORS_TO_TRAIN = 2
+  SHORE_TRIGGER_DISTANCE = 3
+  MEET_DISTANCE = 2
+  CANOE_DISTANCE = 2
+  ARRIVE_DISTANCE = 1
+  MIDSTREAM_Z = 3 # crossing this row of the river alerts the landing party
+  MARCH_CHASE_RANGE = 6
+  LANDING_LEASH = 6
+  BANK_REACH = 2 # an ironclad fires on Pyracmon's tribesmen this close
+  SHOT_DAMAGE = 20 # an ironclad shot on normal; a canoe survives one
+  BEAST_AGGRESSION_NORMAL = 0.3 # chance a beast attacks an adjacent unit each round on normal (always on hard)
+  WATER = ["river", "sea"]
+  HOSTILE_TYPES = ["thrall", "warrior", "raider", "totem", "sanghoyCamp", "warCouncil"]
+  GUARD_TYPES = ["thrall", "warrior", "raider"]
+  VILLAGE_GUARD_RADIUS = 4 # the warriors this close to Kagaalu's village are his followers, not Pyracmon's
 
-  OBJECTIVES = [
-    trainWarriors: [
-      id: "trainWarriors",
-      title: "Muster for battle",
-      image: "warrior",
-      description: "Collect gold and train $WARRIORS_TO_TRAIN warriors. Tonkaa must survive.",
-      state: ObjectiveStates.active
-    ],
-    investigateThunder: [
-      id: "investigateThunder",
-      title: "Ominous rumbling",
-      image: "raider",
-      description: "Take Tonkaa and two warriors to the western shore to investigate the source of the thunder. Tonkaa must survive.",
-      state: ObjectiveStates.active
-    ],
-    findKagaalu: [
-      id: "findKagaalu",
-      title: "Rogash's favorite",
-      image: "kagaalu",
-      description: "Search for the great Sarcomancer, Kagaalu, north of your base camp.",
-      state: ObjectiveStates.active
-    ],
-    goToSwamp: [
-      id: "goToSwamp",
-      title: "Safety in the bog",
-      image: "totem",
-      description: "Find a way to cross the river and reach the safety of Moheela swamp. Kagaalu must survive!",
-      state: ObjectiveStates.active
-    ],
-    findCanoes: [
-      id: "findCanoes",
-      title: "Find canoes",
-      image: "canoe",
-      description: "(OPTIONAL) Find canoes to cross the river.",
-      state: ObjectiveStates.active
-    ]
-  ]
+  OBJ_MUSTER = "muster"
+  OBJ_SHORE = "shore"
+  OBJ_KAGAALU = "kagaalu"
+  OBJ_SWAMP = "swamp"
+  OBJ_CANOES = "canoes"
+
+  # Scenario extras
+  KEY_WAANRU = "waanru"
+  KEY_UIM = "uim"
+  KEY_MARCHERS = "marchers"
+  KEY_LANDERS = "landers"
+  KEY_PATROL = "patrol"
+  KEY_PENDING = "pending"
+
+  # ------------------------------------------------------------------ setup
 
   onStart {
-    Server.setTimeoutEnabled(false)
-    players = Game.players
-    kagaaluPlayer = players.1
+    if Game.currentScenario.objectives.isEmpty { # a loaded game is already set up
+      @setUpMap()
+      @playIntro()
+    }
+  }
+
+  setUpMap {
+    player = @human()
+    followers = Game.players.1
+    outsiders = Game.players.2
+    tribes = Game.players.3
     startingLocations = Game.grid.startingLocations
-    @claimStartingUnits(players.0, startingLocations.0, 3, ["thrall", "warrior", "tonkaa", "sanghoyCamp"])
-    @claimStartingUnits(kagaaluPlayer, startingLocations.1, 2, ["kagaalu", "runestoneOfRogash", "totem"])
-    for unit in Game.grid.allUnits.where(=> $0.type.id == "canoe") {
-      unit.setOwner(kagaaluPlayer)
+    @claimUnits(player, startingLocations.0, 3, ["thrall", "sanghoyCamp", "tonkaa"])
+    @claimUnits(followers, startingLocations.1, 2, ["kagaalu", "runestoneOfRogash", "totem"])
+    @claimUnits(outsiders, startingLocations.2, 4, ["settler", "rifleman", "ironclad", "barracks"])
+    for canoe in Game.grid.allUnits.where(=> $0.type.id == "canoe") {
+      canoe.setOwner(followers)
     }
-    @claimStartingUnits(players.2, startingLocations.2, 4, ["settler", "rifleman", "ironclad", "barracks"])
+    refuge = @marker("swamp").content
+    if refuge != null {
+      refuge.setOwner(followers)
+    }
+    natureId = Game.nature.id
+    village = Game.grid.elementAt(startingLocations.1)
+    for stray in Game.grid.allUnits.where(=> $0.owner.id == natureId && $0.type.id in HOSTILE_TYPES) {
+      # Pyracmon's tribes hold the jungle, but the warriors camped by Kagaalu's village guard him: as tribesmen
+      # they'd kill him before Ormu could reach him.
+      stray.setOwner(if village.distance(stray.coordinates) <= VILLAGE_GUARD_RADIUS followers else tribes)
+    }
 
-    hostileSanghoyPlayer = players.3
-    for unit in Game.grid.allUnits\
-        .where(=> $0.owner.id == Game.nature.id && $0.type.id in ["thrall", "warrior", "raider", "totem", "sanghoyCamp", "warCouncil"]) {
-      unit.setOwner(hostileSanghoyPlayer)
+    # Tonkaa sets out from the camp with Waanru and Uim, through the jungle and its beasts; Ormu keeps the camp.
+    tonkaa = @unitOf(player, "tonkaa")
+    @remember(KEY_WAANRU, @freeCellNear(tonkaa.coordinates).summon("warrior", player).id)
+    @remember(KEY_UIM, @freeCellNear(tonkaa.coordinates).summon("warrior", player).id)
+    @freeCellNear(@campCoordinates()).summon("ormu", player)
+    tribes.addEffect("TribalSenses")
+    tribes.addEffect("TribalPaths")
+    if !@isHard() {
+      player.addEffect("RogashsBlessing") # normal: the heroes heal between fights
     }
-
-    if Game.currentScenario.objectives.isEmpty {
-      Server.setTimeoutEnabled(false)
-      Game.,positionCamera(@campCoordinates()) \
-        .,zoomCamera(8) \
-        .wait(1.0)
-      for _ in 2.times {
-        @playBombardmentSound()
-      }
-      Game.,wait(1.0) \
-        .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Did you hear that?")
-      @playBombardmentSound()
-      Game.,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Thunders rumble on the seas, yet the skies are clear?") \
-        .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "We should train more warriors and investigate. You mongrels, move out! My men need those provisions!") \
-        .,showDialog("thrall", Game.players.0.id, "Thrall", "No, not the whip!") \
-        .currentScenario.addObjective(OBJECTIVES.trainWarriors)
-      Game.refreshState()
-      Server.setTimeoutEnabledOnUserAction(true)
-    }
+    Game.refreshState()
   }
 
-  claimStartingUnits(player, startingLocation, searchRadius, allowedTypes) {
-    for unit in Game.unitsInRange(startingLocation, searchRadius) {
-      if unit.type.id in allowedTypes {
-        unit.setOwner(player)
-      }
+  claimUnits(player, startingLocation, searchRadius, allowedTypes) {
+    origin = Game.grid.elementAt(startingLocation)
+    for claimed in Game.grid.allUnits.where(=> $0.coordinates != null && $0.type.id in allowedTypes && origin.distance($0.coordinates) <= searchRadius) {
+      claimed.setOwner(player)
     }
   }
 
-  campCoordinates => Game.currentPlayer.ownedUnits.first(=> $0.type.id == "sanghoyCamp").coordinates
-  westernShoreCoordinates => Game.grid.cells.first(=> $0?.comment == "westernShore").coordinates
-
-  playBombardmentSound {
-    Game.playSound(campCoordinates(), "ironclad", SoundTypes.attack, true)
+  playIntro {
+    @pauseTimer()
+    camp = @campCoordinates()
+    Game.positionCamera(camp)
+    Game.zoomCamera(8)
+    Game.wait(1.0)
+    @bombardmentSound()
+    @bombardmentSound()
+    @ormuSays("cothIntroOrmu1")
+    Game.positionCamera(@unitOf(@human(), "tonkaa").coordinates)
+    Game.wait(0.5)
+    @bombardmentSound()
+    @tonkaaSays("cothIntroTonkaa1")
+    @tonkaaSays("cothIntroTonkaa2")
+    @startObjective(OBJ_SHORE, "cothShore", "tonkaa", null)
+    Game.positionCamera(camp)
+    @ormuSays("cothIntroOrmu2")
+    @ormuSays("cothIntroOrmu3")
+    @thrallSays("cothIntroThrall1")
+    @ormuSays("cothIntroOrmu4")
+    @thrallSays("cothIntroThrall2")
+    @startObjective(OBJ_MUSTER, "cothMuster", "warrior", @t("cothMusterDescription").format([WARRIORS_TO_TRAIN]))
+    @resumeTimer()
   }
 
-  makeCreepsAttackPlayer {
-    if Game.campaign.difficulty == "hard" {
-      # Console.println("Creeeps attacking player")
-      playerId = Game.players.0.id
-      for creep in Game.nature.ownedUnits \
-          .where(=> $0.type.a > 0) {
-          # .take(15) {
-        creepCoordinates = creep.coordinates
-        target = Game.grid.ringAround(creepCoordinates, 1) \
-          .first(=> $0.content?.owner?.id == playerId)
-        if target != null {
-          # Console.println("Creeeps attacking player unit $(target.content.type.id)")
-          Server.attack(creepCoordinates, target.coordinates, creepCoordinates, 0)
-        }
-      }
-    }
-  }
-
-  onTurnStart {
-    makeCreepsAttackPlayer()
-  }
+  # ------------------------------------------------------------------ events
 
   onCardPlay(card) {
-    if Game.currentScenario.objectiveState(OBJECTIVES.trainWarriors.id) == ObjectiveStates.active \
-        && card.type.id == "warrior" \
-        && Game.currentPlayer.ownedUnits.count(=> $0.type.id == "warrior") >= WARRIORS_TO_TRAIN {
-      Server.setTimeoutEnabled(false)
-      Game.currentScenario.updateObjective(OBJECTIVES.trainWarriors.id, [state: ObjectiveStates.completed])
-      Game.refreshState()
-      playBombardmentSound()
-      Game.,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "Waanru, Uim, with me! We need to go to the shore and see if our fishermen are in danger!") \
-          .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "$ORMU_TITLE, you stay here and watch for intruders!") \
-          .currentScenario.,addObjective(OBJECTIVES.investigateThunder) \
-            .addRevealedCell(westernShoreCoordinates())
-      Server.setTimeoutEnabledOnUserAction(true)
+    if Game.currentPlayerIndex == 0 && @isActive(OBJ_MUSTER) && card.type.id == "warrior" && @musterCount() >= WARRIORS_TO_TRAIN {
+      @pauseTimer()
+      @complete(OBJ_MUSTER)
+      @ormuSays("cothMustered")
+      @resumeTimer()
     }
   }
 
   onMove(unit, from, to) {
-    if Game.currentPlayerIndex == 0 {
-      visibleCells = Game.grid.visibleCells(Game.currentPlayer)
-      if Game.currentScenario.objectiveState(OBJECTIVES.investigateThunder.id) == ObjectiveStates.active \
-          && visibleCells.any(=> $0.content?.type?.id in ["rifleman", "settler", "ironclad"]) {
-        Server.setTimeoutEnabled(false)
-        Game.currentScenario.updateObjective(OBJECTIVES.investigateThunder.id, [state: ObjectiveStates.completed])
-        Game.,refreshState() \
-          .,showDialog(TONKA_PORTRAIT, Game.players.0.id, TONKAA_TITLE, "What the...?")
-        playBombardmentSound()
-        for unit in Game.unitsInRange(westernShoreCoordinates(), 8).where(=> $0.owner.id == Game.currentPlayer.id) {
-          unit.destroy(unit)
-        }
-        Game.,refreshState() \
-          .,wait(1.5) \
-          .,positionCamera(campCoordinates()) \
-          .,zoomCamera(7) \
-          .,showDialog(ORMU_PORTRAIT, Game.players.0.id, ORMU_TITLE, "Thunder again, and Tonkaa is yet to return...")
-        # playBombardmentSound()
-        for cell in Game.grid.cellsAround(westernShoreCoordinates(), 4, Game.currentPlayer) {
-          Game.currentScenario.addRevealedCell(cell.coordinates)
-        }
-        Game.,refreshState() \
-          .,positionCamera(westernShoreCoordinates()) \
-          .,zoomCamera(7) \
-          .,wait(2) \
-          .,showMessage("The outsiders are dangerous! Don't go there!") \
-          .,wait(1.5) \
-          .,positionCamera(campCoordinates()) \
-          .,showDialog(ORMU_PORTRAIT, Game.players.0.id, ORMU_TITLE, "I need to seek council of the great sarcomancer, Kagaalu! His totem lies north, near the edge of the jungle.") \
-          .currentScenario.addObjective(OBJECTIVES.findKagaalu)
-        Game.refreshState()
-        Server.setTimeoutEnabledOnUserAction(true)
-      } else if Game.currentScenario.objectiveState(OBJECTIVES.findKagaalu.id) == ObjectiveStates.active \
-          && visibleCells.any(=> $0.content?.type?.id == "kagaalu") {
-        Server.setTimeoutEnabled(false)
-        Game.currentScenario.updateObjective(OBJECTIVES.findKagaalu.id, [state: ObjectiveStates.completed])
-        Game.,refreshState() \
-          .,positionCamera(Game.grid.cells.first(=> $0.content?.type?.id == "kagaalu").coordinates) \
-          .,zoomCamera(7) \
-          .,showDialog(ORMU_PORTRAIT, Game.players.0.id, ORMU_TITLE, "Great one! Thunders are echoing in the clear sky! Tonkaa went to investigate, but neither him nor our warriors have returned yet.") \
-          .,showDialog(KAGAALU_PORTRAIT, Game.players.1.id, KAGAALU_TITLE, "Yes, I divinated with bones and entrails of beasts for many days now, and Rogash spoke to me.") \
-          .,showDialog(KAGAALU_PORTRAIT, Game.players.1.id, KAGAALU_TITLE, "These are the outsiders that captured many islands already! Their canoes are of iron, their numbers vast.") \
-          .,showDialog(KAGAALU_PORTRAIT, Game.players.1.id, KAGAALU_TITLE, "Our tribe is too weak to stop them. We must move and find shelter across the great river Dair.") \
-          .,showDialog(ORMU_PORTRAIT, Game.players.0.id, ORMU_TITLE, "But the far side of the river is controlled by our enemies, Kaatlaa, Teruu and other tribes that serve the great chieftain Pyracmon!") \
-          .,showDialog(KAGAALU_PORTRAIT, Game.players.1.id, KAGAALU_TITLE, "We will have to evade them and seek refuge in the swamp of Moheela. Let's not waste more time!")
-        kagaalu = Game.grid.allUnits.first(=> $0.type.id == "kagaalu")
-        kagaalu.setOwner(Game.currentPlayer)
-        Game.currentPlayer.setHero(kagaalu)
-        swampCell = Game.grid.cells.first(=> $0?.comment == "swamp")
-        kagaaluSwampDistance = swampCell.distance(kagaalu.coordinates)
-        northSwampCells = Game.grid.ringAround(swampCell.coordinates, 1) \
-          .where(=> $0.distance(kagaalu.coordinates) > kagaaluSwampDistance)
-        for northSwampCell in northSwampCells {
-          Game.currentScenario.addRevealedCell(northSwampCell.coordinates)
-        }
-        Game.currentScenario.addObjective(OBJECTIVES.goToSwamp)
-        Game.,refreshState() \
-          .,showDialog(KAGAALU_PORTRAIT, Game.players.0.id, KAGAALU_TITLE, "Crossing the river won't be easy, but I have hidden a few Canoes somwhere on the river bank...") \
-          .currentScenario.addObjective(OBJECTIVES.findCanoes)
-        Game.refreshState()
-        Server.setTimeoutEnabledOnUserAction(true)
-      } else if Game.currentScenario.objectiveState(OBJECTIVES.findCanoes.id) == ObjectiveStates.active \
-          && visibleCells.any(=> $0.content?.type?.id == "canoe") {
-        for unit in Game.grid.allUnits.where(=> $0.type.id == "canoe") {
-          unit.setOwner(Game.currentPlayer)
-        }
-        Game.showDialog(KAGAALU_PORTRAIT, Game.players.0.id, KAGAALU_TITLE, "There are our canoes! Swiftly now!")
-        Game.currentScenario.updateObjective(OBJECTIVES.findCanoes.id, [state: ObjectiveStates.completed])
-        Game.refreshState()
-      } else if visibleCells.any(=> $0?.comment == "swamp") {
-        Game.currentScenario.updateObjective(OBJECTIVES.goToSwamp.id, [state: ObjectiveStates.completed])
-        Server.win(Game.currentPlayer)
+    if unit.owner.id == @human().id {
+      typeId = unit.type.id
+      if @isActive(OBJ_SHORE) && typeId == "tonkaa" && @distance(to.coordinates, @markerAt("westernShore")) <= SHORE_TRIGGER_DISTANCE {
+        @ambushAtTheShore()
+      } else if @isActive(OBJ_KAGAALU) && typeId == "ormu" && @inSight(to.coordinates, @unitOfType("kagaalu").coordinates, MEET_DISTANCE) {
+        @meetKagaalu()
       }
+      if @isActive(OBJ_CANOES) && @nearCanoes(to.coordinates) {
+        @findCanoes()
+      }
+      if @isActive(OBJ_SWAMP) && @recall(KEY_LANDERS) == null && to.terrain == "river" && to.coordinates.2 >= MIDSTREAM_Z {
+        @landingParty()
+      }
+      @checkArrival()
+    }
+  }
+
+  onSkillCast(caster, skillId) {
+    if skillId == "unloadTransport" {
+      @checkArrival()
     }
   }
 
   onDie(unit) {
-    if unit.type.id == "tonkaa" && \
-        (Game.currentScenario.objectiveState(OBJECTIVES.trainWarriors.id) == ObjectiveStates.active \
-          || Game.currentScenario.objectiveState(OBJECTIVES.investigateThunder.id) == ObjectiveStates.active) {
-      Game.showMessage("Tonkaa died!")
-      Game.currentScenario.updateObjective(OBJECTIVES.trainWarriors.id, [state: ObjectiveStates.failed])
-      Game.lose(Game.players.0)
-      Game.refreshState()
-    } else if unit.type.id == "kagaalu" {
-      Game.showMessage("Kagaalu died!")
-      Game.currentScenario.updateObjective(OBJECTIVES.goToSwamp.id, [state: ObjectiveStates.failed])
-      Game.lose(Game.players.0)
-      Game.refreshState()
+    if unit.owner.id == @human().id {
+      typeId = unit.type.id
+      if typeId == "canoe" {
+        @swimAshore(unit)
+      }
+      if typeId == "canoe" && unit.loadedUnits.any(=> $0.type.id in ["ormu", "kagaalu"]) {
+        @defeat("cothDrowned", OBJ_SWAMP)
+      } else if typeId == "ormu" {
+        @defeat("cothOrmuDied", OBJ_SWAMP)
+      } else if typeId == "kagaalu" && @isActive(OBJ_SWAMP) {
+        @defeat("cothKagaaluDied", OBJ_SWAMP)
+      } else if typeId == "tonkaa" && @isActive(OBJ_SHORE) {
+        # Killed on the way, before the ambush. The story goes on without the shore scene.
+        @fail(OBJ_SHORE)
+        @startMarch()
+        @remember(KEY_PENDING, "tonkaaFell")
+      }
     }
   }
 
+  onStateChange {
+    @trackCanoes()
+    if Game.currentPlayerIndex == 0 && @recall(KEY_PENDING) == "tonkaaFell" {
+      @remember(KEY_PENDING, "")
+      @pauseTimer()
+      @ormuSays("cothShoreTonkaaFell")
+      @sendForKagaalu()
+      @resumeTimer()
+    }
+  }
+
+  onTurnStart {
+    @outsidersAct()
+    @creepsAttack()
+  }
+
   checkVictory => null
+
+  # ------------------------------------------------------------------ act 1: the shore
+
+  ambushAtTheShore {
+    @pauseTimer()
+    player = @human()
+    @complete(OBJ_SHORE) # before anyone dies, so onDie doesn't take Tonkaa's death for an early one
+    shore = @markerAt("westernShore")
+    for seen in Game.grid.cells.where(=> $0.distance(shore) <= 4) {
+      Game.currentScenario.addRevealedCell(seen.coordinates)
+    }
+    Game.refreshState()
+    tonkaa = @unitOf(player, "tonkaa")
+    Game.positionCamera(tonkaa.coordinates)
+    Game.zoomCamera(7)
+    @tonkaaSays("cothShore1")
+    @tonkaaSays("cothShore2")
+
+    uimId = @recall(KEY_UIM)
+    tonkaaAt = tonkaa.coordinates
+    victims = player.ownedUnits.where(=> $0.id != uimId && !$0.isBuilding && $0.coordinates != null && Game.grid.elementAt($0.coordinates).distance(tonkaaAt) <= 4)
+    shooters = Game.grid.allUnits.where(=> $0.type.id == "ironclad")
+    for victim in victims.where(=> $0.id != tonkaa.id) {
+      @shell(shooters.randomItem, victim)
+    }
+    @shell(shooters.randomItem, tonkaa) # Tonkaa falls last
+    Game.refreshState()
+
+    uim = @unitById(uimId)
+    if uim != null && uim.coordinates != null {
+      uim.setHealth(Math.max(5, uim.hp - 30))
+      Game.positionCamera(uim.coordinates)
+      @say("warrior", player, "cothSpeakerUim", "cothShoreUim")
+    }
+    @startMarch()
+    Game.wait(1.0)
+    Game.positionCamera(@campCoordinates())
+    @bombardmentSound()
+    @ormuSays("cothShoreOrmu1")
+    @sendForKagaalu()
+    @resumeTimer()
+  }
+
+  sendForKagaalu {
+    @ormuSays("cothShoreOrmu2")
+    @startObjective(OBJ_KAGAALU, "cothKagaalu", "kagaalu", null)
+    Game.showMessage(@t("cothOutsidersMarch"))
+  }
+
+  # The riflemen on the beach march on the camp, and chase anyone they come across.
+  startMarch {
+    for rifleman in Game.grid.allUnits.where(=> $0.type.id == "rifleman" && $0.owner.id == Game.players.2.id) {
+      @addToSet(KEY_MARCHERS, rifleman.id)
+    }
+  }
+
+  # ------------------------------------------------------------------ act 2: Kagaalu
+
+  meetKagaalu {
+    @pauseTimer()
+    player = @human()
+    followers = Game.players.1
+    @complete(OBJ_KAGAALU)
+    kagaalu = @unitOfType("kagaalu")
+    Game.positionCamera(kagaalu.coordinates)
+    Game.zoomCamera(7)
+    @ormuSays("cothMeet1")
+    @say("kagaalu", followers, "kagaaluTitle", "cothMeet2")
+    @say("kagaalu", followers, "kagaaluTitle", "cothMeet3")
+    @say("kagaalu", followers, "kagaaluTitle", "cothMeet4")
+    @ormuSays("cothMeet5")
+    @say("kagaalu", followers, "kagaaluTitle", "cothMeet6")
+    kagaalu.setOwner(player)
+    player.setHero(kagaalu)
+    # The warriors guarding his village follow him (the totem and the runestone stay).
+    for guard in followers.ownedUnits.where(=> $0.coordinates != null && $0.type.id in GUARD_TYPES) {
+      guard.setOwner(player)
+    }
+
+    refuge = @markerAt("swamp")
+    Game.currentScenario.addRevealedCell(refuge)
+    for nearRefuge in Game.grid.ringAround(refuge, 1) {
+      Game.currentScenario.addRevealedCell(nearRefuge.coordinates)
+    }
+    Game.currentScenario.addRevealedCell(@markerAt("Boats"))
+    @startObjective(OBJ_SWAMP, "cothSwamp", "totem", null)
+    @kagaaluSays("cothMeetCanoes")
+    @startObjective(OBJ_CANOES, "cothCanoes", "canoe", null)
+    @launchPatrol()
+    Game.positionCamera(kagaalu.coordinates)
+    @resumeTimer()
+  }
+
+  launchPatrol {
+    outsiders = Game.players.2
+    boats = 2
+    if @isHard() {
+      boats = 3
+    }
+    for mouth in @markers("riverMouth").take(boats) {
+      if mouth.content == null {
+        boat = mouth.summon("ironclad", outsiders)
+        @addToSet(KEY_PATROL, boat.id)
+        Game.currentScenario.addRevealedCell(mouth.coordinates)
+      }
+    }
+    Game.refreshState()
+    Game.positionCamera(@markerAt("riverMouth"))
+    @bombardmentSound()
+    @kagaaluSays("cothPatrol1")
+    @kagaaluSays("cothPatrol2")
+  }
+
+  # ------------------------------------------------------------------ act 3: the crossing
+
+  # Found once someone close by can see a canoe (or the spot where they were hidden, if they're gone).
+  nearCanoes(coordinates) {
+    for canoe in Game.grid.allUnits.where(=> $0.type.id == "canoe" && $0.coordinates != null) {
+      if @inSight(coordinates, canoe.coordinates, CANOE_DISTANCE) {
+        return true
+      }
+    }
+    return @inSight(coordinates, @markerAt("Boats"), CANOE_DISTANCE)
+  }
+
+  findCanoes {
+    @pauseTimer()
+    player = @human()
+    @complete(OBJ_CANOES)
+    for canoe in Game.grid.allUnits.where(=> $0.type.id == "canoe") {
+      canoe.setOwner(player)
+    }
+    Game.refreshState()
+    @kagaaluSays("cothCanoesFound")
+    @say("canoe", null, "canoeTitle", "cothCanoesHint")
+    @resumeTimer()
+  }
+
+  landingParty {
+    @pauseTimer()
+    outsiders = Game.players.2
+    landing = @markerAt("Landing site")
+    soldiers = 1
+    if @isHard() {
+      soldiers = 2
+    }
+    @remember(KEY_LANDERS, ",")
+    for spot in Game.grid.cells.where(=> $0.content == null && !($0.terrain in WATER) && $0.distance(landing) <= 2).take(soldiers) {
+      @addToSet(KEY_LANDERS, spot.summon("rifleman", outsiders).id)
+    }
+    Game.refreshState()
+    @kagaaluSays("cothLanding")
+    @resumeTimer()
+  }
+
+  checkArrival {
+    if @isActive(OBJ_SWAMP) {
+      kagaalu = @unitOf(@human(), "kagaalu")
+      if kagaalu != null && kagaalu.coordinates != null && @distance(kagaalu.coordinates, @markerAt("swamp")) <= ARRIVE_DISTANCE {
+        @arrive(kagaalu)
+      }
+    }
+  }
+
+  arrive(kagaalu) {
+    @pauseTimer()
+    player = @human()
+    @complete(OBJ_SWAMP)
+    Game.positionCamera(kagaalu.coordinates)
+    @kagaaluSays("cothArrive1")
+    @kagaaluSays("cothArrive2")
+    @saveProgress(kagaalu)
+    Server.win(player)
+  }
+
+  # What later missions can build on.
+  saveProgress(kagaalu) {
+    campaign = Game.campaign
+    if campaign != null {
+      progress = campaign.progressFor("CalamityOnTheHorizon")
+      if progress != null {
+        survivors = @human().ownedUnits.count(=> !$0.isBuilding)
+        progress.addOrUpdateExtra("kagaaluLevel", "kagaaluLevel", "", kagaalu.level)
+        progress.addOrUpdateExtra("survivors", "survivors", "", survivors)
+        progress.addOrUpdateExtra("usedCanoes", "usedCanoes", "", @isDone(OBJ_CANOES))
+      }
+      campaign.unlock("Landfall") # chapter 2
+      campaign.save()
+    }
+  }
+
+  shell(shooter, victim) {
+    victimAt = victim.coordinates
+    Game.animateAttack(shooter, victim)
+    Game.animateVisualFx([[type: "explosion", coordinates: victimAt]])
+    victim.destroy(shooter)
+    Game.wait(0.4)
+  }
+
+  # Before the outsiders sink a canoe, whoever is aboard jumps into the water next to it (if there's room). Without
+  # this they would sink with it: the engine drops the passengers of a destroyed transport.
+  abandonShip(target, maxDamage) {
+    if target.type.id == "canoe" && target.hp <= maxDamage {
+      canoeAt = target.coordinates
+      for passenger in target.loadedUnits {
+        spot = Game.grid.ringAround(canoeAt, 1).first(=> $0.content == null)
+        if spot != null {
+          target.unload(spot.coordinates)
+        }
+      }
+    }
+  }
+
+  # Remembers where every canoe is: by the time a sunk canoe's onDie runs it's off the grid, and its passengers
+  # need somewhere to swim from.
+  trackCanoes {
+    for canoe in Game.grid.allUnits.where(=> $0.type.id == "canoe" && $0.coordinates != null) {
+      at = canoe.coordinates
+      @remember("canoeX:" + canoe.id, at.0)
+      @remember("canoeY:" + canoe.id, at.1)
+      @remember("canoeZ:" + canoe.id, at.2)
+    }
+  }
+
+  # Whoever was aboard a sunk canoe swims to a free cell next to it, if there is one (not out to sea). Only those
+  # with nowhere to go drown with it. (abandonShip does this before an ironclad's shot; this catches everything else,
+  # such as Pyracmon's tribesmen hacking at a canoe by the bank.)
+  swimAshore(canoe) {
+    x = @recall("canoeX:" + canoe.id)
+    if x == null {
+      return
+    }
+    canoeAt = [x, @recall("canoeY:" + canoe.id), @recall("canoeZ:" + canoe.id)]
+    for passenger in canoe.loadedUnits {
+      spot = Game.grid.ringAround(canoeAt, 1).first(=> $0.content == null && $0.terrain != "sea")
+      if spot != null {
+        canoe.unload(spot.coordinates)
+      }
+    }
+    Game.refreshState()
+  }
+
+  defeat(lineKey, objectiveId) {
+    if @isActive(objectiveId) {
+      @fail(objectiveId)
+    }
+    Game.showMessageToAll(@t(lineKey))
+    Game.lose(@human())
+    Game.refreshState()
+  }
+
+  # ------------------------------------------------------------------ the outsiders
+
+  # Runs at the start of every round, before the human's turn.
+  outsidersAct {
+    for marcher in @unitsIn(KEY_MARCHERS) {
+      prey = @nearestPlayerUnit(marcher.coordinates, MARCH_CHASE_RANGE, false)
+      if prey != null {
+        @hunt(marcher, prey.coordinates)
+      } else if @unitOf(@human(), "sanghoyCamp") != null {
+        @hunt(marcher, @campCoordinates())
+      } else {
+        prey = @nearestPlayerUnit(marcher.coordinates, 99, false)
+        if prey != null {
+          @hunt(marcher, prey.coordinates)
+        }
+      }
+    }
+    landing = @markerAt("Landing site")
+    for lander in @unitsIn(KEY_LANDERS) {
+      prey = @nearestPlayerUnit(lander.coordinates, LANDING_LEASH, false)
+      if prey != null && @distance(prey.coordinates, landing) <= LANDING_LEASH {
+        @hunt(lander, prey.coordinates)
+      }
+    }
+    for boat in @unitsIn(KEY_PATROL) {
+      @patrol(boat)
+    }
+  }
+
+  # Attacks a unit of the human player in reach, otherwise moves towards goal.
+  hunt(hunter, goal) {
+    if !@attackPlayerUnit(hunter) {
+      if @trek(hunter, goal, 1) {
+        @attackPlayerUnit(hunter)
+      }
+    }
+  }
+
+  # Attacks the weakest unit of the human's within the attacker's reach, from where it stands. (The engine's attack
+  # range only lists what the outsiders can see at that moment, which at the start of a round is next to nothing.)
+  attackPlayerUnit(attacker) {
+    playerId = @human().id
+    origin = attacker.coordinates
+    if origin == null {
+      return false
+    }
+    inReach = Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null && Game.grid.elementAt(origin).distance($0.coordinates) <= attacker.range(CombatTypes.attack, $0))
+    if inReach.isEmpty {
+      return false
+    }
+    target = inReach.minBy(=> $0.hp)
+    @abandonShip(target, 20)
+    if attacker.ap <= 0 {
+      attacker.setActions(1)
+    }
+    Server.attack(origin, target.coordinates, origin, 0)
+    return true
+  }
+
+  # Ironclads sail up and down the main channel of the river, between its mouth and its eastern end, and fire on
+  # anything of the human's on the water in range. They don't hunt: their cell stays revealed and their route is fixed,
+  # so the human can time the crossing.
+  patrol(boat) {
+    origin = boat.coordinates
+    if origin != null {
+      fireRange = 3
+      steps = 3
+      if @isHard() {
+        fireRange = 4
+        steps = 4
+      }
+      target = @nearestPlayerUnit(origin, fireRange, true)
+      tribesman = @weakestTribesmanNear(origin, BANK_REACH)
+      if target != null {
+        @fire(boat, target)
+      } else if tribesman != null {
+        @fireOnTribesman(boat, tribesman)
+      } else {
+        Game.currentScenario.removeRevealedCell(origin)
+        if !@sail(boat, @patrolGoal(boat), steps) {
+          @turnAround(boat) # blocked (e.g, by someone wading in the channel): patrol the other way
+        }
+        Game.currentScenario.addRevealedCell(boat.coordinates)
+        if @isHard() {
+          target = @nearestPlayerUnit(boat.coordinates, fireRange, true)
+          if target != null {
+            @fire(boat, target)
+          }
+        }
+      }
+    }
+  }
+
+  fire(boat, target) {
+    @abandonShip(target, 50)
+    if @isHard() {
+      boat.setActions(1)
+      Game.combat(boat, target)
+    } else {
+      targetAt = target.coordinates
+      Game.animateAttack(boat, target)
+      Game.animateVisualFx([[type: "explosion", coordinates: targetAt]])
+      target.takeDamage(SHOT_DAMAGE, boat)
+    }
+  }
+
+  # Pyracmon's tribesmen who come at an ironclad from the bank get a broadside: the cannon fires a real attack (the
+  # boat only retaliates once a round, so a band of them could otherwise whittle it down unanswered).
+  weakestTribesmanNear(origin, maxRange) {
+    if origin == null {
+      return null
+    }
+    tribesId = Game.players.3.id
+    here = Game.grid.elementAt(origin)
+    near = Game.grid.allUnits.where(=> $0.owner.id == tribesId && $0.coordinates != null && !$0.isBuilding \
+      && here.distance($0.coordinates) <= maxRange)
+    if near.isEmpty {
+      return null
+    }
+    return near.minBy(=> $0.hp)
+  }
+
+  fireOnTribesman(boat, target) {
+    boat.setActions(1)
+    Game.combat(boat, target)
+  }
+
+  patrolGoal(boat) {
+    directionKey = "heading:" + boat.id
+    heading = @recall(directionKey) ?? "riverEast"
+    if @distance(boat.coordinates, @markerAt(heading)) <= 2 {
+      heading = @turnAround(boat)
+    }
+    return @markerAt(heading)
+  }
+
+  turnAround(boat) {
+    directionKey = "heading:" + boat.id
+    heading = "riverEast"
+    if (@recall(directionKey) ?? "riverEast") == "riverEast" {
+      heading = "riverMouth"
+    }
+    @remember(directionKey, heading)
+    return heading
+  }
+
+  # The jungle is dangerous: beasts attack the human's units that linger next to them (on normal, each
+  # beast only half the time, so a party fighting its way through isn't ground down by every bush).
+  creepsAttack {
+    playerId = @human().id
+    aggression = if @isHard() 1.0 else BEAST_AGGRESSION_NORMAL
+    for creep in Game.nature.ownedUnits.where(=> ($0.type.a ?? 0) > 0) {
+      creepAt = creep.coordinates
+      prey = Game.grid.ringAround(creepAt, 1).first(=> $0.content?.owner?.id == playerId)
+      if prey != null && Math.randomFloat() < aggression {
+        Server.attack(creepAt, prey.coordinates, creepAt, 0)
+      }
+    }
+  }
+
+  # ------------------------------------------------------------------ helpers
+
+  t(key) => Game.localizedStr(key)
+  # Cutscenes stop the turn timer; it starts again with the human's next action.
+  pauseTimer => Server.setTimeoutEnabled(false)
+  resumeTimer => Server.setTimeoutEnabledOnUserAction(true)
+  human => Game.players.0
+  isHard => Game.currentScenario.difficulty == "hard"
+
+  say(portrait, owner, titleKey, lineKey) {
+    Game.showDialog(portrait, owner?.id, @t(titleKey), @t(lineKey))
+  }
+  tonkaaSays(lineKey) => @say("tonkaa", @human(), "tonkaaTitle", lineKey)
+  ormuSays(lineKey) => @say("ormu", @human(), "ormuTitle", lineKey)
+  kagaaluSays(lineKey) => @say("kagaalu", @human(), "kagaaluTitle", lineKey)
+  thrallSays(lineKey) => @say("thrall", @human(), "cothSpeakerThrall", lineKey)
+
+  startObjective(objectiveId, keyBase, image, descriptionText) {
+    objective = [
+      id: objectiveId,
+      title: @t(keyBase + "Title"),
+      description: descriptionText ?? @t(keyBase + "Description"),
+      image: image,
+      state: ObjectiveStates.active
+    ]
+    Game.currentScenario.addObjective(objective)
+    Game.refreshState()
+  }
+  complete(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.completed])
+    Game.refreshState()
+  }
+  fail(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.failed])
+    Game.refreshState()
+  }
+  isActive(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.active
+  isDone(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.completed
+
+  remember(key, value) {
+    Game.currentScenario.addOrUpdateExtra(key, key, "", value)
+  }
+  recall(key) => Game.currentScenario.getExtraValue(key)
+  addToSet(key, unitId) {
+    @remember(key, (@recall(key) ?? ",") + unitId + ",")
+  }
+  unitsIn(key) {
+    members = @recall(key) ?? ""
+    return Game.grid.allUnits.where(=> ("," + $0.id + ",") in members)
+  }
+
+  marker(comment) => Game.grid.cells.first(=> $0.comment == comment)
+  markers(comment) => Game.grid.cells.where(=> $0.comment == comment)
+  markerAt(comment) => @marker(comment).coordinates
+  distance(a, b) => Game.grid.elementAt(a).distance(b)
+
+  unitOf(player, typeId) => player.ownedUnits.first(=> $0.type.id == typeId)
+  unitOfType(typeId) => Game.grid.allUnits.first(=> $0.type.id == typeId)
+  unitById(unitId) => Game.grid.allUnits.first(=> $0.id == unitId)
+  campCoordinates => @unitOf(@human(), "sanghoyCamp")?.coordinates ?? Game.grid.startingLocations.0
+  musterCount {
+    party = [@recall(KEY_WAANRU), @recall(KEY_UIM)]
+    return @human().ownedUnits.count(=> $0.type.id == "warrior" && !($0.id in party))
+  }
+
+  # Whether someone at `from` notices what's at `target`: next to it always, further out (up to maxDistance)
+  # only if the player can actually see that cell, since the jungle hides what's a couple of cells away.
+  inSight(from, target, maxDistance) {
+    apart = @distance(from, target)
+    if apart > maxDistance {
+      return false
+    }
+    if apart <= 1 {
+      return true
+    }
+    targetCell = Game.grid.elementAt(target)
+    return Game.grid.visibleCells(@human()).any(=> targetCell.distance($0.coordinates) == 0)
+  }
+
+  freeCellNear(center) {
+    for radius in 1...3 {
+      for candidate in Game.grid.ringAround(center, radius) {
+        if candidate.content == null && !(candidate.terrain in WATER) {
+          return candidate
+        }
+      }
+    }
+    return null
+  }
+
+  nearestPlayerUnit(origin, maxRange, waterOnly) {
+    if origin == null {
+      return null
+    }
+    playerId = @human().id
+    here = Game.grid.elementAt(origin)
+    best = null
+    bestDistance = maxRange + 1
+    for candidate in Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null) {
+      candidateCell = Game.grid.elementAt(candidate.coordinates)
+      if !waterOnly || candidateCell.terrain in WATER {
+        candidateDistance = here.distance(candidate.coordinates)
+        if candidateDistance < bestDistance {
+          best = candidate
+          bestDistance = candidateDistance
+        }
+      }
+    }
+    return best
+  }
+
+  # The outsiders' soldiers march by the script, not by sight (they would stall at every patch of jungle they're
+  # too slow to enter): up to steps cells over open land, each one closer to goal.
+  trek(walker, goal, steps) {
+    origin = walker.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    at = Game.grid.elementAt(origin)
+    for i in 0..steps {
+      nextCell = null
+      nextDistance = at.distance(goal)
+      for land in Game.grid.ringAround(at.coordinates, 1) {
+        if land.content == null && !(land.terrain in WATER) && land.distance(goal) < nextDistance {
+          nextCell = land
+          nextDistance = land.distance(goal)
+        }
+      }
+      if nextCell != null {
+        at = nextCell
+      }
+    }
+    if at.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, at.coordinates, 0)
+    return true
+  }
+
+  # Boats sail by the river, not by sight: up to steps cells along the open water of the main channel, each one
+  # closer to goal.
+  sail(boat, goal, steps) {
+    origin = boat.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    channel = @markers("riverMouth").map(=> $0.coordinates.2)
+    channel.addAll(@markers("riverEast").map(=> $0.coordinates.2))
+    laneLow = channel.minBy(=> $0) - 1
+    laneHigh = channel.maxBy(=> $0) + 1
+    at = Game.grid.elementAt(origin)
+    for i in 0..steps {
+      nextCell = null
+      nextDistance = at.distance(goal)
+      for water in Game.grid.ringAround(at.coordinates, 1) {
+        row = water.coordinates.2
+        if water.content == null && water.terrain in WATER && row >= laneLow && row <= laneHigh && water.distance(goal) < nextDistance {
+          nextCell = water
+          nextDistance = water.distance(goal)
+        }
+      }
+      if nextCell != null {
+        at = nextCell
+      }
+    }
+    if at.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, at.coordinates, 0)
+    return true
+  }
+
+  bombardmentSound => Game.playSound(@campCoordinates(), "ironclad", SoundTypes.attack, true)
 }

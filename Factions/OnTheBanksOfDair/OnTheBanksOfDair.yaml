@@ -7,6 +7,7 @@ units:
     title: ironcladTitle
     description: ironcladDescription
     image: Images/ironclad
+    projectile: shell
     sounds:
       attack: Sounds/Ironclad/attack
     flavor: ironcladFlavor
@@ -29,6 +30,7 @@ units:
     title: tonkaaTitle
     description: tonkaaDescription
     image: ../Sanghoy/Images/raider
+    projectile: slash
     flavor: tonkaaFlavor
     merit: 160
     h: 60
@@ -42,6 +44,34 @@ units:
     stances:
       - Offense
       - Defense
+    tags:
+      - organic
+    skills:
+      - collectBlood
+  - id: ormu
+    title: ormuTitle
+    description: ormuDescription
+    image: ../Sanghoy/Images/Warrior/warrior
+    flavor: ormuFlavor
+    sounds:
+      summon: ../Sanghoy/Sounds/Warrior/Summon
+      select: ../Sanghoy/Sounds/Warrior/Select
+      attack: ../Sanghoy/Sounds/Warrior/Attack
+      die: ../Sanghoy/Sounds/Warrior/Die
+    merit: 150
+    h: 70
+    a: 10
+    as: 3
+    ac: 2
+    rc: 2
+    d: 2
+    s: 3
+    m: walk
+    projectile: slash
+    stances:
+      - Offense
+      - Defense
+      - Camp
     tags:
       - organic
     skills:
@@ -73,7 +103,8 @@ units:
     merit: 120
     h: 30
     d: 0
-    s: 2
+    s: 4
+    sight: 2
     m: naval
     loadCapacity: 2
     stances:
@@ -87,6 +118,7 @@ units:
     title: cyclopsAmalgamTitle
     description: cyclopsAmalgamDescription
     image: Images/cyclopsAmalgam
+    projectile: impact
     flavor: cyclopsFlavor
     merit: 700
     h: 200
@@ -101,3 +133,109 @@ units:
     skills:
       - siegeAttack
       - rockLob
+  # ---- Campaign-only units for the later missions (each tuned by the mission that introduces it)
+  - id: yon # Shaping of Yon / Battle of Bragi: the cyclops amalgam raised from the Well
+    title: yonTitle
+    description: yonDescription
+    image: Images/yon
+    projectile: impact
+    flavor: yonFlavor
+    merit: 900
+    h: 220
+    reg: 4
+    a: 40
+    as: 3
+    d: 5
+    s: 4 # two cells of open ground a turn
+    sight: 2
+    m: walk
+    stances:
+      - Offense
+    tags:
+      - organic
+      - beastman
+    skills:
+      - siegeAttack
+      - yonRockLob # rockLob has no cost (it could be cast without limit); this one takes 3 actions
+      - collectBlood
+  - id: crimsonCorral # (not shapingCorral: that is a Sanghoy upgrade id) Industrial Devastation: where the Crimson Horde reshapes captives (and Alrood is reborn)
+    title: indevCorralTitle # not shapingCorral*: test.yaml defines those for the Sanghoy upgrade of the same name
+    description: indevCorralDescription
+    image: ../Neutral/Images/shapingCorral
+    flavor: indevCorralFlavor
+    merit: 300
+    h: 120
+    d: 2
+    s: 2
+    m: immovable
+    sight: 2
+    stances:
+      - Ceasefire
+    tags:
+      - building
+  - id: bloodbatNest # Air Superiority: hatches blood bats (by the script); stands on plateaus only fliers reach
+    title: bloodbatNestTitle
+    description: bloodbatNestDescription
+    image: Images/bloodbatNest
+    flavor: bloodbatNestFlavor
+    merit: 300
+    h: 100
+    d: 2
+    s: 1
+    m: immovable
+    sight: 2
+    stances:
+      - Ceasefire
+    tags:
+      - building
+    skills:
+      - airOutOfReach # only fliers and troops standing on a plateau can harm it
+heroes:
+  - id: alooq # Air Superiority: Alooq, the Treetop Terror (an enemy hero; the script hides him, hunts and heals)
+    title: alooqTitle
+    description: alooqDescription
+    image: Images/alooq
+    flavor: alooqFlavor
+    sounds:
+      summon: ../Sanghoy/Sounds/BloodBat/Summon
+      select: ../Sanghoy/Sounds/BloodBat/Select
+      attack: ../Sanghoy/Sounds/BloodBat/Attack
+      die: ../Sanghoy/Sounds/BloodBat/Die
+    merit: 1000
+    h: 120
+    reg: 3
+    a: 10
+    as: 2
+    ac: 3
+    rc: 2
+    d: 2
+    s: 3
+    m: fly
+    projectile: slash
+    sight: 3
+    v: 2
+    f: 2
+    g: 1
+    p: 0
+    vitalityProgression: 2
+    fortitudeProgression: 1
+    guardProgression: 1
+    stances:
+      - Offense
+      - Defense
+    tags:
+      - organic
+      - beastman
+    skills:
+      - collectBlood
+      - bloodBatDrainAttack
+      - airTreetopTerror
+    upgradeTree:
+      nodes:
+        - type: heroStatsL1
+          subnodes:
+            - type: heroStatsL2
+              subnodes:
+                - type: heroStatsL3
+                  subnodes:
+                    - type: heroStatsL4

@@ -1,0 +1,65 @@
+# Mission 5: Shaping of Yon
+shapingOfYonTitle: Shaping of Yon
+shapingOfYonDescription: The Well Kagaalu woke in the mire is thirsty, and the outsiders are coming up the road.
+shapingOfYonLoadingText: Something sleeps at the bottom of the Sacrificial Well. Rogash has shown Kagaalu its shape, and its name.
+
+# Skills and effects
+yonOfferBloodTitle: Offer Blood
+yonScopesTitle: Spotting scopes
+
+# Speakers
+yonSpeakerLookout: Lookout
+
+# Objectives
+yonWellTitle: Feed the Well
+yonWellDescription: "Offer Blood at the Sacrificial Well until it holds {1}. Offered so far: {0} / {1}. The Well and Kagaalu must survive."
+yonBaseTitle: Break the iron nest
+yonBaseDescription: "Destroy the outsiders' forward base east along the road. Buildings left: {0}. Yon and Kagaalu must survive. Blood offered beyond the goal feeds Yon: {1}."
+
+# Opening
+yonIntro1: The Well drinks, and still it thirsts. Rogash has shown me what sleeps at the bottom.
+yonIntro2: A giant, shaped from offerings of blood. His name is Yon. Fill the Well, and he will rise for the tribe.
+yonIntro3: Great one! Smoke on the eastern road. The outsiders have built a nest of iron there, and their machines are stirring.
+yonIntro4: Then we hold the camp. Every drop they spill here is an offering.
+yonCaptives: The captives we freed from Pyracmon's slave post have not left us. They will fight for the Well too.
+
+# Hints
+yonOfferHint: "Select the Sacrificial Well and use <b>Offer Blood</b>. It pours up to 10 of your Blood into the Well and costs no action. Blood kept back can pay for sarcomancy and shaping instead."
+yonSacrificeHint: "Your warriors earn Blood with every blow, and every machine destroyed spills its crew's. The Well's <b>Sacrifice of Blood</b> turns a unit next to it into Blood: the healthier the unit, the more Blood."
+yonCrewBlood: "The machine's crew bleeds into the mud: {0} Blood."
+
+# During the fight
+yonFirstWave: Iron walkers on the road! They are coming for the Well.
+yonWave: Another wave of machines leaves the outsiders' base.
+yonWellHit: They are shooting at the Well! Keep them away from it.
+yonRepairHint: "Thralls can mend the Well: <b>Repair</b> restores 15 health for 1 gold, from a cell next to it."
+yonMev: That wagon mends their iron as fast as we break it. Kill it first.
+yonFirstDrop: A flying ship! It dropped iron turrets at the edge of the camp!
+yonDrop: The airship drops more turrets at the edge of the camp.
+yonHalf: The Well is half full. Something turns over in the deep.
+yonAlmost: Can you hear it? He is breathing. A little more.
+
+# Yon
+yonRise1: Enough. Rogash, take what we have given, and give us what you promised.
+yonRise2: YON.
+yonRiseShock: The earth itself throws their machines aside!
+yonRise3: Yon. Rogash shaped you from our dead and from the blood of our enemies. You belong to the tribe.
+yonRise4: The outsiders' iron nest, on the eastern road. Go, and break it.
+yonRockHint: "Yon hurls boulders with <b>Rock Lob</b>, and his blows crush buildings. Any Blood offered from now on feeds him."
+yonWellLost: The Well is broken. It has given us Yon; that was all Rogash asked of it.
+yonFallBack: Look! Their machines are turning back. They run for their iron nest!
+yonLastStand: The outsiders gather every machine they have left around their base.
+yonFeed: "Yon drinks from the Well. Blood offered beyond the goal: {0}."
+yonBaseHit: One of their iron houses is down. Finish it.
+yonBaseFellEarly: Their nest is burning, but the Well is not full. More will come up that road.
+
+# Ending
+yonVictory1: Their nest burns. Let the outsiders on the coast see the smoke.
+yonVictory2: Their great camp lies down the river, at Bragi. Go to Bragi, Yon, and show them what the Well has made.
+yonVictory3: YON.
+
+# Defeat
+yonWellDestroyed: The Sacrificial Well is broken. What slept in it will never rise.
+yonKagaaluDied: Kagaalu has fallen. Without Rogash's favourite, the Well falls silent.
+yonKagaaluDiedYonRisen: Kagaalu has fallen. With no one to speak Rogash's will, Yon wanders off into the mire.
+yonYonDied: Yon has fallen, and the tribe's hope with him.

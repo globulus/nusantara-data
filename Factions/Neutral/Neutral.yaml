@@ -458,10 +458,11 @@ units:
 
   ## Tribes
   - id: elrood
-    title: elroodTitle
-    description: elroodDescription
-    image: Images/elrood
-    flavor: elroodFlavor
+    title: alroodTitle
+    description: alroodDescription
+    image: Images/alrood
+    projectile: slash
+    flavor: alroodFlavor
     merit: 800
     h: 80
     reg: 4
@@ -488,6 +489,7 @@ units:
     title: crimsonOutriderTitle
     description: crimsonOutriderDescription
     image: Images/crimsonOutrider
+    projectile: slash
     flavor: crimsonOutriderFlavor
     merit: 180
     h: 60

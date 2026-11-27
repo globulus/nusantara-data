@@ -1,0 +1,152 @@
+# Campaign: On the Banks of Dair
+onTheBanksOfDairName: Banks of Dair
+calamityOnTheHorizonDescription: Thunder rumbles from a clear sky over the mouth of the Dair, and Warchief Tonkaa goes to see why.
+
+# Units and skills of the campaign faction
+ironcladTitle: Ironclad
+ironcladDescription: An outsider warship of iron and smoke. Its cannons reach far across the water.
+ironcladFlavor: The fishermen called them canoes of iron. Nobody had a better word yet.
+tonkaaTitle: Warchief Tonkaa
+tonkaaDescription: Chieftain of the tribe at the mouth of the Dair.
+tonkaaFlavor: He has never lost a fight he started.
+ormuTitle: Ormu
+ormuDescription: Tonkaa's most trusted warrior, left to keep the camp. If Ormu falls, the tribe is lost.
+ormuFlavor: Ormu listens more than he speaks, which is why Tonkaa keeps him close.
+canoeTitle: Canoe
+canoeDescription: A light river canoe that carries two. Fast on the water, helpless against cannons.
+canoeFlavor: Kagaalu hid them for a day like this one.
+cyclopsAmalgamTitle: Cyclops Amalgam
+cyclopsAmalgamDescription: A giant stitched together by sarcomancy. Lobs rocks at its enemies.
+cyclopsAmalgamFlavor: Nobody remembers who made the first one.
+rockLobTitle: Rock Lob
+loadTransportTitle: Load
+unloadTransportTitle: Unload
+
+yonTitle: Yon
+yonDescription: The cyclops amalgam raised from the Well of the Mire. Hurls rocks; regenerates.
+yonFlavor: Every offering poured into the Well went into him. He remembers each one.
+bloodbatNestTitle: Bloodbat Nest
+bloodbatNestDescription: A roost atop the jungle plateaus. Hatches blood bats; only fliers can reach it.
+bloodbatNestFlavor: The canopy drips red at dusk.
+alooqTitle: Alooq, the Treetop Terror
+alooqDescription: The great blood bat of the plateaus. Hunts airships and heals at his nests.
+alooqFlavor: The crews of Skyfleet tell of a shadow that drinks the light from the lamps.
+
+# Speakers
+cothSpeakerThrall: Thrall
+cothSpeakerUim: Uim
+
+# Objectives
+cothMusterTitle: Muster for battle
+cothMusterDescription: "Train {0} warriors at the camp. Thralls can mine gold at the gold mine east of the camp."
+cothShoreTitle: Ominous rumbling
+cothShoreDescription: Lead Tonkaa to the western shore and find the source of the thunder.
+cothKagaaluTitle: Rogash's favourite
+cothKagaaluDescription: Bring Ormu to the sarcomancer Kagaalu, north of the camp. Ormu must survive.
+cothSwampTitle: Safety in the bog
+cothSwampDescription: Cross the river Dair and bring Kagaalu to the totem in Moheela swamp, far to the north-west. Kagaalu and Ormu must survive.
+cothCanoesTitle: Kagaalu's canoes
+cothCanoesDescription: (Optional) Find the canoes Kagaalu hid where the river bends, west of his totem. A canoe crosses the river far faster than wading.
+
+# Opening
+cothIntroOrmu1: Thunder? There isn't a cloud in the sky.
+cothIntroTonkaa1: You heard that too? Thunder rolling over the sea, and the sky as clear as a pool.
+cothIntroTonkaa2: Waanru, Uim, with me. Our fishermen live on that shore.
+cothIntroOrmu2: Tonkaa wants me to keep the camp. If something is coming from the sea, we'll need more warriors.
+cothIntroOrmu3: Thralls! To the gold mine, now!
+cothIntroThrall1: No, not the whip!
+cothIntroOrmu4: I don't have a whip.
+cothIntroThrall2: ...To the mine, yes.
+
+# Muster
+cothMustered: The warriors are ready. Whatever comes from the sea, we'll meet it.
+
+# The shore
+cothShore1: Canoes of iron, belching smoke... and men on the beach, holding sticks of fire.
+cothShore2: Down! Get down!
+cothShoreUim: Tonkaa! Waanru! ...They're gone. I have to warn the camp!
+cothShoreOrmu1: Thunder again, from the shore where Tonkaa went.
+cothShoreOrmu2: If the warchief has fallen, only Kagaalu can tell us what to do. His totem stands north of the camp, at the edge of the jungle.
+cothShoreTonkaaFell: Tonkaa has fallen before he even reached the shore. The tribe needs counsel, and fast.
+cothOutsidersMarch: The outsiders are coming ashore. In a few days they will reach the camp.
+
+# Kagaalu
+cothMeet1: Great one! Thunder in a clear sky, and Tonkaa has not returned!
+cothMeet2: I know. I have read the bones and the entrails for nine days, and Rogash has spoken.
+cothMeet3: These are the outsiders who took the islands to the south. Their canoes are made of iron, and there are more of them than stars.
+cothMeet4: We are too few to fight them. We must cross the Dair and hide in the swamp of Moheela.
+cothMeet5: The far bank belongs to Pyracmon's tribes. They will kill us on sight!
+cothMeet6: Then we will not be seen. Gather who you can, and follow me.
+cothMeetCanoes: I hid canoes where the river bends, west of here. Wading the Dair takes days; a canoe takes hours.
+
+# The river
+cothPatrol1: More iron canoes are coming up the river.
+cothPatrol2: They sail up and down the river and fire on anything on the water. Watch them, and cross when they have passed.
+cothLanding: The outsiders have seen us! A boat is putting soldiers ashore on the north bank.
+
+# Canoes
+cothCanoesFound: There they are, just as I left them. Two to a canoe, and keep low.
+cothCanoesHint: "Select a canoe next to one of your units and use <b>Load</b>. Move the canoe across, then use <b>Unload</b> on an empty cell of the far bank."
+
+# Ending
+cothArrive1: Moheela. The mist will hide us, and the outsiders' iron will rust in the mud.
+cothArrive2: We have lost our warchief and our home. But we are alive, and Rogash is not done with us.
+
+# Defeat
+cothOrmuDied: Ormu has fallen. Without him, the tribe scatters.
+cothKagaaluDied: Kagaalu has fallen. Without his counsel, the tribe is lost.
+cothDrowned: The canoe is sunk, and the Dair takes those aboard. The tribe is lost.
+
+# ------------------------------------------------------------------ Mission 2: Landfall
+lfSpeakerCaptain: Captain Varrenne
+lfSpeakerNavy: The Resolute
+
+# Objectives
+lfColonyTitle: Landfall
+lfColonyDescription: Found the Colonial Hall with a settler. If every settler falls before it stands, the landing fails.
+lfBarracksTitle: Dig in
+lfBarracksDescription: Build a Barracks with the Colonial Hall. The Hall must stand.
+lfCampsTitle: Break the clans
+lfCampsDescription: "Destroy Pyracmon's war camps. Each camp destroyed stops its warbands. Camps left: {0}."
+lfWarchiefsTitle: Cut off the head
+lfWarchiefsDescription: "(Optional) Kill the warchiefs guarding the camps with assassins. Assassinated: {0} of {1}."
+
+# Hints
+lfColonyHint: "Select a settler and use <b>Found Colony</b> (25 gold). The settler becomes the Colonial Hall, which earns gold every turn."
+lfBarracksHint: "Select the Colonial Hall and use <b>Build Barracks</b>. When the card in your hand is ready, play it on a cell next to the Hall."
+lfMineHint: "Settlers can mine the gold mine south of the beach. More gold, more soldiers."
+lfAssassinHint: "Barracks train riflemen and assassins. An assassin's poisoned blades keep hurting after the strike: the right tool for a warchief."
+
+# Opening
+lfIntro1: The mouth of the Dair. The charts call it a river delta. The Resolute's guns made it ours this morning.
+lfIntro2: The natives who held this bank are gone. Their neighbours are not, by the look of that smoke inland.
+lfIntro2Fled: The natives who held this bank fled across the river in the night, canoes and all. Let them run. Their neighbours did not.
+lfIntro3: Captain, the scouts have marked the natives' war camps inland, by the river and to the south. Every camp answers to a warchief.
+lfIntro4: Then we dig in before they come. Settlers, choose your ground.
+
+# The colony
+lfFounded1: The Hall stands. Now walls, then soldiers. They will have seen our smoke by now.
+
+# The barracks
+lfBarracks1: The Barracks is up. Every man who can hold a rifle, to the line.
+lfWarchiefs1: The tribes follow their warchiefs, Captain. Kill one, and the warriors lose their nerve.
+lfWarchiefs2: Then we'll send the quiet ones. Assassins, see to the warchiefs.
+
+# During the fight
+lfFirstWarband: Warriors leaving the camps, Captain! They're headed for the beach. Keep them under our guns if you can.
+lfWarband: Another warband has left the camps for the beach.
+lfReinforcements: The Resolute's boats have landed more riflemen on the beach.
+lfSettlerLanded: The boats bring a settler this time. Keep this one alive, Captain.
+lfCampFell: The camp is burning. That's one less warband to worry about.
+lfAssassinated: A warchief has been assassinated.
+lfAllAssassinated: Every warchief dead by an assassin's blade. The tribes won't forget this.
+
+# Ending
+lfVictory1: The last camp is ashes. The river mouth is ours.
+lfVictory2: Signal from the fleet, Captain. The Viceroy lands tomorrow.
+lfVictory3: Then let him find a colony, not a beachhead.
+lfVictory3Assassins: Then let him find a colony. And let the tribes find their warchiefs' heads on stakes by the river.
+
+# Defeat
+lfHallFell: The Colonial Hall has fallen. The landing party is driven back into the sea.
+lfSettlersLost: Every settler is dead. Without them there will be no colony.

@@ -1,0 +1,64 @@
+# Mission 7: A Turn of Tides
+aTurnOfTidesTitle: A Turn of Tides
+aTurnOfTidesDescription: Pyracmon the Unshackled brings his horde into the Dair delta to kill Rogash's favourite. Kagaalu means to take his tribes from him instead.
+aTurnOfTidesLoadingText: Every few days the sea climbs up the Dair and drowns the fords of the delta. Pyracmon's jungle clans have never had to count the tides. Kagaalu's people count nothing else.
+
+# Speakers
+tidesSpeakerScout: Scout
+tidesSpeakerHeron: Heron warrior
+tidesSpeakerCrocodile: Crocodile warrior
+tidesSpeakerBoar: Boar warrior
+
+# The warbands (index order of the band markers: north, south, east)
+tidesClanHeron: the Heron clan
+tidesClanCrocodile: the Crocodile clan
+tidesClanBoar: the Boar clan
+
+# Objectives
+tidesPyracmonTitle: The Unshackled
+tidesPyracmonDescription: Kill Pyracmon. Every warband that still follows him will turn to Kagaalu. Kagaalu must survive.
+tidesTribesTitle: Turn the tribes
+tidesTribesDescription: "(Optional) Kill each warchief within {0} cells of Kagaalu: his warband sees it and follows Kagaalu. Warbands turned: {1} of {2}."
+tidesTideTitle: The tide
+tidesTideLow: "Low tide: the fords can be waded. The water rises in {0} turns."
+tidesTideLowSoon: "Low tide, but the water rises next turn. Anyone standing in a ford then is swept ashore and hurt."
+tidesTideHigh: "High tide: the fords are deep water and the mudflats are flooded. The water falls in {0} turns."
+tidesTideHighSoon: "High tide. The water falls next turn, and the fords can be waded again."
+
+# Opening
+tidesIntro1: Great one! Pyracmon's clans are in the delta. Warbands on the north bank and on the south bank, and Pyracmon himself on the eastern island.
+tidesIntro2: Rogash's favourite hides on a mud island? Bring me his head. The clan that does will eat first.
+tidesIntro3: The Unshackled crushed his own shaper. He will not leave Rogash's favourite alive.
+tidesIntro4: But his warriors don't love him; they fear him. Let a warchief fall where his men can see me, and they will know whom Rogash favours.
+tidesIntro5: And watch the water. When the sea climbs the Dair, the fords drown. The jungle clans have never had to count the tides.
+tidesHint: "Kill a warchief within 3 cells of Kagaalu and his warband joins you. Every few turns the tide floods the fords: the objective tells you when."
+
+# The tide
+tidesFloodWarning: The tide is turning. Next turn the fords will be too deep to wade; anyone standing in one will be swept ashore.
+tidesDrainWarning: The tide is going out. Next turn the fords can be waded again.
+tidesFlooded: High tide! The fords are deep water, and nobody crosses until the tide goes out.
+tidesSwept: "The tide swept {0} of yours and {1} of Pyracmon's off the fords."
+tidesDrained: Low tide. The fords can be waded again.
+tidesFirstFlood: See how the jungle clans stand at the water's edge. Whoever crossed is on his own until the sea lets go.
+
+# Turning the tribes
+tidesTurnedHeron: We saw our chief fall before the sarcomancer. Rogash has chosen. The Heron clan follows Kagaalu.
+tidesTurnedCrocodile: Our chief is dead, and Kagaalu stands. The Crocodile clan will not die for the Unshackled.
+tidesTurnedBoar: Pyracmon promised us Rogash's favour. It was never his to give. The Boar clan is yours, great one.
+tidesTurnedKagaaluFirst: Rogash sees you. Stand with us, and your children will not be fed to Pyracmon's shapers.
+tidesTurnedKagaalu: Welcome, brothers. There is room on this island for every clan that leaves him.
+tidesTurnedTooLate: He fell where I could see him, but none of his warriors lived to see it.
+tidesLeaderlessFirst: That warchief fell where his men could not see me. They saw only a dead chief; they will fight on without him.
+tidesLeaderless: "The warchief of {0} fell out of Kagaalu's sight. His warriors fight on without him."
+
+# Pyracmon
+tidesPyracmonComes: Enough! If my chiefs cannot bring me the sarcomancer's head, I will take it myself.
+tidesPyracmonComesKagaalu: He is coming himself. Kill him, and his clans are free to choose.
+
+# Ending
+tidesVictory1: The Unshackled is dead. Who still follows him?
+tidesVictory2: Nobody, great one. Every clan in the delta waits for your word.
+tidesVictory3: Then gather them all. The outsiders still sit at the mouth of the Dair, and now we are many.
+
+# Defeat
+tidesKagaaluDied: Kagaalu has fallen. Pyracmon's clans howl on the mudflats, and the tide washes the rest away.

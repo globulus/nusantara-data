@@ -1,0 +1,790 @@
+# On the Banks of Dair, mission 4: Industrial Devastation. The outsiders again: Vitarron the Viceroy pushes inland
+# from the Landfall colony, into the jungle of Alrood's Crimson Horde.
+#
+# Act 1: the colony builds a Factory. The Viceroy's industrial program is slotted at the start: tanks (a major
+#        upgrade), tanks that lay roads (Combat engineers) and autoturrets (Automated defenses).
+# Act 2: lay roads through the jungle (tanks can't enter it at all) and destroy the shaping corrals. Outriders raid
+#        the road crews; Alrood leads the first raid himself.
+# Alrood: when he dies he walks out of a surviving corral REBIRTH_DELAY rounds later. Once every corral is gone he
+#        stays dead. Victory: no corrals left and Alrood dead. Defeat: the Colonial Hall falls, or Vitarron dies.
+#
+# Map markers (cell comments): hall, corral (the forward corrals), lair (Alrood's corral), farCorral (summoned on
+# hard), landfallRoad (where the settlers from Landfall arrive).
+# Everything that must survive a save is kept in objectives or in scenario extras (strings and numbers only).
+# Dialogs only reach the human on their own turn, so anything that happens off-turn is queued (see onStateChange).
+scenario IndustrialDevastation {
+  REBIRTH_DELAY = 2 # rounds between Alrood's death and his rebirth
+  REBORN_HEALTH_NORMAL = 0.5 # share of his health he comes back with on normal (all of it on hard)
+  FIRST_RAID_NORMAL = 6 # Alrood rides out at the colony on this round
+  FIRST_RAID_HARD = 4
+  RAID_STEPS = 3 # cells a rider covers in a round, whatever the terrain: the Horde knows its jungle
+  CHASE_RANGE = 3 # a rider goes for an outsider this close rather than for its quarry
+  CORRAL_HEALTH_NORMAL = 75 # three tank shells
+  RAID_TURNS = 7 # Alrood heads home if his raid hasn't found a fight by then
+  WATER = ["river", "sea"]
+  PLAYER_TYPES = ["colonialHall", "settler", "rifleman", "devilhornTank"]
+  PLAYER_UPGRADES = ["intensiveIndustrialization", "engineKits", "combatEngineers", "automatedDefenses"]
+  ROAD_SKILLS = ["buildRoad", "buildRoadDevilhornTank"]
+  CLEARED = "indevCleared" # cell extra: a road whose surroundings are revealed
+
+  OBJ_FACTORY = "factory"
+  OBJ_CORRALS = "corrals"
+  OBJ_ALROOD = "alrood"
+
+  # Scenario extras
+  KEY_CORRALS = "corrals" # the corrals, as ",id,id,"
+  KEY_CORRAL_COUNT = "corralCount"
+  KEY_DESTROYED = "corralsDestroyed"
+  KEY_GUARDS = "guards" # chironites shaped at the corrals
+  KEY_RAIDERS = "raiders" # outriders out on a raid; each one's quarry is "quarry:<id>"
+  KEY_ALROOD = "alrood" # Alrood's current unit id (a new one every rebirth)
+  KEY_ALROOD_MODE = "alroodMode" # guard (his corral), raid (the first raid) or berserk (no corrals left)
+  KEY_ALROOD_HOME = "alroodHome" # the corral he guards
+  KEY_RAID_UNTIL = "raidUntil"
+  KEY_REBIRTH_DUE = "rebirthDue" # the round he's reborn; 0 while he's alive, or dead for good
+  KEY_REBIRTHS = "rebirths"
+  KEY_DEATHS = "deaths"
+  KEY_NEXT_RAID = "nextRaid"
+  KEY_RAIDS = "raids"
+  KEY_NEXT_SHAPING = "nextShaping"
+  KEY_CREW = "crew" # the last unit that laid a road
+  KEY_ROADS = "roads" # roads laid (casts)
+  KEY_ALARMS = "alarms" # corrals that saw a road crew this round, as ",id,id,"
+  KEY_LANDFALL_SETTLERS = "landfallSettlers"
+  KEY_PENDING = "pending" # events waiting for the human's turn, as ",event,event,"
+  KEY_OVER = "over"
+  # Queued events, in the order they're told to the human.
+  EVENTS = ["firstRoad", "alroodRides", "raid", "alarm", "alroodFell", "corralFell", "alroodReborn", "alroodMortal", "victory"]
+
+  # ------------------------------------------------------------------ setup
+
+  onStart {
+    if Game.currentScenario.objectives.isEmpty { # a loaded game is already set up
+      @setUpMap()
+      @playIntro()
+    }
+  }
+
+  setUpMap {
+    player = @human()
+    crimson = @horde()
+    natureId = Game.nature.id
+    for unit in Game.grid.allUnits.where(=> $0.owner.id == natureId && $0.coordinates != null) {
+      typeId = unit.type.id
+      if typeId in PLAYER_TYPES {
+        unit.setOwner(player)
+      } else if typeId == "crimsonCorral" {
+        unit.setOwner(crimson)
+      }
+    }
+    if @isHard() {
+      far = @marker("farCorral")
+      if far != null && far.content == null {
+        far.summon("crimsonCorral", crimson)
+      }
+      @slot(crimson.upgradeTree, "tasteOfManflesh", crimson) # the riders drain their prey
+    }
+    corralCount = 0
+    for corral in @hordeUnits("crimsonCorral") {
+      corralCount += 1
+      @addToSet(KEY_CORRALS, corral.id)
+      if !@isHard() {
+        corral.setHealth(CORRAL_HEALTH_NORMAL)
+      }
+      @reveal(corral.coordinates) # Varrenne's scouts mapped the clearings
+      for i in 0..@guardsAtStart() {
+        @shapeGuard(corral)
+      }
+    }
+    @remember(KEY_CORRAL_COUNT, corralCount)
+    @remember(KEY_DESTROYED, 0)
+    @remember(KEY_REBIRTHS, 0)
+    @remember(KEY_DEATHS, 0)
+    @remember(KEY_REBIRTH_DUE, 0)
+    @remember(KEY_RAIDS, 0)
+    @remember(KEY_ROADS, 0)
+    @remember(KEY_NEXT_RAID, if @isHard() FIRST_RAID_HARD else FIRST_RAID_NORMAL)
+    @remember(KEY_NEXT_SHAPING, 1 + @shapeEvery())
+    @summonAlrood(@marker("lair").content)
+
+    # The Viceroy and his industrial program
+    hall = @unitOf(player, "colonialHall")
+    vitarron = @freeCellNear(hall.coordinates).summon("vitarron", player)
+    player.setHero(vitarron)
+    @slot(vitarron.upgradeTree, "governanceAuraL1", player)
+    for upgradeId in PLAYER_UPGRADES {
+      @slot(player.upgradeTree, upgradeId, player)
+    }
+    if !@isHard() { # normal: a second tank came up the road from Landfall with the Viceroy
+      spot = @freeCellNear(@markerAt("landfallRoad"))
+      if spot != null {
+        spot.summon("devilhornTank", player)
+      }
+    }
+    # Settlers from Landfall, if the colony there did well
+    bonus = @landfallBonus()
+    arrived = 0
+    for i in 0..bonus {
+      spot = @freeCellNear(@markerAt("landfallRoad"))
+      if spot != null {
+        spot.summon("settler", player)
+        arrived += 1
+      }
+    }
+    @remember(KEY_LANDFALL_SETTLERS, arrived)
+    Game.refreshState()
+  }
+
+  playIntro {
+    @pauseTimer()
+    hallCell = @hallAt()
+    Game.positionCamera(hallCell)
+    Game.zoomCamera(8)
+    Game.wait(0.5)
+    @vitarronSays("indevIntro1")
+    @varrenneSays(if @wonLandfall() "indevIntro2Landfall" else "indevIntro2")
+    @vitarronSays("indevIntro3")
+    @varrenneSays("indevIntro4")
+    chief = @alrood()
+    if chief != null {
+      Game.positionCamera(chief.coordinates)
+      Game.wait(0.5)
+      @alroodSays("indevIntroAlrood")
+    }
+    Game.positionCamera(hallCell)
+    @vitarronSays("indevIntro5")
+    @varrenneSays("indevIntro6")
+    @vitarronSays("indevIntro7")
+    arrived = @num(KEY_LANDFALL_SETTLERS)
+    if arrived > 0 {
+      Game.positionCamera(@markerAt("landfallRoad"))
+      @say("rifleman", @human(), "indevSpeakerVarrenne", null, @t("indevLandfallSettlers").format([arrived]))
+      Game.positionCamera(hallCell)
+    }
+    @startObjective(OBJ_FACTORY, "indevFactory", "factory", null)
+    @startObjective(OBJ_CORRALS, "indevCorrals", "crimsonCorral", @corralsDescription())
+    @startObjective(OBJ_ALROOD, "indevAlrood", "elrood", @alroodDescription())
+    @say("vitarron", @human(), "vitarronTitle", "indevFactoryHint", null)
+    @say("settler", @human(), "settlerTitle", "indevRoadHint", null)
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ events
+
+  onCardPlay(card) {
+    if Game.currentPlayerIndex == 0 && card.type.id == "factory" && @isActive(OBJ_FACTORY) {
+      @pauseTimer()
+      @complete(OBJ_FACTORY)
+      @vitarronSays("indevFactoryBuilt")
+      @say("devilhornTank", @human(), "devilhornTankTitle", "indevTankHint", null)
+      @resumeTimer()
+    }
+  }
+
+  onSkillCast(caster, skillId) {
+    if skillId in ROAD_SKILLS && caster.owner?.id == @human().id {
+      @roadLaid(caster)
+    }
+  }
+
+  onDie(unit) {
+    if @recall(KEY_OVER) == "yes" {
+      return
+    }
+    typeId = unit.type.id
+    if unit.owner.id == @human().id {
+      if typeId == "vitarron" {
+        @defeat("indevViceroyFell")
+      } else if typeId == "colonialHall" && @human().ownedUnits.count(=> $0.type.id == "colonialHall" && $0.id != unit.id) == 0 {
+        @defeat("indevHallFell")
+      }
+    } else if @inSet(KEY_CORRALS, unit.id) {
+      @corralDestroyed(unit)
+    } else if unit.id == @recall(KEY_ALROOD) {
+      @alroodDied()
+    }
+  }
+
+  onStateChange {
+    if Game.currentPlayerIndex == 0 && (@recall(KEY_PENDING) ?? "") != "" && @recall(KEY_OVER) != "yes" {
+      events = @recall(KEY_PENDING)
+      @remember(KEY_PENDING, "")
+      @pauseTimer()
+      for event in EVENTS.where(=> ("," + $0 + ",") in events) {
+        @announce(event)
+      }
+      @resumeTimer()
+    }
+  }
+
+  onTurnStart {
+    if @recall(KEY_OVER) == "yes" {
+      return
+    }
+    @rebirth()
+    @shapeGuards()
+    @sendRaids()
+    @marchRaiders()
+    @alroodRides()
+  }
+
+  checkVictory => null
+
+  announce(event) {
+    if event == "firstRoad" {
+      @varrenneSays("indevFirstRoad")
+    } else if event == "alroodRides" {
+      chief = @alrood()
+      if chief != null {
+        Game.positionCamera(chief.coordinates)
+      }
+      Game.showMessage(@t("indevAlroodRides"))
+    } else if event == "raid" {
+      Game.showMessage(@t("indevRaid"))
+    } else if event == "alarm" {
+      Game.showMessage(@t("indevAlarm"))
+    } else if event == "alroodFell" {
+      @alroodSays(if @num(KEY_DEATHS) <= 1 "indevAlroodFell" else "indevAlroodFellAgain")
+      @updateAlroodObjective()
+    } else if event == "corralFell" {
+      @updateCorralsObjective()
+      if !@corralsStanding().isEmpty {
+        @varrenneSays("indevCorralFell")
+      }
+    } else if event == "alroodReborn" {
+      chief = @alrood()
+      if chief != null {
+        Game.positionCamera(chief.coordinates)
+      }
+      if @rebirths() <= 1 {
+        @varrenneSays("indevAlroodReborn")
+        @vitarronSays("indevAlroodReborn2")
+      } else {
+        Game.showMessage(@t("indevAlroodRebornAgain"))
+      }
+      @updateAlroodObjective()
+    } else if event == "alroodMortal" {
+      @alroodSays("indevAlroodMortal")
+      @vitarronSays("indevAlroodMortal2")
+      @updateAlroodObjective()
+    } else if event == "victory" {
+      @victory()
+    }
+  }
+
+  # ------------------------------------------------------------------ the corrals and Alrood
+
+  corralDestroyed(corral) {
+    @remember(KEY_DESTROYED, @num(KEY_DESTROYED) + 1)
+    @queue("corralFell")
+    if @corralsStanding().isEmpty {
+      @remember(KEY_REBIRTH_DUE, 0) # nowhere left to be reborn
+      if @alrood() == null {
+        @queue("victory")
+      } else {
+        @remember(KEY_ALROOD_MODE, "berserk")
+        @queue("alroodMortal")
+      }
+    }
+  }
+
+  alroodDied {
+    @remember(KEY_DEATHS, @num(KEY_DEATHS) + 1)
+    if @corralsStanding().isEmpty {
+      @remember(KEY_REBIRTH_DUE, 0)
+      @queue("victory")
+    } else {
+      @remember(KEY_REBIRTH_DUE, Game.turn + REBIRTH_DELAY)
+      @queue("alroodFell")
+    }
+  }
+
+  # Alrood walks out of the corral furthest from the outsiders, whole again.
+  rebirth {
+    due = @num(KEY_REBIRTH_DUE)
+    if due <= 0 || Game.turn < due {
+      return
+    }
+    standing = @corralsStanding()
+    if standing.isEmpty {
+      @remember(KEY_REBIRTH_DUE, 0)
+      return
+    }
+    corral = standing.maxBy(=> @distanceToPlayer($0.coordinates))
+    if @summonAlrood(corral) {
+      if !@isHard() { # normal: the new flesh is still knitting
+        chief = @alrood()
+        chief.setHealth(Math.round(chief.health * REBORN_HEALTH_NORMAL))
+      }
+      @remember(KEY_REBIRTH_DUE, 0)
+      @remember(KEY_REBIRTHS, @rebirths() + 1)
+      @queue("alroodReborn")
+    }
+  }
+
+  summonAlrood(corral) {
+    if corral == null {
+      return false
+    }
+    spot = @freeCellNear(corral.coordinates)
+    if spot == null {
+      return false # every cell around is taken: he tries again next round
+    }
+    chief = spot.summon("elrood", @horde())
+    @remember(KEY_ALROOD, chief.id)
+    @remember(KEY_ALROOD_HOME, corral.id)
+    @remember(KEY_ALROOD_MODE, "guard")
+    Game.animateVisualFx([[type: "boost", coordinates: spot.coordinates, color: "#B22222"]])
+    Game.refreshState()
+    return true
+  }
+
+  # A finished road opens up the jungle: the road and the cells along it stay in sight from then on (the Frenza see
+  # no further than the next tree, while the Horde's corrals watch their clearings).
+  clearSightlines(crew) {
+    crewAt = crew.coordinates
+    if crewAt == null {
+      return
+    }
+    built = Game.grid.ringAround(crewAt, 1)
+    built.add(Game.grid.elementAt(crewAt))
+    for cell in built {
+      if cell.terrain == "road" && cell.getExtraValue(CLEARED) == null {
+        cell.addExtra(CLEARED, CLEARED, "", 1)
+        Game.currentScenario.addRevealedCell(cell.coordinates)
+        for near in Game.grid.ringAround(cell.coordinates, 1) {
+          Game.currentScenario.addRevealedCell(near.coordinates)
+        }
+      }
+    }
+  }
+
+  # Every few rounds each corral shapes a chironite to guard it, up to a few each.
+  shapeGuards {
+    if Game.turn < @num(KEY_NEXT_SHAPING) {
+      return
+    }
+    @remember(KEY_NEXT_SHAPING, Game.turn + @shapeEvery())
+    shaped = false
+    for corral in @corralsStanding() {
+      if @guardsNear(corral.coordinates) < @guardCap() {
+        shaped = @shapeGuard(corral) || shaped
+      }
+    }
+    if shaped {
+      Game.refreshState()
+    }
+  }
+
+  shapeGuard(corral) {
+    spot = @freeCellNear(corral.coordinates)
+    if spot == null {
+      return false
+    }
+    @addToSet(KEY_GUARDS, spot.summon("chironite", @horde()).id)
+    return true
+  }
+
+  # ------------------------------------------------------------------ the raids
+
+  roadLaid(crew) {
+    @clearSightlines(crew)
+    @remember(KEY_CREW, crew.id)
+    roadCount = @num(KEY_ROADS) + 1
+    @remember(KEY_ROADS, roadCount)
+    if roadCount == 1 {
+      @queue("firstRoad")
+    }
+    crewAt = crew.coordinates
+    if crewAt == null {
+      return
+    }
+    for corral in @corralsStanding() {
+      if @distance(crewAt, corral.coordinates) <= @alarmRange() && Game.turn >= @num("alarmReady:" + corral.id) \
+          && !@inSet(KEY_ALARMS, corral.id) {
+        @addToSet(KEY_ALARMS, corral.id)
+      }
+    }
+  }
+
+  # Corrals that saw a road crew send outriders after it; every few rounds a corral (they take turns) sends a raid
+  # at the colony. The first raid is Alrood's own.
+  sendRaids {
+    standing = @corralsStanding()
+    alarms = @recall(KEY_ALARMS) ?? ""
+    @remember(KEY_ALARMS, "")
+    if standing.isEmpty {
+      return
+    }
+    for corral in standing {
+      if ("," + corral.id + ",") in alarms && @raiderRoom() > 0 {
+        @remember("alarmReady:" + corral.id, Game.turn + @alarmCooldown())
+        if @raid(corral, @alarmSize(), @recall(KEY_CREW)) {
+          @queue("alarm")
+        }
+      }
+    }
+    if Game.turn < @num(KEY_NEXT_RAID) {
+      return
+    }
+    raidCount = @num(KEY_RAIDS) + 1
+    @remember(KEY_RAIDS, raidCount)
+    @remember(KEY_NEXT_RAID, Game.turn + @raidEvery())
+    chief = @alrood()
+    if raidCount == 1 && chief != null {
+      home = @homeCorral() ?? standing.0
+      @raid(home, @firstRaidSize(), null)
+      @remember(KEY_ALROOD_MODE, "raid")
+      @remember(KEY_RAID_UNTIL, Game.turn + RAID_TURNS)
+      @queue("alroodRides")
+    } else if @raid(standing.(raidCount % standing.size), @raidSize(), null) { # at the colony
+      @queue("raid")
+    }
+  }
+
+  raid(corral, size, quarryId) {
+    sent = false
+    crimson = @horde()
+    for i in 0..Math.min(size, @raiderRoom()) {
+      spot = @freeCellNear(corral.coordinates)
+      if spot != null {
+        rider = spot.summon("crimsonOutrider", crimson)
+        @addToSet(KEY_RAIDERS, rider.id)
+        if quarryId != null {
+          @remember("quarry:" + rider.id, quarryId)
+        }
+        sent = true
+      }
+    }
+    if sent {
+      Game.refreshState()
+    }
+    return sent
+  }
+
+  # Riders ride by the script, not by sight, and through the jungle as if it were open ground: after their quarry
+  # (a road crew), or the outsider nearest them, or the colony. Next to an outsider they stop; the Horde's own turn
+  # does the fighting.
+  marchRaiders {
+    for rider in @unitsIn(KEY_RAIDERS) {
+      riderAt = rider.coordinates
+      if @nearestPlayerUnit(riderAt, 1) == null {
+        quarry = @unitById(@recall("quarry:" + rider.id) ?? "")
+        prey = @nearestPlayerUnit(riderAt, CHASE_RANGE)
+        goal = quarry?.coordinates ?? prey?.coordinates ?? @hallAt()
+        @trek(rider, goal, RAID_STEPS)
+      }
+    }
+  }
+
+  # Alrood leads the first raid, then guards his corral (the one he was last reborn at; the nearest one if it falls)
+  # and rides out at outsiders who come near it. With no corral left he goes for the outsiders himself.
+  alroodRides {
+    chief = @alrood()
+    if chief == null {
+      return
+    }
+    alroodAt = chief.coordinates
+    if @nearestPlayerUnit(alroodAt, 1) != null {
+      return # already in a fight
+    }
+    mode = @recall(KEY_ALROOD_MODE) ?? "guard"
+    if mode == "raid" && Game.turn >= @num(KEY_RAID_UNTIL) {
+      mode = "guard"
+      @remember(KEY_ALROOD_MODE, mode)
+    }
+    if mode == "berserk" {
+      prey = @nearestPlayerUnit(alroodAt, 99)
+      if prey != null {
+        @trek(chief, prey.coordinates, RAID_STEPS)
+      }
+    } else if mode == "raid" {
+      prey = @nearestPlayerUnit(alroodAt, CHASE_RANGE)
+      quarry = @unitById(@recall(KEY_CREW) ?? "")
+      @trek(chief, prey?.coordinates ?? quarry?.coordinates ?? @hallAt(), RAID_STEPS)
+    } else {
+      home = @homeCorral()
+      intruder = if home == null null else @nearestPlayerUnit(home.coordinates, @guardAlert())
+      if intruder != null {
+        @trek(chief, intruder.coordinates, RAID_STEPS)
+      } else if home != null && @distance(alroodAt, home.coordinates) > 1 {
+        @trek(chief, home.coordinates, RAID_STEPS)
+      }
+    }
+  }
+
+  homeCorral {
+    home = @unitById(@recall(KEY_ALROOD_HOME) ?? "")
+    if home != null && @inSet(KEY_CORRALS, home.id) {
+      return home
+    }
+    chief = @alrood()
+    standing = @corralsStanding()
+    if chief == null || standing.isEmpty {
+      return null
+    }
+    home = @nearestOf(standing, chief.coordinates)
+    @remember(KEY_ALROOD_HOME, home.id)
+    return home
+  }
+
+  # ------------------------------------------------------------------ the end
+
+  victory {
+    if @recall(KEY_OVER) == "yes" {
+      return
+    }
+    @remember(KEY_OVER, "yes")
+    @pauseTimer()
+    player = @human()
+    @updateCorralsObjective()
+    @complete(OBJ_CORRALS)
+    @complete(OBJ_ALROOD)
+    if @isActive(OBJ_FACTORY) {
+      if @unitOf(player, "factory") != null {
+        @complete(OBJ_FACTORY)
+      } else {
+        @fail(OBJ_FACTORY)
+      }
+    }
+    Game.positionCamera(player.hero?.coordinates ?? @hallAt())
+    @varrenneSays("indevVictory1")
+    @vitarronSays("indevVictory2")
+    @varrenneSays("indevVictory3")
+    @saveProgress()
+    Server.win(player)
+  }
+
+  # What later missions can build on.
+  saveProgress {
+    campaign = Game.campaign
+    if campaign != null {
+      progress = campaign.progressFor("IndustrialDevastation")
+      if progress != null {
+        progress.addOrUpdateExtra("vitarronLevel", "vitarronLevel", "", @human().hero?.level ?? 1)
+        progress.addOrUpdateExtra("corralsDestroyed", "corralsDestroyed", "", @num(KEY_DESTROYED))
+        progress.addOrUpdateExtra("alroodRebirths", "alroodRebirths", "", @rebirths())
+        progress.addOrUpdateExtra("turns", "turns", "", Game.turn)
+      }
+      campaign.unlock("ShapingOfYon") # chapter 5
+      campaign.save()
+    }
+  }
+
+  defeat(lineKey) {
+    if @recall(KEY_OVER) == "yes" {
+      return
+    }
+    @remember(KEY_OVER, "yes")
+    for objectiveId in [OBJ_FACTORY, OBJ_CORRALS, OBJ_ALROOD].where(=> @isActive($0)) {
+      @fail(objectiveId)
+    }
+    Game.showMessageToAll(@t(lineKey))
+    Game.lose(@human())
+    Game.refreshState()
+  }
+
+  updateCorralsObjective {
+    Game.currentScenario.updateObjective(OBJ_CORRALS, [description: @corralsDescription()])
+    Game.refreshState()
+  }
+
+  updateAlroodObjective {
+    Game.currentScenario.updateObjective(OBJ_ALROOD, [description: @alroodDescription()])
+    Game.refreshState()
+  }
+
+  corralsDescription => @t("indevCorralsDescription").format([@num(KEY_DESTROYED), @num(KEY_CORRAL_COUNT)])
+  alroodDescription => @t(if @corralsStanding().isEmpty "indevAlroodMortalDescription" else "indevAlroodDescription").format([@rebirths()])
+  rebirths => @num(KEY_REBIRTHS)
+
+  # ------------------------------------------------------------------ difficulty
+
+  guardsAtStart => if @isHard() 2 else 1
+  guardCap => if @isHard() 2 else 1
+  shapeEvery => if @isHard() 4 else 6
+  raidEvery => if @isHard() 4 else 7
+  guardAlert => if @isHard() 4 else 2 # Alrood rides out at outsiders this close to his corral
+  raidSize => if @isHard() 3 else 2
+  firstRaidSize => if @isHard() 2 else 1
+  alarmSize => if @isHard() 2 else 1
+  alarmCooldown => if @isHard() 3 else 6
+  alarmRange => if @isHard() 5 else 4
+  maxRaiders => if @isHard() 6 else 3
+  raiderRoom => @maxRaiders() - @unitsIn(KEY_RAIDERS).count(=> true)
+
+  # ------------------------------------------------------------------ Landfall
+
+  # (progressFor makes an empty entry for a mission that was never played, so ask only once it's unlocked.)
+  landfallProgress(key) {
+    campaign = Game.campaign
+    if campaign == null || !("Landfall" in campaign.unlockedScenarios) {
+      return null
+    }
+    return campaign.progressFor("Landfall")?.getExtraValue(key)
+  }
+  wonLandfall => @landfallProgress("turns") != null
+  # Landfall's surviving settlers beyond the first come up the road (at most two).
+  landfallBonus {
+    landfallSettlers = @landfallProgress("settlers")
+    if landfallSettlers == null {
+      return 0
+    }
+    return Math.min(2, Math.max(0, Math.round(landfallSettlers) - 1))
+  }
+
+  # ------------------------------------------------------------------ helpers
+
+  t(key) => Game.localizedStr(key)
+  # Cutscenes stop the turn timer; it starts again with the human's next action.
+  pauseTimer => Server.setTimeoutEnabled(false)
+  resumeTimer => Server.setTimeoutEnabledOnUserAction(true)
+  human => Game.players.0
+  horde => Game.players.1
+  isHard => Game.currentScenario.difficulty == "hard"
+
+  say(portrait, owner, titleKey, lineKey, text) {
+    Game.showDialog(portrait, owner?.id, @t(titleKey), text ?? @t(lineKey))
+  }
+  vitarronSays(lineKey) => @say("vitarron", @human(), "vitarronTitle", lineKey, null)
+  varrenneSays(lineKey) => @say("rifleman", @human(), "indevSpeakerVarrenne", lineKey, null)
+  alroodSays(lineKey) => @say("elrood", @horde(), "alroodTitle", lineKey, null)
+
+  startObjective(objectiveId, keyBase, image, descriptionText) {
+    objective = [
+      id: objectiveId,
+      title: @t(keyBase + "Title"),
+      description: descriptionText ?? @t(keyBase + "Description"),
+      image: image,
+      state: ObjectiveStates.active
+    ]
+    Game.currentScenario.addObjective(objective)
+    Game.refreshState()
+  }
+  complete(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.completed])
+    Game.refreshState()
+  }
+  fail(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.failed])
+    Game.refreshState()
+  }
+  isActive(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.active
+
+  remember(key, value) {
+    Game.currentScenario.addOrUpdateExtra(key, key, "", value)
+  }
+  recall(key) => Game.currentScenario.getExtraValue(key)
+  # Numbers come back from a saved game as strings: read every numeric extra through this.
+  num(key) => Math.round(@recall(key) ?? 0)
+  queue(event) {
+    pending = @recall(KEY_PENDING) ?? ""
+    if !(("," + event + ",") in pending) {
+      @remember(KEY_PENDING, (if pending == "" "," else pending) + event + ",")
+    }
+  }
+  addToSet(key, unitId) {
+    @remember(key, (@recall(key) ?? ",") + unitId + ",")
+  }
+  inSet(key, unitId) => ("," + unitId + ",") in (@recall(key) ?? "")
+  unitsIn(key) {
+    members = @recall(key) ?? ""
+    return Game.grid.allUnits.where(=> $0.coordinates != null && ("," + $0.id + ",") in members)
+  }
+  corralsStanding => @unitsIn(KEY_CORRALS)
+  # (Lambdas only capture parameters here: a lambda that captures a local of a loop or of a function that returns
+  # early fails with "Unable to read upvalue from stack".)
+  guardsNear(center) => @unitsIn(KEY_GUARDS).count(=> @distance($0.coordinates, center) <= 2)
+  nearestOf(units, center) => units.minBy(=> @distance($0.coordinates, center))
+  alrood => @unitById(@recall(KEY_ALROOD) ?? "")
+  unitById(unitId) => Game.grid.allUnits.first(=> $0.id == unitId && $0.coordinates != null)
+
+  # Slots an upgrade into the first free node of that type (a player's tree or a hero's).
+  slot(tree, typeId, owner) {
+    node = tree?.allNodes?.first(=> $0.type == typeId && $0.upgrade == null)
+    if node != null {
+      node.slot(owner, true)
+    }
+  }
+
+  # The corral and its clearing (two cells around it).
+  reveal(center) {
+    Game.currentScenario.addRevealedCell(center)
+    for radius in 1...2 {
+      for near in Game.grid.ringAround(center, radius) {
+        Game.currentScenario.addRevealedCell(near.coordinates)
+      }
+    }
+  }
+
+  marker(comment) => Game.grid.cells.first(=> $0.comment == comment)
+  markerAt(comment) => @marker(comment).coordinates
+  distance(a, b) => Game.grid.elementAt(a).distance(b)
+  hallAt => @unitOf(@human(), "colonialHall")?.coordinates ?? Game.grid.startingLocations.0
+  unitOf(player, typeId) => player.ownedUnits.first(=> $0.type.id == typeId && $0.coordinates != null)
+  hordeUnits(typeId) {
+    hordeId = @horde().id
+    return Game.grid.allUnits.where(=> $0.owner.id == hordeId && $0.type.id == typeId && $0.coordinates != null)
+  }
+
+  freeCellNear(center) {
+    for radius in 1...3 {
+      for candidate in Game.grid.ringAround(center, radius) {
+        if candidate.content == null && !(candidate.terrain in WATER) {
+          return candidate
+        }
+      }
+    }
+    return null
+  }
+
+  nearestPlayerUnit(origin, maxRange) {
+    if origin == null {
+      return null
+    }
+    playerId = @human().id
+    here = Game.grid.elementAt(origin)
+    best = null
+    bestDistance = maxRange + 1
+    for candidate in Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null) {
+      candidateDistance = here.distance(candidate.coordinates)
+      if candidateDistance < bestDistance {
+        best = candidate
+        bestDistance = candidateDistance
+      }
+    }
+    return best
+  }
+
+  distanceToPlayer(origin) {
+    nearest = @nearestPlayerUnit(origin, 99)
+    return if nearest == null 99 else @distance(origin, nearest.coordinates)
+  }
+
+  # Up to steps cells over land, each one closer to goal (whatever the terrain: the Horde knows the jungle).
+  trek(walker, goal, steps) {
+    origin = walker.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    at = Game.grid.elementAt(origin)
+    for i in 0..steps {
+      nextCell = null
+      nextDistance = at.distance(goal)
+      for land in Game.grid.ringAround(at.coordinates, 1) {
+        if land.content == null && !(land.terrain in WATER) && land.distance(goal) < nextDistance {
+          nextCell = land
+          nextDistance = land.distance(goal)
+        }
+      }
+      if nextCell != null {
+        at = nextCell
+      }
+    }
+    if at.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, at.coordinates, 0)
+    return true
+  }
+}

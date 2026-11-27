@@ -1,0 +1,24 @@
+import "../Bots/CustomGameBots"
+
+# On the Banks of Dair, mission 9 (The Dair Runs Red): the Landfall colony's commander.
+#
+# It's the stock full bot: NormalAi on normal, HardAi on hard. A scenario names one bot per player, whatever the
+# difficulty, so this one reads the difficulty and plays as the matching tier. The only change: it never
+# concedes. The colony fights to the last, and the mission ends when its Colonial Hall burns.
+ai DairColonyAi is MeleeAi {
+  init {
+    @maxMoves = 50
+  }
+
+  awake {
+    super.awake()
+    @maxMoves = if @dairIsHard() 80 else 50 # HardAi : NormalAi
+  }
+
+  dairIsHard => Game.currentScenario?.difficulty == "hard"
+
+  plansAttacks => @dairIsHard()
+  advanceRatio => if @dairIsHard() 1.15 else 1.3
+
+  concede(player, playableCards, miners, hero, heroProducer, unitProducers, soldiers) => REJECTED_ACTION
+}

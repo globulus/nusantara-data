@@ -96,11 +96,13 @@ hexes:
   - 11
   - 7
   t: river
+  comment: riverMouth
 - c:
   - -18
   - 12
   - 6
   t: river
+  comment: riverMouth
 - c:
   - -18
   - 13
@@ -168,6 +170,7 @@ hexes:
   - 11
   - 6
   t: river
+  comment: riverMouth
 - c:
   - -17
   - 12
@@ -3570,6 +3573,7 @@ hexes:
   - -19
   - 6
   t: river
+  comment: riverEast
 - c:
   - 13
   - -18

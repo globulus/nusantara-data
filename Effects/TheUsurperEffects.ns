@@ -1,0 +1,20 @@
+import "CommonEffects"
+
+# Mission effects for On the Banks of Dair, mission 10: The Usurper.
+
+# Half of Skyfleet's crews were the Viceroy's men and stayed with the colonies. The flagship that comes for Vitarron
+# is short of hands: the script gives this to the enemy Denburhin above level 3, with penalties that bring his
+# defense and attack back to their level-3 values. His health and repairs still grow with the level he reached in
+# Air Superiority.
+effect UsurpUndermannedModifier is AuraModifier {
+  init(@defensePenalty, @attackPenalty)
+
+  run(caster, target) => [
+    defense: ["-", defensePenalty],
+    attack: ["-", attackPenalty]
+  ]
+
+  sprite => "reinforcedHull"
+
+  title => "usurpUndermannedTitle"
+}
