@@ -36,6 +36,7 @@ grassTitle: Grass
 hillsTitle: Hills
 oceanTitle: Ocean
 forestTitle: Forest
+jungleTitle: Jungle
 swampTitle: Swamp
 beachTitle: Beach
 desertTitle: Desert
@@ -152,6 +153,9 @@ wreckTitle: Wreck
 ruinTitle: Ruin
 airShieldTitle: Air Shield
 speedBoostTitle: Speed Boost
+tribalSensesTitle: Tribal Senses
+tribalPathsTitle: Tribal Paths
+rogashsBlessingTitle: Rogash's Blessing
 uncoveredHiddenKnowledge: You uncovered hidden knowledge!
 rescuedPrisoners: You rescued some prisoners!
 
@@ -855,7 +859,10 @@ hardAiTitle: Hard AI
 onTheBanksOfDairTitle: On the Banks of Dair
 onTheBanksOfDairDescription: Armies and ambitions collide on the banks of the great river Dair.
 calamityOnTheHorizonTitle: Calamity on the Horizon
-calamityOnTheHorizonLoadingText: One morning, not far from where the mighty river Dair flows into the sea, chieftain Tonkaa is awoken by strange rumble...
+calamityOnTheHorizonLoadingText: One morning, not far from where the mighty river Dair flows into the sea, thunder rolls across a cloudless sky...
+landfallTitle: Landfall
+landfallDescription: The Empire comes ashore at the mouth of the Dair.
+landfallLoadingText: The natives who held the river mouth are gone. The jungle behind the beach is not empty.
 
 # Otok
 
@@ -904,3 +911,489 @@ platingExpertTitle: Plating Expert
 platingExpertFlavor: Sounds way better and cooler than just 'blacksmith'!
 airshipCarrierTitle: Airship Carrier
 airshipCarrierFlavor: More than a few Sanghoy mistook these floating cities for newly-formed islands.
+
+# Client UI: the menus, lobby, game screen, saves, editor, Otok and loading tips (the client passes English
+# fallbacks for most of these; bot titles and tips have none)
+brutalAiTitle: Brutal AI
+connectingToServer: Connecting to server...
+
+# Campaign
+uiBack: Back
+uiCancel: Cancel
+uiConfirm: Confirm
+uiError: Error
+uiHero: Hero
+uiLoading: Loading
+uiMainMenu: Main Menu
+uiMessage: Message
+uiNo: "No"
+uiOk: OK
+uiOtok: Otok
+uiPlayer: Player
+uiSaveGame: Save game
+uiStartingGame: Starting game
+uiSuccess: Success!
+uiUpgrades: Upgrades
+
+# UI - Main menu
+uiCampaignChapter: Chapter {0}
+uiCreditsIntro: "{0} is a zero-budget indie game that is feature-rich and highly moddable. We hope it gives you many hours of fun!"
+uiCreditsMoreInfo: For more info and updates, be sure to {0}!
+uiCreditsRoleEverything: almost everything.
+uiCreditsRoleMusic: music.
+uiCreditsRolePlaytesting: extensive playtesting.
+uiCreditsThanks: Thanks for playing Nusantara!
+uiCreditsTitle: Credits
+uiCreditsVisitWebsite: visit our website
+uiMenuFeedback: |-
+  To send feedback, please send an email to nusantara @ theglobulus.com and include the "Player.log" file.
+  Once you click OK, the game will open the location of that file for you.
+uiMenuLoadReplay: Load replay
+uiMenuLoadSavedGame: Load saved game
+uiMenuTutorialPrompt: Would you like to play the tutorial to learn the basics of the game?
+uiMenuWelcome: Welcome!
+uiOptionsAnimationFast: Fast
+uiOptionsAnimationInsta: Insta
+uiOptionsAnimationNormal: Normal
+uiOptionsAnimationSpeed: "Animation Speed: {0}"
+uiOptionsMusicVolume: "Music Volume: ({0})"
+uiOptionsSfxVolume: "SFX Volume: ({0})"
+uiOptionsTerrainBlending: "Terrain Blending Quality: {0}"
+uiOptionsVoiceVolume: "Voice Volume: ({0})"
+
+# UI - Multiplayer & lobby
+uiChatFrom: "From {0}:"
+uiChatUnknownRecipient: Unknown recipient, check the player names!
+uiConnectionDisconnected: DISCONNECTED
+uiConnectionOfflineDescription: |-
+  You seem to be offline!
+  Left-click to reconnect, right-click to get newest state!
+uiConnectionOnline: ONLINE
+uiConnectionOnlineDescription: |-
+  Your multiplayer game is up and running!{0}
+  Right-click to get newest state!
+uiConnectionPing: "Ping: {0} ms."
+uiLobbyDefaultPlayerName: Player {0}
+uiLobbyEndpoints: "Endpoints: {0}."
+uiLobbyHostedGameUpdated: Hosted game updated
+uiLobbyHostingAt: Hosting game at {0}.
+uiLobbyInputName: Please input name
+uiLobbyJoinedRemote: Joined to remote game at {0}{1}.
+uiLobbyLeaveGame: Leave game
+uiLobbyMap: Map
+uiLobbyMapSize: Map size
+uiLobbyMaxPlayers: Max players
+uiLobbyMissingMap: You don't have the map "{0}" used by the host. Please update your game data.
+uiLobbyMissingRuleset: You don't have the ruleset "{0}" used by the host. Please update your game data.
+uiLobbyNeedTwoPlayers: Please have at least 2 set players!
+uiLobbyNoHost: There's no host player in this game. Please set one of the players to Host.
+uiLobbyNoSlot: You don't have a slot in this game anymore. Please leave and join again.
+uiLobbyPlayersNotReady: Not all remote players are ready!
+uiLobbyPublish: Publish
+uiLobbyPublishHint: When you're ready, hit 'Publish' to make the game visible to other players!
+uiLobbyRandomFaction: Random
+uiLobbyReady: Ready
+uiLobbySameColor: You can't have multiple teams with the same color!
+uiLobbySameTeam: You can't have all players in the same team!
+uiLobbyScenarios: Scenarios
+uiLobbyServerConnected: "Hosted game server is connected?: {0}"
+uiLobbyStartGame: Start Game
+uiLobbyStartGameHosted: Start game
+uiLobbyStopHosting: Stop hosting
+uiLobbyUrlCopied: Hosted game URL copied to clipboard, share it with your friends!
+uiMultiplayerCheckingStatus: Checking hosted game status...
+uiMultiplayerClosingConnection: Closing existing connection...
+uiMultiplayerConnecting: Connecting...
+uiMultiplayerConnectionEstablished: Remote connection established.
+uiMultiplayerConnectionTerminated: "Remote connection terminated: {0}"
+uiMultiplayerCreatingHostedGame: Creating hosted game...
+uiMultiplayerHostParamsTitle: Input URL, port and endpoint for the hosted game
+uiMultiplayerHostSteamGame: Host Steam game...
+uiMultiplayerInvalidEndpoint: Invalid endpoint
+uiMultiplayerInvalidNgrokPath: Invalid Ngrok path!
+uiMultiplayerInvalidPort: Invalid port
+uiMultiplayerInvalidUrl: Invalid URL
+uiMultiplayerIpAddress: IP Address {0}
+uiMultiplayerJoinParamsTitle: Input full URL of the remote host
+uiMultiplayerNgrokAttempting: Attempting tunneling using Ngrok...
+uiMultiplayerNgrokError: "Error running Ngrok: {0}"
+uiMultiplayerNgrokGettingUrl: Ngrok running, getting tunnel URL...
+uiMultiplayerNgrokGotUrl: "Got Ngrok URL: {0}"
+uiMultiplayerNgrokRetrying: Unable to read URL yet, retrying...
+uiMultiplayerNoHostedGame: No hosted game yet at server
+uiMultiplayerNoOpenPlaces: No open places in game!
+uiMultiplayerNotJoined: Not joined!
+uiMultiplayerRejoining: Rejoining game in progress...
+uiMultiplayerServerSetupFailed: Something went wrong while setting up the server, please try again (or restart the game)!
+uiMultiplayerSettingUp: Setting up...
+uiMultiplayerStartingServer: Starting server...
+uiMultiplayerStoppingServer: Stopping existing server...
+uiMultiplayerTimeout: Timeout!
+uiMultiplayerUrl: URL
+uiMultiplayerVerifyingServer: Verifying server...
+uiRulesetDeterministicCombat: Deterministic combat
+uiRulesetFogOfWar: Fog of war
+uiRulesetInfinity: Infinity
+uiRulesetMaxHandSize: Max hand size
+uiRulesetMaxTeams: Max teams
+uiRulesetRandomizedFirstPlayer: Randomized first player
+uiRulesetTimerKind: Timer kind
+uiRulesetTurnLength: Turn length
+uiRulesetWinCondition: Win condition
+uiSteamIncompatibleLobbies: "{0} more game(s) hidden because they run a different game or data version."
+uiSteamLoadedLobbies: Loaded {0} lobbies!
+uiSteamLoadingLobbies: Loading lobbies...
+uiSteamRejoin: Rejoin
+
+# UI - Game screen
+uiGameCast: Cast
+uiGameCheater: "{0} is a cheater because he typed: {1}!"
+uiGameConcedeAndSpectate: Concede & spectate
+uiGameConfirmCast: Are you sure you wish to cast this?
+uiGameConfirmConcede: Are you sure you wish to concede?
+uiGameConfirmMainMenu: Are you sure you wish to go to main menu?
+uiGameConfirmPlayUpgrade: Do you wish to put this upgrade in slot?
+uiGameDefeatMessage: You lost!
+uiGameDefeatTitle: Defeat!
+uiGameDisconnected: Disconnected
+uiGameDisconnectedByHost: You were disconnected from the remote game by the host!
+uiGameDisconnectedMessage: The remote game connection was terminated.
+uiGameErrorInsufficientFunds: Insufficient funds!
+uiGameErrorMissingUpgrades: Some required upgrades are missing!
+uiGameErrorPrefix: ERROR
+uiGameErrorTargetBlocked: Target hex is blocked!
+uiGameErrorTargetNotInfluenced: Target hex is not under your influence!
+uiGameInvalidActionKey: Invalid action key!
+uiGameInvalidCheat: Invalid cheat code
+uiGameInvalidTarget: Invalid target, (Esc) to cancel!
+uiGameLeaveGame: Leave Game
+uiGameNeedHeroForUpgrade: You need a Hero to play a Hero Upgrade!
+uiGameNoHeroOnMap: You don't have a Hero on the map!
+uiGameNoInfluencedCells: There's no free hex under your influence to put this unit on.
+uiGameNoTargetsInRange: No available targets within range!
+uiGameOtokChallenge: "{0} has challenged you to a game of Otok!"
+uiGameOverTitle: Game over
+uiGamePlayUpgrade: Play upgrade
+uiGamePlayersTurn: It's {0}'s turn...
+uiGameReconnect: Reconnect
+uiGameReconnectFailed: Reconnect failed
+uiGameReconnectFailedMessage: Please check your connectivity and try reconnecting again.
+uiGameReconnecting: Reconnecting...
+uiGameReplay: Replay
+uiGameReplayEnded: Replay ended
+uiGameReplayPause: Pause
+uiGameReplayResume: Resume
+uiGameReturningToMainMenu: Taking you back to Main Menu...
+uiGameSaved: Saved!
+uiGameShowStatsAndExit: Show stats & exit
+uiGameTeamWon: Team {0} won!
+uiGameTurn: "Turn: {0}"
+uiGameTurnEndingSoon: Ending soon...
+uiGameVictoryMessage: You won the game!
+uiGameVictoryTitle: Victory!
+uiObjectiveCompleted: OBJECTIVE COMPLETED
+uiObjectiveFailed: OBJECTIVE FAILED
+uiObjectiveHidden: You shouldn't be able to see this!
+uiObjectiveNew: NEW OBJECTIVE
+uiSkillAutocasting: Autocasting
+uiSkillInsufficientFundsNeeds: Insufficient funds, needs {0}
+uiTerrainInfluencedBy: Influenced by {0}
+uiTerrainNoInfluence: No influence
+uiUpgradeAlreadySlotted: Already slotted
+uiUpgradeClickToSlot: Click to slot upgrade
+uiUpgradeKindHero: Hero Upgrade
+uiUpgradeKindMajor: Major Upgrade
+uiUpgradeKindMinor: Minor Upgrade
+uiUpgradeResearchToSlot: Research upgrade to slot
+uiUpgradeUnavailable: Upgrade unavailable
+
+# UI - Unit stats & effect triggers
+uiStatAttack: Attack
+uiStatAttackCount: Attack count
+uiStatDefense: Defense
+uiStatFortitude: Fortitude
+uiStatGuard: Guard
+uiStatLevel: Level
+uiStatLoad: Load
+uiStatMovement: Movement
+uiStatOffense: Offense
+uiStatProwess: Prowess
+uiStatRange: Range
+uiStatRetaliationAttack: Retaliation attack
+uiStatRetaliationCount: Retaliation count
+uiStatRetaliationRange: Retaliation range
+uiStatRetaliationsLeft: Retaliations left
+uiStatSight: Sight
+uiStatSpeed: Speed
+uiStatType: Type
+uiStatVitality: Vitality
+uiStatXp: XP
+uiTriggerAfterAttacking: After attacking
+uiTriggerAfterDeath: After death
+uiTriggerAfterKill: After kill
+uiTriggerAfterRetaliating: After retaliating
+uiTriggerAfterSummon: After summon
+uiTriggerAfterTakingDamage: After taking damage
+uiTriggerAura: Aura
+uiTriggerCastable: Castable
+uiTriggerOnDeath: On death
+uiTriggerOnEndOfTurn: On end of turn
+uiTriggerOnStartOfTurn: On start of turn
+uiTriggerPassive: Passive
+
+# UI - Stats screen
+uiStatsBuildingsDestroyed: Buildings Destroyed
+uiStatsBuildingsLost: Buildings Lost
+uiStatsBuildingsPlayed: Buildings Played
+uiStatsCasts: Casts
+uiStatsDeaths: Deaths
+uiStatsDefeat: Defeat
+uiStatsEconomy: Economy
+uiStatsGoldGained: Gold Gained
+uiStatsGoldSpent: Gold Spent
+uiStatsInfluencedCells: Influenced Cells
+uiStatsInfluencedMap: Influenced Map
+uiStatsKills: Kills
+uiStatsLargestArmy: Largest Army
+uiStatsMajorUpgrades: Major Upgrades
+uiStatsMaxLevel: Max Level
+uiStatsMinorUpgrades: Minor Upgrades
+uiStatsReceivingReplay: Receiving replay...
+uiStatsSaveGameReplay: Save game replay
+uiStatsSaveReplay: Save replay
+uiStatsTechtreeComplete: Techtree Complete
+uiStatsTotals: Totals
+uiStatsUniqueGained: Unique Gained
+uiStatsUniqueSpent: Unique Spent
+uiStatsUnits: Units
+uiStatsUnitsDestroyed: Units Destroyed
+uiStatsUnitsLost: Units Lost
+uiStatsUnitsPlayed: Units Played
+uiStatsUploadingReplay: Uploading replay...
+uiStatsVictory: Victory
+uiStatsXpGained: XP Gained
+
+# UI - Save & load
+uiFileFilterGameReplay: Game replay
+uiFileFilterMaps: Maps
+uiFileFilterReplays: Replays
+uiFileFilterSavedGame: Saved game
+uiFileFilterSavedGames: Saved games
+uiSaveFileEmpty: The file is empty.
+uiSaveGameFailed: Saving the game failed
+uiSaveLoadGameFailed: Loading the saved game failed
+uiSaveLoadReplayFailed: Loading the replay failed
+uiSaveLoadingGame: Loading game
+uiSaveLoadingReplay: Loading replay
+uiSaveNewerVersion: This game was saved by a newer version of Nusantara. Please update the game.
+uiSaveProgressCompressing: Compressing
+uiSaveProgressDecoding: Decoding
+uiSaveProgressEncoding: Encoding
+uiSaveProgressPreparing: Preparing
+uiSaveProgressReadingFile: Reading file
+uiSaveProgressWriting: Writing
+uiSaveReplayFailed: Saving the replay failed
+uiSaveSavingGame: Saving game
+uiSaveSavingReplay: Saving replay
+
+# UI - Map editor
+uiEditorBrushSize: "Brush size: ({0})"
+uiEditorCellComment: Cell comment
+uiEditorConfirmSave: Do you wish to save?
+uiEditorDeleteOnClick: Delete content on click
+uiEditorMapSize: "Map size: ({0})"
+uiEditorMaxPlayers: "Max players: ({0})"
+uiEditorOpenMap: Open map
+uiEditorPlacingStartingLocation: Placing starting location {0}
+uiEditorPlacingTerrain: Placing terrain {0}
+uiEditorPlacingUnit: Placing unit {0}
+uiEditorSaveMap: Save map
+uiEditorStartingLocation: Starting location {0}
+
+# UI - Otok
+uiOtokChooseDeck: Choose your deck!
+uiOtokCombatEnds: Combat ends!
+uiOtokCombatStarts: Combat starts!
+uiOtokCombatStatus: Play cards from your hand! Left-click to focus, right-click to select! To flip a card, right click on the board!
+uiOtokConfirmLeave: Are you sure you wish to go back to Nusantara?
+uiOtokCost: COST
+uiOtokDoneDrafting: Done drafting!
+uiOtokDraftStarts: Draft starts!
+uiOtokDraftStatus: Buy cards for your deck! Left-click to focus, right-click to select! Remove cards from deck by right-click in hand. Press the button when you're done!
+uiOtokDraftingComplete: Drafting complete!
+uiOtokEffects: EFFECTS
+uiOtokGameWinner: "{0} wins the game! Sending you back to Nusantara in 5 seconds..."
+uiOtokKindBase: Base
+uiOtokKindFront: Front
+uiOtokKindSpell: Spell
+uiOtokLeave: Leave Otok
+uiOtokOpponentLeft: Your opponent left, sending you back to Nusantara...
+uiOtokOpponentName: Otok Opponent
+uiOtokPickHero: Pick your hero!
+uiOtokPickHeroStatus: Pick your hero! Left-click to focus, right-click to select!
+uiOtokPreparationDone: Preparation phase done!
+uiOtokPreparationStarts: Preparation starts!
+uiOtokRoundAndTurn: "Round: {0} / {1}, Turn: {2} / {3}"
+uiOtokRoundEnds: Round {0} ends!
+uiOtokRoundStarts: Round {0} starts!
+uiOtokRoundWinner: "{0} wins the Round! Scores: {1}."
+uiOtokScore: SCORE
+uiOtokScoreSeparator: " to "
+uiOtokStartingGame: Starting game, please wait...
+uiOtokTags: TAGS
+uiOtokTraitEscaping: Escaping
+uiOtokTraitEscapingDescription: Goes back to your hand at the end of round if it was face-up.
+uiOtokTraitHeroDescription: You can have just one hero and it starts in your hand.
+uiOtokTraitInactive: Inactive
+uiOtokTraitInactiveDescription: Played face-down and doesn't flip when played.
+uiOtokTraitMarked: Marked
+uiOtokTraitMarkedDescription: Is always an elligible target for effects.
+uiOtokTraitPersistent: Persistent
+uiOtokTraitPersistentDescription: Stays on the board at the end of the turn.
+uiOtokTraitRare: Rare
+uiOtokTraitRareDescription: You can have a maximum of {0} of the same kind in your deck.
+uiOtokTraitShielded: Shielded
+uiOtokTraitShieldedDescription: Ignores first damage or destroy effect, then loses this trait.
+uiOtokTraitStealthy: Stealthy
+uiOtokTraitStealthyDescription: Stays face-down on the board after round ends, if it was face-down already.
+uiOtokTraitStrategist: Strategist
+uiOtokTraitStrategistDescription: Goes back to your deck at the end of round if it was face-up.
+uiOtokTraitSurvivalist: Survivalist
+uiOtokTraitSurvivalistDescription: Stays face-down on the board after round ends, if it was face-up.
+uiOtokTraitUnique: Unique
+uiOtokTraitUniqueDescription: You can have just one of this type in your deck.
+uiOtokTriggerOnAmbush: On Ambush
+uiOtokTriggerOnDie: On Die
+uiOtokTriggerOnEndRound: On End Round
+uiOtokTriggerOnEndTurn: On End Turn
+uiOtokTriggerOnFlip: On Flip
+uiOtokTriggerOnSummon: On Summon
+uiOtokTriggerOnWeaken: On Weaken
+uiOtokTurnEnds: Turn {0} ends!
+uiOtokTurnStarts: Turn {0} starts!
+uiOtokTutorialCollectionText: |-
+  This is your card collection - here are all the cards you can purchase. Your collection presists between rounds - cards you purchase now won't be available for drafts next turn!
+
+  Each card has a cost, indicates by the number inside the golden circle. The number of copies of a card is shown below it.
+
+  Left-click to zoom in on cards and get more info on what they do, and right-click to purchase them.
+uiOtokTutorialCollectionTitle: Collection
+uiOtokTutorialCombatText: |-
+  The combat phase decides who wins the round!
+
+  Each combat consists of five turns. During your turns, you can do one of two things:
+
+    1. Play a card from your hand, or
+
+    2. Flip one of your cards on the board.
+
+  If you can't make a move, you lose the game automatically.
+uiOtokTutorialCombatTitle: Combat phase
+uiOtokTutorialDraftingText: A game of Otok consists of three rounds! Each round starts with a drafting phase, during which you add cards to your deck!
+uiOtokTutorialDraftingTitle: Drafting phase
+uiOtokTutorialEndDraftText: |-
+  Once you're done, hit this button to move forward. Remember - during normal Otok games, drafts are timed to 90 seconds!
+  Also be mindful of the number of cards you purchase - you'll only draw a maximum of 5 cards at the start of the round.
+uiOtokTutorialEndDraftTitle: End draft
+uiOtokTutorialGoldText: |-
+  Here are your total resources that you can use to purchase cards during drafting phase.
+
+  You'll get some more for each subsequent draft, but less than the amount you have now. Of course, more Gold can always be obtained though playing specific cards.
+uiOtokTutorialGoldTitle: Gold
+uiOtokTutorialHowCardsWorkText1: |-
+  Most cards have special abilities and can work together for awesome combos, but some basics are common to all of them.
+
+  Each card has a <b>Power</b>, indicated by the blue rectangle. At the end of each round, each unit's power contributes to their owner's score. Player with the higher score wins the round!
+uiOtokTutorialHowCardsWorkText2: Another common thing is the <b>Flip</b> effect trigger - it triggers whenever card goes from being <i>face-down</i> to <i>face-up</i>. Most cards get flipped up when they're played from hand (exception are cards with the <b>Inactive</b> trait). Likewise, you can manually flip cards during your turns.
+uiOtokTutorialHowCardsWorkTitle: How cards work
+uiOtokTutorialPickHeroText: During the prep phase, you get to pick your hero! Your hero is free (costs no gold) and always starts in your hand at the start of the 1st round.
+uiOtokTutorialSimultaneousText1: |-
+  Here's where Otok gets special - both you and your opponent select the action you want to take, and only then do they get resolved! In a way, you're playing simultaneously, not knowing what the other will do.
+
+  However, effects are still resolved sequentially, meaning whichever action was taken first will be resolved first as well.
+uiOtokTutorialSimultaneousText2: |-
+  Be wary - sometimes you want your actions to resolve first, and sometimes it's best if you play after your opponent. Naturally, there's no way of knowing if your opponent played their action already until you play yours!
+
+  Oh, and turns are normally limited to 15 seconds - if you don't make your action by then, the game will randomly choose one for you.
+uiOtokTutorialSimultaneousTitle: Playing simultaneously
+uiOtokTutorialStatusText: You can always get info on what's going on and what actions you can take in the status bar.
+uiOtokTutorialStatusTitle: Status message
+uiOtokTutorialTitle: Otok tutorial
+uiOtokTutorialWelcomeText: Welcome to Otok! This tutorial will help you learn about the basics of the game. Just follow the tooltips, and have fun!
+uiOtokWaitingForOpponent: Waiting for your opponent...
+uiOtokWelcome: Welcome to Otok!
+
+# UI - Tips
+uiTip01: You can save or load a single player game at any time.
+uiTip02: After a multiplayer game ends, you can download its replay which you can re-watch and analyze later on.
+uiTip03: Multiplayer games are always hosted by one player, while others connect to their local game server.
+uiTip04: "There are currently three ways to set up a multiplayer game: via TCP, WebSockets or Steam backbone."
+uiTip05: Accessing Steam multiplayer requires you to run Steam client before starting the game.
+uiTip06: If you'd like to host a multiplayer game via TCP or WS, you'll have to expose your local IP address via a reverse SSH tunneling tool.
+uiTip07: Nusantara has built-in Ngrok integration that makes it trival to expose your local server to online players. Make sure to provide a path to your Ngrok executable before hosting the game.
+uiTip08: Changing Stance always takes 1 AP.
+uiTip09: The March stance grants extra APs, which you can spend any way you want to!
+uiTip10: "When figuring out the final Movement Type of a unit, the following order or precedence is applied: temp effects > active stance > skill passives > default."
+uiTip11: You can set any ability to auto-cast by pressing Mouse Wheel. Auto-cast abilities have green border. Press Mouse Wheel again to deactivate auto-casting.
+uiTip12: Auto-cast abilities trigger at the end of each player's turn, if they can be cast.
+uiTip13: Selected cell is marked with a white hex. Cells that a unit can move to or which you can cast a spell or ability on are marked in blue.
+uiTip14: Attackable units have a red hex, while interactables have a green one.
+uiTip15: All unit skills have hotkeys in form of numbers 1-0, where 1 represents the first skills, and 0 represents the last one.
+uiTip16: You can only play units from your hand onto cells that are under your influence. Spells can have custom target cells.
+uiTip17: Expand your influenced area by constructing more buildings.
+uiTip18: The more cells you influence, the closer you can deploy your units to the front lines.
+uiTip19: Some terrains, such as Sea and Ocean, can't be influenced.
+uiTip20: Cargo Dirigibles provide one cell of influence next to them - be sure to make good use of it!
+uiTip21: You can clean up your view by disabling display of influenced terrain in the Options menu.
+uiTip22: Sanghoy rely on Blood to fuel their spells and shape basic units into advanced ones.
+uiTip23: Sanghoy can collect Blood by fighting their enemies, as well as sacrificing their own units in a Sacrifical Well.
+uiTip24: A newly shaped unit starts with zero AP, regarldess of how the base unit had.
+uiTip25: It's always good to have a few Bloodlusts in the stockpile.
+uiTip26: Frenza pay upkeep in Gold for all of their advanced machinery.
+uiTip27: Every few turns, a Frenza commander turns in a status report and gets Imperial Favor based on the size of the territory they control.
+uiTip28: Shipments take a while to come in, so make sure to order them on time.
+uiTip29: You can cast shipments on any cell under your influence.
+uiTip30: You can only have a single Hero in the entire game.
+uiTip31: Dead Heroes can be revived. After the Revive Hero ability is cast, the Hero will be revived next turn.
+uiTip32: When reviving Heroes, make sure to have empty cells near the building that revives them. Otherwise, revival won't happen.
+uiTip33: Reviving a Hero requires Gold. The cost increases with the Hero's level.
+uiTip34: If the building that began reviving a Hero is destroyed, the Hero won't be revived next turn.
+uiTip35: Heroes level up by gaining experience points (XP). XP is gained whenever one of your units kills an enemy unit.
+uiTip36: XP gained per kill depends on the merit of the killed unit - better units have higher merit.
+uiTip37: Whenever your Hero levels up, you'll get a Hero upgrade in your hand. It will appear even if your hand is full.
+uiTip38: Hero upgrades can be slotted in the Hero's Upgrade Tree.
+uiTip39: Heroes have four stats - Vitality, Fortitude, Guard and Prowess. Putting points into these affects Hero's strengths and weaknesses.
+uiTip40: Heroes start with some stat points already allocated and gain more for each level based on predefined schedule.
+uiTip41: Differences in stat point allocation add flavour to Heroes - some are great at absorbing damage, others are glass canons, while some specialize in using their abilities.
+uiTip42: All Heroes have Hero Stats upgrades in their tree. Each level of this upgrade adds 1 stat point to each of the four stats
+uiTip43: Vitality increases Hero's Health and Regeneration, making them more durable.
+uiTip44: Fortitude increases Hero's Attack and Attack Count values.
+uiTip45: Guard points increase Hero's Defense and Retaliation Count, making them quite tanky in the process.
+uiTip46: Prowess increases the power of Hero abilities, but it also makes them cheaper. However, it can't lower an ability's AP cost below 1.
+uiTip47: Champion units, such as Imperial Juggernaut, gain XP while in combat, without needing to kill.
+uiTip48: Kill creeps to free access to Gold Mines, open up new pathways on the map and gain experience for your Hero.
+uiTip49: The stronger the creep, the richer the bounty.
+uiTip50: Creeps that are variants of standard units (e.g, Rogue Shadespear) are much tougher than their vanilla counterparts.
+uiTip51: Creeps can't attack, but they can sure as hell retaliate (a lot).
+uiTip52: Only some units can interact with interactable map objects. On the other hand, all Heroes can interact.
+uiTip53: Interacting can only be done from an adjacent cell and spends all remaining AP, just like attacking.
+uiTip54: You can interact with some map objects multiple times.
+uiTip55: Any player can interact with any map object.
+uiTip56: You can attack some interactable objects, either with units that can't interact with them or from range.
+uiTip57: Some interactable objects will change side to yours after interacting them. After that, nobody else can interact with them anymore.
+uiTip58: Some map objects always have the same interaction effect, while for others, chance will decide what happens.
+uiTip59: There are both positive and negative interaction effects, but a map object never produces purely negative interactions.
+uiTip60: The higher the interaction risk, the higher the reward.
+uiTip61: Some interaction effects are extremely rare and equally as powerful.
+uiTip62: A lot of knowledge can be found in Broken Totems, if one is persistent enough.
+uiTip63: Effects, stances, scenarios and AI are coded in NusantaraScript programming language. You can find its documentation online.
+uiTip64: The Data folder prioritizes convention over configuration - files need to live in specific subfolders to be analyzed by the data loader.
+uiTip65: You can perform a hot reload of data from the main menu, without having to restart the game. If it fails for any reason, you'll retain the already loaded data package so that you can keep playing.
+uiTip66: The game normally checks for new data online when it starts. You can disable this functionality in the Options menu
+uiTip67: Scripts are compiled at load time. If there are any compilation errors, you'll see them in the loading screen. The game won't start until all compilation errors are resovled.
+uiTip68: Since NusantaraScript is an interpreted language, you may encounter runtime issues. There's a built-in debugger that will help you iron those problems out before your mod is ready for shipping.
+uiTip69: There is no Otok.
+easyAiDescription: Makes mistakes and doesn't watch for danger. Good for learning the game.
+normalAiDescription: Plays a straightforward game by the same rules as you.
+hardAiDescription: Plans its attacks within a turn and pushes forward earlier.
+brutalAiDescription: Plays like Hard AI and starts with 25 extra Gold and 5 extra of its faction's resource.
