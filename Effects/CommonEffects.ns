@@ -40,8 +40,11 @@ effect Aura {
   trigger => Triggers.aura
 
   run(caster, target) {
-    around = Game.unitsInRange(Game.grid.locate(caster) ?? Game.grid.elementAt([0, 0, 0]), @range(caster))\
-      .where(=> @isValidTarget(caster, $0))
+    origin = Game.grid.locate(caster)
+    # A player's aura has no cell of its own and covers the whole map. (It used to search around the map's centre,
+    # and unitsInRange leaves out its origin cell, so a unit standing on the centre never got it.)
+    reached = if origin == null Game.grid.allUnits.where(=> $0.coordinates != null) else Game.unitsInRange(origin, @range(caster))
+    around = reached.where(=> @isValidTarget(caster, $0))
     for unit in around {
       if @stacks || !unit.hasTempEffect(@modifierId) {
         @affect(unit, caster)
@@ -57,7 +60,7 @@ effect Aura {
     desc = "Aura" \
       + "\nRange: " + @range(caster) \
       + "\nValid types: " + this?.validTypes.join(", ")
-    if stacks {
+    if @stacks {
       desc += "\nStacks"
     }
     desc += "\nEffect: " + @modifier(caster, null).description(caster)
@@ -90,10 +93,10 @@ effect AddCardToHand {
   flavor(caster) => Game.localizedStr(typeId + "Flavor")
 }
 
+# The inits below set the inherited fields directly with @ params, like AddCardToHand's own init does:
+# params can't reuse the names of the class's members.
 effect AddCardToHandWithRampingCost is AddCardToHand {
-  init(typeId, downtime, goldCost, uniqueCost, actionsCost, @goldRamp, @uniqueRamp, @actionsRamp) {
-    super.init(typeId, downtime, goldCost, uniqueCost, actionsCost)
-  }
+  init(@typeId, @downtime, @goldCost, @uniqueCost, @actionsCost, @goldRamp, @uniqueRamp, @actionsRamp)
 
   cost(caster) {
     countSame = countUnitsOfType(caster.owner, @typeId)
@@ -107,9 +110,7 @@ effect AddCardToHandWithRampingCost is AddCardToHand {
 }
 
 effect AddCardToHandWithRampingCostIfUpgrade is AddCardToHandWithRampingCost {
-  init(typeId, downtime, goldCost, uniqueCost, actionsCost, goldRamp, uniqueRamp, actionsRamp, @requiredUpgrade) {
-    super.init(typeId, downtime, goldCost, uniqueCost, actionsCost, goldRamp, uniqueRamp, actionsRamp)
-  }
+  init(@typeId, @downtime, @goldCost, @uniqueCost, @actionsCost, @goldRamp, @uniqueRamp, @actionsRamp, @requiredUpgrade)
 
   isEnabled(caster) => super.isEnabled(caster).addAll([[caster.owner.hasUpgrade(requiredUpgrade), "Owner doesn't have $(Game.localizedStr(@requiredUpgrade + "Title"))."]])
 
@@ -117,9 +118,7 @@ effect AddCardToHandWithRampingCostIfUpgrade is AddCardToHandWithRampingCost {
 }
 
 effect AddCardToHandIfUpgrade is AddCardToHand {
-  init(typeId, downtime, goldCost, uniqueCost, actionsCost, @requiredUpgrade) {
-    super.init(typeId, downtime, goldCost, uniqueCost, actionsCost)
-  }
+  init(@typeId, @downtime, @goldCost, @uniqueCost, @actionsCost, @requiredUpgrade)
 
   isEnabled(caster) => super.isEnabled(caster).addAll([[caster.owner.hasUpgrade(requiredUpgrade), "Owner doesn't have $(Game.localizedStr(@requiredUpgrade + "Title"))."]])
 
@@ -132,7 +131,7 @@ effect Repair {
   check(caster, target) => areAllies(caster, target) && !isOrganic(target) && target.hp <= target.health - @repairAmount
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " repars " + Game.localizedStr(target.type.id + "Title") + " for $repairAmount.", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " repairs " + Game.localizedStr(target.type.title) + " for $(@repairAmount).", LogLevels.info, caster.coordinates)
     target.restoreHealth(@repairAmount)
     Game.animateVisualFx([
       [
@@ -156,7 +155,7 @@ effect Heal {
   check(caster, target) => areAllies(caster, target) && isOrganic(target) && target.hp < target.health - healAmount
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " heals " + Game.localizedStr(target.type.id + "Title") + " for $healAmount.", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " heals " + Game.localizedStr(target.type.title) + " for $healAmount.", LogLevels.info, caster.coordinates)
     target.restoreHealth(@healAmount)
     Game.animateVisualFx([
       [
@@ -178,8 +177,8 @@ effect DrainAttack {
   check(caster, target) => isOrganic(target)
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " drains $healthRestored HP from " \
-      + Game.localizedStr(target.type.id + "Title") + ".", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " drains $healthRestored HP from " \
+      + Game.localizedStr(target.type.title) + ".", LogLevels.info, caster.coordinates)
     caster.restoreHealth(healthRestored)
     Game.animateVisualFx([
       [
@@ -201,7 +200,7 @@ effect Morph {
   } 
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " morphs " + Game.localizedStr(target.type.id + "Title") \
+    Game.logEvent(Game.localizedStr(caster.type.title) + " morphs " + Game.localizedStr(target.type.title) \
       + " into " + Game.localizedStr(@newType + "Title") + ".", LogLevels.info, caster.coordinates)
     Game.animateVisualFx([
       [
@@ -224,7 +223,7 @@ effect MorphSelf {
   targets => Targets.none
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " morphs into " \
+    Game.logEvent(Game.localizedStr(caster.type.title) + " morphs into " \
       + Game.localizedStr(@newType + "Title") + ".", LogLevels.info, caster.coordinates)
     caster.setType(@newType)
     caster.restoreHealth(caster.health)
