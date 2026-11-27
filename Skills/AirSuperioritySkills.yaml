@@ -1,0 +1,9 @@
+# Mission 8 of On the Banks of Dair: Air Superiority
+- id: airOutOfReach
+  title: airOutOfReachTitle
+  image: ../Factions/OnTheBanksOfDair/Images/bloodbatNest
+  effect: AirOutOfReach
+- id: airTreetopTerror
+  title: airTreetopTerrorTitle
+  image: ../Factions/OnTheBanksOfDair/Images/alooq
+  effect: AirTreetopTerror

@@ -1,0 +1,83 @@
+# Mission 10: The Usurper
+theUsurperTitle: The Usurper
+theUsurperDescription: The Emperor recalls his Viceroy in irons. Vitarron has other plans.
+theUsurperLoadingText: The colony at the mouth of the Dair has burned, and the Emperor wants someone to answer for it. His cousin, the Viceroy Vitarron, would rather answer to no one.
+
+# Unit panel
+usurpStyleLabel: Hailed as
+usurpUndermannedTitle: Undermanned
+
+# Objectives
+usurpFleetTitle: The punitive fleet
+usurpFleetDescription: "Turns until Denburhin's fleet arrives: {0}. Until then the Colonial Halls earn gold: spend it. If the fleet finds Vitarron still the Emperor's Viceroy, he goes home in irons."
+usurpFleetRaisedDescription: "Turns until Denburhin's fleet arrives: {0}. The banner is raised: make ready."
+usurpBannerTitle: Raise the banner
+usurpBannerDescription: Have Vitarron use Insurrection before the fleet arrives. Every settler becomes militia, and every Barracks, Factory and Airfield arms a soldier. The Colonial Halls burn, and their gold with them. Insurrection needs at least one settler.
+usurpBeachheadTitle: Break the beachhead
+usurpBeachheadDescription: Destroy the Imperial Colonial Hall on the ruins of the river-mouth colony. While it stands, the fleet keeps landing soldiers.
+usurpDenburhinTitle: Bring down the flagship
+usurpDenburhinDescription: Bring down Denburhin. While the beachhead stands, he breaks off when hurt and flies back to the fleet offshore for repairs. Vitarron must survive.
+
+# Hints
+usurpEconomyHint: "Until the banner is raised, the Halls earn gold every turn. Train settlers and build Barracks, Factories and Airfields: each one is a soldier when the Insurrection comes. Settlers can mine the gold mines too."
+usurpInsurrectionHint: "Select Vitarron and use <b>Insurrection</b> when you're ready. Raise it too early and the Halls stop earning; too late, and the fleet arrives first."
+usurpParadeHint: "With the Halls gone there's no ground to muster new troops on, but for the parade ground west of Bragi. Train them all the same: at the start of your turn they march out of the Barracks or Factory that trained them. The colonies send a war chest of gold every turn."
+
+# Opening
+usurpIntro1: The Resolute, of the Emperor's fleet. A letter under His Majesty's seal, for the Viceroy of the Dair.
+usurpIntro2: The river-mouth colony is ashes, my lord. The Emperor has heard.
+usurpIntro2Kagaalu: The river-mouth colony is ashes, my lord. Kagaalu's tribes saw to that. And the Emperor has heard.
+usurpIntro3: "'The Viceroy is recalled to answer for the loss of the colony.' In irons! My own cousin writes that I am to come home in irons!"
+usurpIntro4: Skyfleet's Denburhin brings the fleet to fetch you. A week, the Resolute's captain says.
+usurpIntro5: Denburhin. I gave that man his medals. Captain, who built these colonies?
+usurpIntro6: The settlers, my lord. And the soldiers. And the...
+usurpIntro7: I did. Spend every coin they earn this week, Captain. Then we raise our own banner.
+
+# The countdown
+usurpFleetWarning: Sails on the horizon, my lord. If we're raising a banner, it had better be soon.
+
+# The banner
+usurpBanner1: Colonists of the Dair! The Emperor would put your Viceroy in chains and leave you to the jungle. Let him keep his chains. From today the Dair answers to me.
+usurpBanner2: The colonies declare for you, my lord. The Halls are burning, and the Emperor's writ with them. Shall I tell the settlers they're soldiers now?
+usurpBanner3: They know. Let the fleet come.
+
+# The fleet
+usurpFleet1: Vitarron! You raised your own flag over the Emperor's colonies. I am ordered to take it down, and you with it.
+usurpFleet2: Captain Denburhin. Did my cousin send you alone?
+usurpFleet3: Not alone. Boats in the water, guns on the river.
+usurpFleet3Air: I flew over the plateaus for you, Viceroy. Today I fly for the Emperor. Boats in the water, guns on the river.
+usurpFleet4: They're landing on the old colony beach, my lord. Where it all started.
+usurpFleetUndermanned: Half of Skyfleet's crews were your men, my lord, and they stayed. His flagship flies short-handed. Fewer hands on the guns and the pumps.
+usurpFleet5: The ironclads will shell anything near the river. And keep the men together. Denburhin picks off stragglers.
+
+# During the war
+usurpWave: The fleet's boats have landed more soldiers on the beach.
+usurpLastWave: That was their last landing, my lord. The fleet has no more men to spare.
+usurpRaidUsurper: A war band has left a tribal camp, heading for the colonies.
+usurpRaidEmpire: A war band has left a tribal camp, heading for the Imperial army.
+usurpTribesWatch: Outsiders killing outsiders. Let them bleed each other. Then we take what's left.
+usurpSortie: Denburhin's flagship is over the front! It will bomb at the end of your turn.
+usurpBreaksOff: Denburhin's flagship breaks off, trailing smoke, and flies back to the fleet for repairs.
+usurpCampFell: A tribal camp is burning. One less war band to worry about.
+
+# The end of the fleet
+usurpBeachheadFell1: The beachhead's Hall is burning! They have nowhere left to land.
+usurpBeachheadFell2: Then there's nothing to go back to. Marines, ashore! Every last man. For the Emperor!
+usurpBeachheadFell3: He's coming for us himself. Good. Bring him down.
+usurpDenburhinFell1: The flagship is down! Denburhin is finished.
+usurpDenburhinFell2: One captain less. Now burn their beachhead.
+
+# Ending
+usurpVictory1: The Resolute to the colonies. The fleet is withdrawing. We carry no message for the Viceroy.
+usurpVictory2: There is no Viceroy any more, is there, my lord?
+usurpVictory3: No, Captain. The Empire will call me the Usurper. Let it. On the Dair they will call me Emperor.
+usurpVictory4: And the tribes, my lord? They're still out there.
+usurpVictory5: So am I. Raise the banner over Bragi.
+usurpEpilogue: Vitarron, the Usurper, rules the banks of the Dair. The Empire remembers. So does the jungle.
+
+# Defeat
+usurpArrested1: Viceroy Vitarron, by order of His Majesty you are relieved of your office. The marines will escort you aboard.
+usurpArrested2: ...Escort. How kind.
+usurpArrested: The fleet found the Viceroy still loyal to the Emperor, and took him home in irons.
+usurpColoniesLost: The last of the colonies' workshops is ashes. With nothing left to rule, the Usurper's rebellion is over.
+usurpVitarronFell: Vitarron has fallen. The rebellion dies with him, and the colonies go back to the Emperor.

@@ -17,8 +17,8 @@ effect MineGold {
     mined = Math.min(currentGoldCapacity, amountMined * goldBatch)
     target.updateExtra(targetExtraId, currentGoldCapacity - mined)
     caster.owner.addResources([g: mined])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " mines $mined gold from " \
-      + Game.localizedStr(target.type.id + "Title") + ".", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " mines $mined gold from " \
+      + Game.localizedStr(target.type.title) + ".", LogLevels.info, caster.coordinates)
     Game.animateVisualFx([
       [
         type: "earn",
@@ -46,8 +46,8 @@ effect AutoAttackAtStartTurn {
       damage = Math.max(1, attack - randomTarget.defense(caster))
       Game.animateAttack(caster, randomTarget)
       randomTarget.takeDamage(damage, caster)
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " auto-attacks " \
-        + Game.localizedStr(target.type.id + "Title") + " for $damage.", LogLevels.info, caster.coordinates)
+      Game.logEvent(Game.localizedStr(caster.type.title) + " auto-attacks " \
+        + Game.localizedStr(target.type.title) + " for $damage.", LogLevels.info, caster.coordinates)
     }
   }
 
@@ -109,7 +109,7 @@ effect GenerateGold {
         coordinates: caster.coordinates
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " generates $(gold.g) Gold.", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " generates $(gold.g) Gold.", LogLevels.info, caster.coordinates)
   }
 
   description(caster) => "Generate $(@gold.g) Gold."
@@ -215,7 +215,7 @@ effect PoisonModifier {
   trigger => Triggers.startOfTurn
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " takes $damageTaken poison damage!", LogLevels.info, target.coordinates)
+    Game.logEvent(Game.localizedStr(target.type.title) + " takes $damageTaken poison damage!", LogLevels.info, target.coordinates)
     target.takeDamage(damageTaken, caster)
   }
 
@@ -237,7 +237,7 @@ effect VenomStrike {
     if !target.hasTempEffect("PoisonModifier") {
       target.addTempEffect(PoisonModifier(damageTaken), caster, duration)
       
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " poisons " + Game.localizedStr(target.type.id + "Title") + " to take $damageTaken damage for $duration turns!", \
+      Game.logEvent(Game.localizedStr(caster.type.title) + " poisons " + Game.localizedStr(target.type.title) + " to take $damageTaken damage for $duration turns!", \
         LogLevels.info, caster.coordinates)
       Game.animateVisualFx([
         [
@@ -791,7 +791,7 @@ effect MercilessAssassination is TargetableSpell {
   check(caster, target) => target.isHero() && !areAllies(caster, target)
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " dies under mysterious circumstainces...", LogLevels.warn, target.coordinates)
+    Game.logEvent(Game.localizedStr(target.type.title) + " dies under mysterious circumstainces...", LogLevels.warn, target.coordinates)
     Game.animateVisualFx([
       [
         type: ["hit", "poison", "explosion", "electric", "blood"].randomItem(),

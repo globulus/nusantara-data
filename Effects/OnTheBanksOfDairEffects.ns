@@ -1,10 +1,12 @@
 import "CommonEffects"
 
 CAMPAIGN_SPEED_BOOST = 2
+CAMPAIGN_SIGHT_BOOST = 1
 
 effect SpeedBoostModifier is AuraModifier {
   run(caster, target) => [
-    speed: ["+", CAMPAIGN_SPEED_BOOST]
+    speed: ["+", CAMPAIGN_SPEED_BOOST],
+    sight: ["+", CAMPAIGN_SIGHT_BOOST]
   ]
 
   sprite => "March"
@@ -18,7 +20,8 @@ effect SpeedBoost is Aura {
 
   range(caster) => Game.grid.size
 
-  isValidTarget(caster, target) => target.type.id in ["warrior", "tonkaa", "kagaalu"]
+  # a player effect: the caster is the player, and only its own units benefit
+  isValidTarget(caster, target) => target.owner.id == caster.id && target.type.id in ["warrior", "tonkaa", "ormu", "kagaalu", "canoe"]
 
   modifier(caster, target) => SpeedBoostModifier()
 
@@ -31,7 +34,101 @@ effect SpeedBoost is Aura {
 
   title => "speedBoostTitle"
 
-  description(caster) => "Provides a global speed boost to your warriors!"
+  description(caster) => "Your warriors and canoes move faster and see further."
+}
+
+# Pyracmon's tribes know their jungle: without this, their units are as blind in it as anyone else's, and
+# since nobody can step into a cell they can't see, they stood still while enemies walked past.
+TRIBAL_SIGHT_BOOST = 1
+
+ROGASH_BLESSING_REGENERATION = 5
+ROGASH_BLESSING_DEFENSE = 3 # each point takes 10% off the damage
+
+# Normal difficulty only: Tonkaa, Ormu and Kagaalu take less damage and heal between fights, so they can
+# survive a brush with Pyracmon's tribes and rest up afterwards.
+effect RogashsBlessingModifier is AuraModifier {
+  run(caster, target) => [
+    regeneration: ["+", ROGASH_BLESSING_REGENERATION],
+    defense: ["+", ROGASH_BLESSING_DEFENSE]
+  ]
+
+  sprite => "eyeToEyeClawToClaw"
+
+  title => "rogashsBlessingTitle"
+}
+
+effect RogashsBlessing is Aura {
+  stacks = false
+  modifierId = "RogashsBlessingModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => target.owner.id == caster.id && target.type.id in ["tonkaa", "ormu", "kagaalu"]
+
+  modifier(caster, target) => RogashsBlessingModifier()
+
+  sprite => "eyeToEyeClawToClaw"
+
+  title => "rogashsBlessingTitle"
+
+  description(caster) => "Rogash watches over the tribe's leaders: they take less damage and heal $(ROGASH_BLESSING_REGENERATION) health each turn."
+}
+
+
+effect TribalSensesModifier is AuraModifier {
+  run(caster, target) => [
+    sight: ["+", TRIBAL_SIGHT_BOOST]
+  ]
+
+  sprite => "warchief"
+
+  title => "tribalSensesTitle"
+}
+
+effect TribalSenses is Aura {
+  stacks = false
+  modifierId = "TribalSensesModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => target.owner.id == caster.id
+
+  modifier(caster, target) => TribalSensesModifier()
+
+  sprite => "warchief"
+
+  title => "tribalSensesTitle"
+
+  description(caster) => "Pyracmon's warriors know every path of their jungle."
+}
+
+# Pyracmon's riders dismount in their jungle: on horseback a jungle cell takes all of a raider's movement, so it
+# could never step up to an enemy and strike, and riders let anyone walk past them.
+effect TribalPathsModifier is AuraModifier {
+  run(caster, target) => [
+    movementType: "walk"
+  ]
+
+  sprite => "warchief"
+
+  title => "tribalPathsTitle"
+}
+
+effect TribalPaths is Aura {
+  stacks = false
+  modifierId = "TribalPathsModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => target.owner.id == caster.id && target.type.id == "raider"
+
+  modifier(caster, target) => TribalPathsModifier()
+
+  sprite => "warchief"
+
+  title => "tribalPathsTitle"
+
+  description(caster) => "Pyracmon's riders fight on foot in the jungle."
 }
 
 effect RockLob {
@@ -44,15 +141,16 @@ effect RockLob {
 
   check(caster, target) => !areAllies(caster, target)
 
+  cost(caster) => [ap: 3] # one lob a turn
+
   run(caster, target) {
-    Game \
-      .,animateProjectile("stone", caster.coordinates, target.coordinates) \
-      .,animateVisualFx([
-        [
-          type: "hit",
-          coordinates: unit.coordinates
-        ]
-      ])
+    Game.animateAttack(caster, target) # (there is no Game.animateProjectile)
+    Game.animateVisualFx([
+      [
+        type: "hit",
+        coordinates: target.coordinates
+      ]
+    ])
     target.takeDamage(DAMAGE, caster)
   }
 

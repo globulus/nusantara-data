@@ -1,0 +1,62 @@
+# Mission 4: Industrial Devastation
+industrialDevastationTitle: Industrial Devastation
+industrialDevastationDescription: Vitarron the Viceroy pushes inland from the Landfall colony, with factories, tanks and roads, against Alrood's Crimson Horde.
+industrialDevastationLoadingText: The jungle east of the Dair has no roads. The Viceroy intends to change that.
+
+# The shaping corral (shared campaign unit; its own keys, as test.yaml's shapingCorral* belong to the Sanghoy upgrade)
+indevCorralTitle: Shaping Corral
+indevCorralDescription: Where the Crimson Horde reshapes its captives into beastmen. While one stands, Alrood is reborn there.
+indevCorralFlavor: Maalaki promised them rebirth. He did not say into what.
+# Alrood (unit elrood) had no description key; this belongs with alroodTitle/alroodFlavor in test.yaml
+alroodDescription: Chieftain of the Crimson Horde. Maalaki's spirit in a chironite's body, reborn at the shaping corrals.
+
+# Speakers
+indevSpeakerVarrenne: Captain Varrenne
+
+# Objectives
+indevFactoryTitle: Smoke over the jungle
+indevFactoryDescription: Build a Factory near the Colonial Hall. Factories make Steam Golems, Devilhorn Tanks, MEVs and Autoturrets.
+indevCorralsTitle: Burn the corrals
+indevCorralsDescription: "Destroy the Crimson Horde's shaping corrals: {0} of {1} destroyed. Tanks can't cross the jungle: lay roads to the corrals. Vitarron and the Colonial Hall must survive."
+indevAlroodTitle: The undying chieftain
+indevAlroodDescription: "Kill Alrood. While a corral stands, he is reborn there. Reborn so far: {0}."
+indevAlroodMortalDescription: "Kill Alrood. The corrals are gone: this time he stays dead. Reborn so far: {0}."
+
+# Opening
+indevIntro1: Captain Varrenne. My cousin the Emperor did not send me across an ocean to admire a beach.
+indevIntro2: The Landfall colony holds the river mouth, Viceroy. Inland it's jungle as far as the scouts went.
+indevIntro2Landfall: Landfall holds the river mouth, Viceroy. Pyracmon's camps by the beach are ash. Inland it's jungle as far as the scouts went.
+indevIntro3: And in that jungle?
+indevIntro4: The Crimson Horde. Their chieftain is called Alrood. The tribes say he can't die. The scouts marked his shaping corrals on the map.
+indevIntroAlrood: Maalaki has died before, outsiders. The corrals remember his shape. Come into the green and learn what rebirth means.
+indevIntro5: Charming. Captain, we will build a factory, and then we will build a road, and at the end of the road we will build a bonfire.
+indevIntro6: The jungle doesn't take kindly to wheels, Viceroy.
+indevIntro7: Then the jungle will have to learn. Industry, Captain. The Empire runs on it.
+indevLandfallSettlers: "Settlers from Landfall, Viceroy: {0} of them. They know how to lay a road."
+
+# Hints
+indevFactoryHint: "The Colonial Hall can build a Factory. Keep Vitarron next to the Hall and the Factory: his Governance Aura gives settlers and buildings next to him an extra action."
+indevRoadHint: Tanks can't enter jungle, swamp or hills, and soldiers only enter jungle in March stance. Settlers and Devilhorn Tanks can lay a road on a cell next to them (Build Road), one turn on open ground, two in jungle. Hills can't take a road. A finished road also keeps the jungle along it in sight.
+indevTankHint: Devilhorn Tanks hit hard and lay roads, but they can't leave the road in the jungle. Steam Golems are cheaper; MEVs repair mechs; Autoturrets guard the colony.
+
+# Events
+indevFactoryBuilt: There's your smoke, Captain. Now, tanks. Lots of tanks.
+indevFirstRoad: Outriders will come for the road crews. The Horde watches every cell we cut.
+indevAlroodRides: Riders out of the jungle! Alrood himself leads them.
+indevRaid: Crimson outriders ride out of the jungle.
+indevAlarm: Outriders ride out of a corral, after your road crews.
+indevAlroodFell: I have died before, outsider. I will be back before your smoke clears.
+indevAlroodFellAgain: Again? You only teach me patience.
+indevAlroodReborn: The scouts saw him walk out of a corral, Viceroy. Alive, and in a temper.
+indevAlroodReborn2: Then we burn every corral in this jungle, and see how he likes the ash.
+indevAlroodRebornAgain: Alrood walks out of a shaping corral again.
+indevCorralFell: One corral less. The smell is indescribable, Viceroy.
+indevAlroodMortal: The corrals! What have you done? There is nowhere left for me to return...
+indevAlroodMortal2: Then this time, Captain, we see to it he stays down.
+
+# Victory and defeat
+indevVictory1: The corrals are ash and Alrood stays dead. The road runs all the way to the lair, Viceroy.
+indevVictory2: Excellent. Name it the Vitarron Road. And have the factories double their shifts. The Emperor will want to hear how much jungle we turned into progress.
+indevVictory3: He'll hear about the smoke first. It reaches the coast.
+indevHallFell: The Colonial Hall has fallen. The push inland is over.
+indevViceroyFell: The Viceroy is dead. The expedition falls apart without him.

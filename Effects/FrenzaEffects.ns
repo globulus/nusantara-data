@@ -194,7 +194,7 @@ effect ColonialHallGenerateGold {
         coordinates: caster.coordinates
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " generates $g Gold.", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " generates $g Gold.", LogLevels.info, caster.coordinates)
   }
   
   description(caster) => "At start of turn, generate $(gold(caster)) gold. Improved for every Factory and Airfield nearby."
@@ -276,7 +276,7 @@ effect Airlift {
   run(caster, target) {
     target.destroy(caster)
     caster.owner.addToHand("paradrop", 1)
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " is undergoing parachute training...", LogLevels.info, target.coordinates)
+    Game.logEvent(Game.localizedStr(target.type.title) + " is undergoing parachute training...", LogLevels.info, target.coordinates)
   }
 
   description(caster) => "Target a friendly Rifleman. Destroy it and add a Paradrop spell to your hand."
@@ -296,7 +296,7 @@ effect GenerateFavorMonument {
         color: "#0000FF"
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " generates $amount Favor.", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " generates $amount Favor.", LogLevels.info, caster.coordinates)
   }
   
   description(caster) => "Generate $amount Favor."
@@ -347,11 +347,11 @@ effect BuildRoad {
     if turnsLeft == 1 {
       target.removeExtra(extraId())
       target.setTerrain("road")
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " builds road!", LogLevels.info, caster.coordinates)
+      Game.logEvent(Game.localizedStr(caster.type.title) + " builds road!", LogLevels.info, caster.coordinates)
     } else {
       turnsLeft -= 1
       target.updateExtra(extraId(), turnsLeft)
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " is building road, $turnsLeft turns left...", LogLevels.info, caster.coordinates)
+      Game.logEvent(Game.localizedStr(caster.type.title) + " is building road, $turnsLeft turns left...", LogLevels.info, caster.coordinates)
     }
   }
 
@@ -406,7 +406,7 @@ effect PlagueSeedsModifier {
     damagePercentage = if target.owner.hasUpgrade("superspread") DAMAGE_PERCENTAGE_WITH_IMUNITY else DAMAGE_PERCENTAGE
     damageTaken = target.hp * damagePercentage // 100
     target.takeDamage(damageTaken, caster)
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " takes $damageTaken damage from Plague!", LogLevels.info, target.coordinates)
+    Game.logEvent(Game.localizedStr(target.type.title) + " takes $damageTaken damage from Plague!", LogLevels.info, target.coordinates)
     location = target.coordinates
     if location != null { # didn't die yet, infect others
       units = Game.unitsInRange(location, 1).where(=> isOrganic($0) && !$0.hasTempEffect("PlagueSeedsModifier"))
@@ -417,7 +417,7 @@ effect PlagueSeedsModifier {
           coordinates: unit.coordinates,
           color: "#006400"
         ])
-        Game.logEvent(Game.localizedStr(unit.type.id + "Title") + " gets infected with Plague!", LogLevels.warn, unit.coordinates)
+        Game.logEvent(Game.localizedStr(unit.type.title) + " gets infected with Plague!", LogLevels.warn, unit.coordinates)
         unit.addTempEffect(PlagueSeedsModifier(), caster, PLAGUE_SEEDS_DURATION)
       }
       Game.animateVisualFx(vfx)
@@ -446,7 +446,7 @@ effect Autoinfection {
         color: "#006400"
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " now bears plague!", LogLevels.warn, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " now bears plague!", LogLevels.warn, caster.coordinates)
     caster.addTempEffect(PlagueSeedsModifier(), caster, duration())
   }
 
@@ -514,7 +514,7 @@ effect Sabotage {
           coordinates: target.coordinates
         ]
       ])
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sabotages " + Game.localizedStr(target.type.id + "Title"), LogLevels.info, caster.coordinates)
+      Game.logEvent(Game.localizedStr(caster.type.title) + " sabotages " + Game.localizedStr(target.type.title), LogLevels.info, caster.coordinates)
     }
   }
 
@@ -536,7 +536,7 @@ effect ConcussiveGrenade {
         coordinates: target.coordinates
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " throws concussive grenade at " + Game.localizedStr(target.type.id + "Title"), \
+    Game.logEvent(Game.localizedStr(caster.type.title) + " throws concussive grenade at " + Game.localizedStr(target.type.title), \
       LogLevels.info, target.coordinates)
     target.takeDamage(DAMAGE, caster)
     target.setActions(-1) # stun
@@ -580,7 +580,7 @@ effect Recrew {
         color: "#800080"
       ]
     ])
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " recrews " + Game.localizedStr(caster.type.id + "Title") \
+    Game.logEvent(Game.localizedStr(target.type.title) + " recrews " + Game.localizedStr(caster.type.title) \
       + ", restoring $hp HP and $ap AP.", LogLevels.info, caster.coordinates)
   }
 
@@ -623,7 +623,7 @@ effect CombatShields {
     modifier = CombatShieldsModifier()
     around = Game.unitsInRange(Game.grid.locate(caster), radius) \
       .where(=> areAllies(caster, $0) && $0.type.id in validTypes)
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " issues combat shields to $(around.size) allies!", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " issues combat shields to $(around.size) allies!", LogLevels.info, caster.coordinates)
     Game.animateVisualFx(around.map(=> [
       type: "boost",
       coordinates: $0.coordinates,
@@ -662,7 +662,7 @@ effect CellTech {
     modifier = CellTechModifier()
     around = Game.unitsInRange(Game.grid.locate(caster), radius) \
       .where(=> areAllies(caster, $0) && $0.type.id in validTypes)
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " issues dat dere cell tech to $(around.size) allies!", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " issues dat dere cell tech to $(around.size) allies!", LogLevels.info, caster.coordinates)
     Game.animateVisualFx(around.map(=> [
       type: "boost",
       coordinates: $0.coordinates,
@@ -697,7 +697,7 @@ effect Promoted {
     ])
     target.restoreHealth(HP_RESTORED)
     target.owner.addResources([u: FAVOR_RECEIVED])
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + "'s past deeds give it a nice pension that provides premium healthcare.", LogLevels.info, target.coordinates)
+    Game.logEvent(Game.localizedStr(target.type.title) + "'s past deeds give it a nice pension that provides premium healthcare.", LogLevels.info, target.coordinates)
   }
 
   sprite => "valiantPromotion"
@@ -719,7 +719,7 @@ effect ValiantPromotion is TargetableSpell {
         color: "#FFD700"
       ]
     ])
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " gets promoted for valiance in the theater of war.", LogLevels.info, target.coordinates)
+    Game.logEvent(Game.localizedStr(target.type.title) + " gets promoted for valiance in the theater of war.", LogLevels.info, target.coordinates)
   }
 
   description(caster) => "Promote a friendly unit so that it generates favor and restores health at the end of turn. Doesn't stack."
@@ -781,7 +781,7 @@ effect BlazeOfGlory {
         coordinates: caster.coordinates
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s service ends in a fiery inferno that engulfs its enemies and allies alike.", LogLevels.warn, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + "'s service ends in a fiery inferno that engulfs its enemies and allies alike.", LogLevels.warn, caster.coordinates)
     caster.destroy(caster)
   }
 
@@ -848,7 +848,7 @@ effect StrafingRun {
     startingCell = Game.grid.locate(caster)
     targetCell = getVacantCell(target, 1)
     caster.moveTo(targetCell.coordinates)
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " dive bombs at " + Game.localizedStr(target.type.id + "Title"), LogLevels.info, target.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " dive bombs at " + Game.localizedStr(target.type.title), LogLevels.info, target.coordinates)
     Game.combat(caster, target)
     if targetCell.content != null {
       caster.moveTo(startingCell.coordinates)
@@ -921,7 +921,7 @@ effect NoxiousCloud {
     vfx = []
     for unit in units {
       unit.takeDamage(p.damage, caster)
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Noxious Cloud engulfs the land, dealing $(p.damage) damage and spreading poison!", \
+      Game.logEvent(Game.localizedStr(caster.type.title) + "'s Noxious Cloud engulfs the land, dealing $(p.damage) damage and spreading poison!", \
         LogLevels.info, target.coordinates)
       if !unit.hasTempEffect("PoisonModifier") {
         unit.addTempEffect(PoisonModifier(poisonDamage), caster, p.poisonDuration)
@@ -937,7 +937,7 @@ effect NoxiousCloud {
 
   description(caster) {
     p = params(caster)
-    return "Deal $(p.damage) to all organic units in radius $(p.radius). They take $posionDamage each turn for $(p.poisonDuration) turns."
+    return "Deal $(p.damage) to all organic units in radius $(p.radius). They take $poisonDamage each turn for $(p.poisonDuration) turns."
   }
 }
 
@@ -958,7 +958,7 @@ effect TofansKissModifier {
         color: "#FF0000"
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Kiss still lingers on " + Game.localizedStr(target.type.id + "Title") \
+    Game.logEvent(Game.localizedStr(caster.type.title) + "'s Kiss still lingers on " + Game.localizedStr(target.type.title) \
       + "'s skin, dealing $damage damage.", LogLevels.info, target.coordinates)
   }
 
@@ -1005,7 +1005,7 @@ effect TofansKiss {
         color: "#0000FF"
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Kiss is something " + Game.localizedStr(target.type.id + "Title") \
+    Game.logEvent(Game.localizedStr(caster.type.title) + "'s Kiss is something " + Game.localizedStr(target.type.title) \
       + " won't forget for at least $(p.duration) turns!", LogLevels.info, target.coordinates)
   }
 
@@ -1037,7 +1037,7 @@ effect PlagueSeeds {
         color: "#006400"
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " exposes " + Game.localizedStr(target.type.id + "Title") \
+    Game.logEvent(Game.localizedStr(caster.type.title) + " exposes " + Game.localizedStr(target.type.title) \
       + " to the deadly plague!", LogLevels.warn, target.coordinates)
     target.addTempEffect(PlagueSeedsModifier(), caster, PLAGUE_SEEDS_DURATION)
   }
@@ -1147,7 +1147,7 @@ effect FireBrigade {
           color: "#00FF00"
         ]
       ])
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Fire brigades serve with pride.", LogLevels.info, caster.coordinates)
+      Game.logEvent(Game.localizedStr(caster.type.title) + "'s Fire brigades serve with pride.", LogLevels.info, caster.coordinates)
       caster.restoreHealth(EXTRA_REGEN_ON_LOW)
     }
   }
@@ -1191,7 +1191,7 @@ effect AimForTheSun {
     caster.moveTo(target.coordinates)
     animateHitOn(caster)
     caster.takeDamage(damageTaken(caster), caster)
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " rises sharply and lands far, far away...", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " rises sharply and lands far, far away...", LogLevels.info, caster.coordinates)
   }
 
   description(caster) => "Instantly move to an empty cell with range $(range(caster)). Take damage equal to $(damageTakenPercentage(caster))% of your max health."
@@ -1263,7 +1263,7 @@ effect Insurrection {
         color: "#FF0000"
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " decides to take matters into his own hands...", LogLevels.error, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " decides to take matters into his own hands...", LogLevels.error, caster.coordinates)
     player = caster.owner
     units = player.ownedUnits
     for unit in units.where(=> $0.type.id == "settler") {

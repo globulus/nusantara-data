@@ -1,0 +1,59 @@
+id: IndustrialDevastation
+title: industrialDevastationTitle
+description: industrialDevastationDescription
+ruleset:
+  id: IndustrialDevastationRuleset
+  inherits: DefaultCampaign
+  timeoutLength: 60 # building takes longer than marching; cutscenes pause it (see the script)
+  factionData:
+    frenza:
+      startingData:
+        resources:
+          g: 30 # a factory (15) and the first roads
+          u: 0
+        cards: { }
+        units: [ ] # the colony is on the map; the script gives it to the player and brings in Vitarron
+      # The Viceroy's industrial program: the script slots all four at the start (tanks need a major upgrade,
+      # tanks lay roads with Combat engineers, factories train autoturrets with Automated defenses).
+      upgradeTree:
+        nodes:
+          - type: intensiveIndustrialization
+            subnodes:
+              - type: automatedDefenses
+              - type: engineKits
+                subnodes:
+                  - type: combatEngineers
+    sanghoy:
+      startingData:
+        resources:
+          g: 0
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes:
+          - type: tasteOfManflesh # hard: the script slots it, and the Horde's riders drain their prey
+  bans:
+    skills:
+      - buildAirfield
+      - buildMagistratesCourt
+      - buildMonument
+      - addMajorUpgrade
+      - addMinorUpgrade
+      - sendTribute
+      - foundPlantation
+      - retrofitToVoltTank
+      - retrofitToVoltWalker
+      - insurrection
+      - riseToWarchief
+      - pillage
+players:
+  - name: Player
+    color: blue
+    team: 1
+    faction: frenza
+  - name: Crimson Horde
+    color: red
+    team: 2
+    faction: sanghoy
+    ai: TerritorialAi

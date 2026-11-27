@@ -1,0 +1,66 @@
+# Mission 9: The Dair Runs Red
+theDairRunsRedTitle: The Dair Runs Red
+theDairRunsRedDescription: Kagaalu leads the united tribes back across the Dair to burn the outsiders' colony at the river mouth.
+theDairRunsRedLoadingText: Nine moons ago the tribe fled across the Dair in hidden canoes. Now every clan on the north bank answers the same drum, and Kagaalu has a reckoning in mind.
+
+# Speakers
+dairSpeakerThrall: Thrall
+dairSpeakerElder: Clan elder
+
+# Objectives
+dairBurnTitle: The Dair runs red
+dairBurnDescription: Burn Landfall. Destroy the outsiders' Colonial Hall at the mouth of the Dair, on the south bank.
+dairBurnDescriptionCrossed: Burn Landfall. Destroy the Colonial Hall at the mouth of the Dair. The camp at the ashes trains warriors on the south bank.
+dairCrossTitle: Cross the Dair
+dairCrossDescription: Bring Kagaalu to the ashes of Pyracmon's war camp on the south bank. The clans hiding there will raise a camp for him. Kagaalu must live; the Runestone of Rogash can raise him if he falls.
+
+# Hints
+dairCanoeHint: "The canoes are moored up the creek, out of the ironclads' reach. Select a canoe next to a unit and use <b>Load</b>; cross, then <b>Unload</b> on the far bank. Far upstream, a sandbar ford crosses the river where the ironclads can't sail."
+dairBuildHint: "Thralls mine gold and build: a <b>War Council</b> trains raiders and shadespears, a <b>Totem</b> trains shapers, who turn warriors into kavouros that swim the river. With <b>Thick Shell</b>, a kavouros carries two across."
+
+# Opening
+dairIntro1: Nine moons ago the outsiders came up the Dair, and we ran across it in the night. Now every tribe on this bank answers the same drum.
+dairIntroClans: "{0} clans that marched for Pyracmon march for Rogash now."
+dairIntroNoClans: Pyracmon is gone, but his clans are slow to follow a sarcomancer. We go with the warriors we have.
+dairIntro2: Their iron canoes still sail the river, great one. Up and down, day and night.
+dairIntro3: Let them sail. Our canoes are still in the creek where I left them. And upstream there is a ford where iron cannot float.
+dairIntro4: Smoke over the north bank, Viceroy. More fires than last night.
+dairIntro5: Savages cooking their supper, Captain. This colony has a hall, cannon and the Emperor's flag. They have spears.
+dairIntro6: Their hall stands where Tonkaa's fishermen lived. We burn it, and we drive them into the sea.
+
+# The river
+dairRiverHint: The iron canoes fire on anything on the open river. Watch where they sail, and cross behind them.
+dairFirstShot: They have seen us on the water. Cross when the iron canoes have passed, or take the ford upstream.
+dairCanoeSunk: A canoe is sunk.
+dairCanoeSunkSwim: A canoe is sunk. Those aboard swim for it.
+dairIroncladSunk: An iron canoe goes down into the Dair! Rogash drinks deep tonight.
+dairFleetSunk: The last iron canoe is at the bottom of the river. The Dair is ours again.
+
+# The crossing
+dairWarCamp1: Ashes. This is where Pyracmon's war camp burned, the day the outsiders landed.
+dairWarCamp2: Kagaalu! When the outsiders burned our camp we hid in the jungle, kept our fires low and waited. We are done waiting.
+dairWarCamp3: Then raise the camp again. From here their hall is a short march, and warriors trained here won't have to swim.
+
+# During the fight
+dairRaid: Outsiders on our bank! They have crossed the river to burn our camp.
+dairWarCampFell: The outsiders have burned our camp at the ashes again! Bring Kagaalu back there, and we will raise it once more.
+dairWarCampAgain: Ashes again, and the clans still here. Raise the camp. Rogash likes a fire that won't go out.
+dairKagaaluFell: Kagaalu has fallen! Raise him at the Runestone of Rogash before the clans lose heart.
+dairKagaaluRaised: Rogash is not finished with me yet. Back to the river.
+dairVitarronFell: The Viceroy is down! Carry him back to the court. Every other man, hold the line!
+dairMarines1: Landfall, this is the Resolute. Boats are coming ashore with marines. Hold the hall.
+dairMarines2: You heard them. Hold the hall until the marines are up the beach!
+
+# Ending
+dairVictory1: The hall burns. Rogash, take the smoke.
+dairVictory2: The hall is lost! Get the Viceroy to the boats. Everyone else, to the beach!
+dairVictory3: All boats, all hands. The Resolute sails on the tide.
+dairVictory4: This is not over, savages. The Emperor will hear of this, and he will send more ships than you have trees.
+dairVictory5: Let him send them. The Dair runs red with their blood, and it carries them back to the sea.
+
+# Defeat
+dairCampsBurned: Every camp of the tribes has burned. The clans scatter into the jungle.
+dairKagaaluLost: Kagaalu has fallen, and no Runestone of Rogash stands to raise him. The clans scatter.
+
+# Event log
+dairIroncladFires: "Ironclad fire on the river: {0} takes {1} damage."

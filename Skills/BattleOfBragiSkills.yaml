@@ -1,0 +1,14 @@
+# On the Banks of Dair, mission 6: Battle of Bragi (effects in Effects/BattleOfBragiEffects.ns). The mission script
+# adds these to Yon and to the Magistrates Court; the Court's usual shipEmperorsFist is banned for the mission.
+- id: bragiStitchedHide
+  title: bragiStitchedHideTitle
+  image: ../Factions/OnTheBanksOfDair/Images/yon
+  effect: BragiStitchedHide
+- id: bragiYonFury
+  title: bragiYonFuryTitle
+  image: ../Factions/Sanghoy/Images/sacrificialWell
+  effect: BragiYonFury
+- id: bragiShipEmperorsFist
+  title: bragiShipEmperorsFistTitle
+  image: ../Factions/Frenza/Images/imperialJuggernaut
+  effect: BragiShipEmperorsFist

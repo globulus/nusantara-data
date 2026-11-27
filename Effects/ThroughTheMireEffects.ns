@@ -1,0 +1,87 @@
+import "CommonEffects"
+
+# On the Banks of Dair, mission 3: Through the Mire. Mission-only effects (all prefixed Mire).
+
+MIRE_MARCH_SPEED = 2
+MIRE_MARCH_SIGHT = 1
+MIRE_MARCH_TYPES = ["kagaalu", "ormu", "warrior", "thrall"]
+
+# A player effect's aura: every unit of the player's that qualifies, wherever it stands. (Aura's own run looks for
+# units in range of the map's centre cell, and leaves out whoever stands on that very cell.)
+effect MirePlayerAura is Aura {
+  run(caster, target) {
+    for unit in caster.ownedUnits.where(=> $0.coordinates != null && @isValidTarget(caster, $0)) {
+      if @stacks || !unit.hasTempEffect(@modifierId) {
+        @affect(unit, caster)
+      }
+    }
+  }
+}
+
+# Kagaalu's band marches light: the walkers move faster and see further (a player effect of the human's only, so
+# the other Sanghoy players in the mission don't get it).
+effect MireMarchModifier is AuraModifier {
+  run(caster, target) => [
+    speed: ["+", MIRE_MARCH_SPEED],
+    sight: ["+", MIRE_MARCH_SIGHT]
+  ]
+
+  sprite => "March"
+
+  title => "mireMarchTitle"
+}
+
+effect MireMarch is MirePlayerAura {
+  stacks = false
+  modifierId = "MireMarchModifier"
+
+  range(caster) => Game.grid.size
+
+  # a player effect: the caster is the player, and only its own units benefit
+  isValidTarget(caster, target) => target.owner.id == caster.id && target.type.id in MIRE_MARCH_TYPES
+
+  modifier(caster, target) => MireMarchModifier()
+
+  affect(unit, caster) {
+    super.affect(unit, caster)
+    unit.restoreActions(MIRE_MARCH_SPEED)
+  }
+
+  sprite => "March"
+
+  title => "mireMarchTitle"
+
+  description(caster) => Game.localizedStr("mireMarchDescription")
+}
+
+MIRE_REMEDY_REGENERATION = 4
+MIRE_REMEDY_TYPES = ["warrior", "thrall", "chironite", "kavouros"]
+
+# Normal difficulty only: Kagaalu knows the swamp's herbs, and the band's wounds close between fights (Kagaalu and
+# Ormu have Rogash's Blessing instead).
+effect MireRemediesModifier is AuraModifier {
+  run(caster, target) => [
+    regeneration: ["+", MIRE_REMEDY_REGENERATION]
+  ]
+
+  sprite => "eyeToEyeClawToClaw"
+
+  title => "mireRemediesTitle"
+}
+
+effect MireRemedies is MirePlayerAura {
+  stacks = false
+  modifierId = "MireRemediesModifier"
+
+  range(caster) => Game.grid.size
+
+  isValidTarget(caster, target) => target.owner.id == caster.id && target.type.id in MIRE_REMEDY_TYPES
+
+  modifier(caster, target) => MireRemediesModifier()
+
+  sprite => "eyeToEyeClawToClaw"
+
+  title => "mireRemediesTitle"
+
+  description(caster) => Game.localizedStr("mireRemediesDescription")
+}

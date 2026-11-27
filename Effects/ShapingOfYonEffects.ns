@@ -1,0 +1,116 @@
+import "CommonEffects"
+import "OnTheBanksOfDairEffects"
+
+# Mission 5 of On the Banks of Dair: Shaping of Yon.
+
+YON_SCENARIO = "ShapingOfYon"
+YON_OFFER_CHUNK = 10 # Blood poured into the Well with each offering
+YON_KEY_OFFERED = "bloodOffered" # the Well's tally, a scenario extra (the mission script reads it too)
+
+# Scenario extras can come back from a saved game as text: this reads them as a number either way.
+fn yonNumber(value) => if value == null 0 else Math.round(value)
+
+# How much Blood the player has, up to `upTo`. (Asked through canPay: it always reads the live amount.)
+fn yonBloodOf(player, upTo) {
+  blood = 0
+  for amount in 1...upTo {
+    if player.canPay([u: amount]) {
+      blood = amount
+    } else {
+      break
+    }
+  }
+  return blood
+}
+
+# Moves the player's Blood into the Well's tally. Costs no action, so it can be offered any time, as often as the
+# player likes: the choice is what to keep for sarcomancy and shaping.
+effect YonOfferBlood {
+  trigger = Triggers.cast
+
+  targets => Targets.none
+
+  cost(caster) => [ap: 0]
+
+  isEnabled(caster) => [
+    [Game.currentScenario.scriptId == YON_SCENARIO, "Only the Well of the Mire answers."],
+    [caster.owner.canPay([u: 1]), "You have no Blood to offer."]
+  ]
+
+  run(caster, target) {
+    player = caster.owner
+    amount = yonBloodOf(player, YON_OFFER_CHUNK)
+    if amount <= 0 {
+      return
+    }
+    player.pay([u: amount])
+    live = Game.currentScenario
+    offered = yonNumber(live.getExtraValue(YON_KEY_OFFERED)) + amount
+    live.addOrUpdateExtra(YON_KEY_OFFERED, YON_KEY_OFFERED, "", offered)
+    Game.animateVisualFx([
+      [
+        type: "blood",
+        coordinates: caster.coordinates
+      ],
+      [
+        type: "aura",
+        coordinates: caster.coordinates,
+        color: "#8B0000"
+      ]
+    ])
+    Game.logEvent("$amount Blood is poured into the Sacrificial Well. It holds $offered.", LogLevels.positive, caster.coordinates)
+  }
+
+  description(caster) => "Pour up to $YON_OFFER_CHUNK of your Blood into the Well. Costs no action."
+}
+
+# Yon's rock lob: the campaign's RockLob, with a cost, so Yon throws once a turn. (RockLob's own run calls
+# Game.animateProjectile, which the engine doesn't have: the boulder never landed.)
+effect YonRockLob is RockLob {
+  cost(caster) => [ap: 3]
+
+  run(caster, target) {
+    Game.animateAttack(caster, target)
+    Game.animateVisualFx([
+      [
+        type: "hit",
+        coordinates: target.coordinates
+      ]
+    ])
+    target.takeDamage(DAMAGE, caster)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " hurls a boulder at " + Game.localizedStr(target.type.title) \
+      + " for $DAMAGE damage!", LogLevels.info, caster.coordinates)
+  }
+
+  description(caster) => "Deal $DAMAGE damage to an enemy in range $RANGE. Uses 3 actions."
+}
+
+# The outsiders' mechs see a cell further (a player effect on the outsiders). Without it a steam golem (range 2,
+# sight 1) marched to within range of the tribe couldn't see its target, and its turn passed without a shot.
+effect YonOutsiderScopesModifier is AuraModifier {
+  run(caster, target) => [
+    sight: ["+", 1]
+  ]
+
+  sprite => "cellTech"
+
+  title => "yonScopesTitle"
+}
+
+effect YonOutsiderScopes is Aura {
+  stacks = false
+  modifierId = "YonOutsiderScopesModifier"
+
+  range(caster) => Game.grid.size
+
+  # a player effect: the caster is the player, and only its own units benefit
+  isValidTarget(caster, target) => target.owner.id == caster.id
+
+  modifier(caster, target) => YonOutsiderScopesModifier()
+
+  sprite => "cellTech"
+
+  title => "yonScopesTitle"
+
+  description(caster) => "The outsiders' machines see a cell further."
+}

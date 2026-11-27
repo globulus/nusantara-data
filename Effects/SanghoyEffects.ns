@@ -93,7 +93,7 @@ effect Pillage {
 
   run(caster, target) {
     caster.owner.addResources([g: goldGained])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " pillages $goldGained Gold!", LogLevels.info, caster.coordinates)
+    Game.logEvent(Game.localizedStr(caster.type.title) + " pillages $goldGained Gold!", LogLevels.info, caster.coordinates)
     Game.animateVisualFx([
       [
         type: "earn",
@@ -255,7 +255,7 @@ effect Sarcomancy {
   run(caster, target) {
     target.takeDamage(damage, caster)
     target.addTempEffect(SarcomancyModifier(), source: caster, duration: INFINITY)
-    Game.logEvent("A vile sarcomantic ritual affects " + Game.localizedStr(target.type.id + "Title") + ", damaging it by $damage! New flesh already begins growing...", \
+    Game.logEvent("A vile sarcomantic ritual affects " + Game.localizedStr(target.type.title) + ", damaging it by $damage! New flesh already begins growing...", \
       LogLevels.info, target.coordinates)
     Game.animateVisualFx([
       [
@@ -287,7 +287,7 @@ effect Amalgamation {
   check(caster, target) => predicate(caster, target) && Game.unitsInRange(Game.grid.locate(target), 1).any(=> predicate(caster, $0))
 
   run(caster, target) {
-    Game.logEvent("A horrible ritual binds two of " + Game.localizedStr(target.type.id + "Title") + " into a terrifying Amalgam!", \
+    Game.logEvent("A horrible ritual binds two of " + Game.localizedStr(target.type.title) + " into a terrifying Amalgam!", \
       LogLevels.info, target.coordinates)
     otherTarget = Game.unitsInRange(Game.grid.locate(target), 1).first(=> predicate(caster, $0))
     Game.animateVisualFx([
@@ -337,7 +337,7 @@ effect TributeToRogash {
     bloodGained = Math.min(maxBlood, target.hp // ratio)
     caster.owner.addResources([u: bloodGained])
     target.destroy(caster)
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " is sacrificed at " + Game.localizedStr(caster.type.id + "Title") \
+    Game.logEvent(Game.localizedStr(target.type.title) + " is sacrificed at " + Game.localizedStr(caster.type.title) \
       + ", its fleshy carcass yielding $bloodGained Blood!", LogLevels.info, caster.coordinates)
   }
 
@@ -354,7 +354,7 @@ effect Trample {
     if destination != null {
       target.moveTo(destination.coordinates)
       animateHitOn(target)
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " charges at " + Game.localizedStr(target.type.id + "Title") + ", knocking it back a cell!", \
+      Game.logEvent(Game.localizedStr(caster.type.title) + " charges at " + Game.localizedStr(target.type.title) + ", knocking it back a cell!", \
         LogLevels.info, target.coordinates)
     }
   }
@@ -397,7 +397,7 @@ effect GroundSlam {
         color: "#FF0000"
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s tectonic slam damages $(around.size) enemies by $(p.damage).", \
+    Game.logEvent(Game.localizedStr(caster.type.title) + "'s tectonic slam damages $(around.size) enemies by $(p.damage).", \
       LogLevels.info, caster.coordinates)
     for unit in around {
       unit.takeDamage(p.damage, caster)
@@ -439,7 +439,7 @@ effect Bash {
         coordinates: target.coordinates
       ]
     ])
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s mighty bash damages " + Game.localizedStr(target.type.id + "Title") + " by $damage and stuns it.", \
+    Game.logEvent(Game.localizedStr(caster.type.title) + "'s mighty bash damages " + Game.localizedStr(target.type.title) + " by $damage and stuns it.", \
       LogLevels.info, caster.coordinates)
   }
 
@@ -471,7 +471,7 @@ effect Smite {
     if !target.hasTempEffect("SmiteModifier") {
       animateHitOn(target)
       target.addTempEffect(SmiteModifier(), caster, duration(caster))
-      Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " smites " + Game.localizedStr(target.type.id + "Title") + ", crushing its body and its will to live!", \
+      Game.logEvent(Game.localizedStr(caster.type.title) + " smites " + Game.localizedStr(target.type.title) + ", crushing its body and its will to live!", \
         LogLevels.info, target.coordinates)
     }
   }
@@ -529,7 +529,7 @@ effect KagaalusSarcomancy {
     ])
     target.takeDamage(damage, caster)
     target.addTempEffect(KagaalusSarcomancyModifier(l), source: caster, duration: INFINITY)
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s Sarcomancy affects " + Game.localizedStr(target.type.id + "Title") + ". Its life will never be the same!", \
+    Game.logEvent(Game.localizedStr(caster.type.title) + "'s Sarcomancy affects " + Game.localizedStr(target.type.title) + ". Its life will never be the same!", \
       LogLevels.info, target.coordinates)
   }
 
@@ -556,7 +556,7 @@ effect SacrificeOfHealth is Sacrifice {
     hp = healthRestored(caster)
     around = Game.unitsInRange(Game.grid.locate(caster), radius)\
       .where(=> areAllies(caster, $0) && !$0.isBuilding)
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sacrifices " + Game.localizedStr(target.type.id + "Title") + " to restore $hp HP to $(around.size) allies!", \
+    Game.logEvent(Game.localizedStr(caster.type.title) + " sacrifices " + Game.localizedStr(target.type.title) + " to restore $hp HP to $(around.size) allies!", \
       LogLevels.info, target.coordinates)
     vfx = []
     for unit in around {
@@ -590,7 +590,7 @@ effect SacrificeOfVigor is Sacrifice {
     ap = apRestored(caster)
     around = Game.unitsInRange(Game.grid.locate(caster), radius)\
       .where(=> areAllies(caster, $0) && !$0.isBuilding)
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sacrifices " + Game.localizedStr(target.type.id + "Title") + " to restore $ap AP to $(around.size) allies!", \
+    Game.logEvent(Game.localizedStr(caster.type.title) + " sacrifices " + Game.localizedStr(target.type.title) + " to restore $ap AP to $(around.size) allies!", \
       LogLevels.info, target.coordinates)
     vfx = []
     for unit in around {
@@ -624,7 +624,7 @@ effect SacrificeOfDeath is Sacrifice {
     damage = totalDamage(caster)
     around = Game.unitsInRange(Game.grid.locate(caster), radius)\
       .where(=> !areAllies(caster, $0) && !$0.isBuilding)
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " sacrifices " + Game.localizedStr(target.type.id + "Title") + " to damage $(around.size) enemies by $damage!", \
+    Game.logEvent(Game.localizedStr(caster.type.title) + " sacrifices " + Game.localizedStr(target.type.title) + " to damage $(around.size) enemies by $damage!", \
       LogLevels.info, target.coordinates)
     for unit in around {
       animateHitOn(unit)
@@ -712,7 +712,7 @@ effect BeastmastersWarcry {
     duration = Math.max(1, l // 2)
     around = Game.unitsInRange(Game.grid.locate(caster), radius)\
       .where(=> areAllies(caster, $0) && !$0.isBuilding && !$0.hasTempEffect("BeastmastersWarcryModifier"))
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + "'s warcry inspires $(around.size) allies!", \
+    Game.logEvent(Game.localizedStr(caster.type.title) + "'s warcry inspires $(around.size) allies!", \
       LogLevels.info, caster.coordinates)
     vfx = []
     for unit in around {
@@ -757,7 +757,7 @@ effect LeapAttack {
     damage = totalDamage(caster)
     animateHitOn(target)
     target.takeDamage(damage, caster)
-    Game.logEvent(Game.localizedStr(caster.type.id + "Title") + " ferociously leaps at " + Game.localizedStr(target.type.id + "Title") + " and damages it by $damage!", \
+    Game.logEvent(Game.localizedStr(caster.type.title) + " ferociously leaps at " + Game.localizedStr(target.type.title) + " and damages it by $damage!", \
       LogLevels.info, target.coordinates)
   }
   
@@ -772,7 +772,7 @@ effect Bloodlust is TargetableSpell {
   check(caster, target) => areAllies(caster, target) && !target.isBuilding && target.ap < target.speed
 
   run(caster, target) {
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " feels renewed thirst for carnage!", LogLevels.info, target.coordinates)
+    Game.logEvent(Game.localizedStr(target.type.title) + " feels renewed thirst for carnage!", LogLevels.info, target.coordinates)
     Game.animateVisualFx([
       [
         type: "boost",
@@ -986,7 +986,7 @@ effect ConvertToBeastlord {
   run(caster, target) {
     unit = caster.owner.ownedUnits.first(=> $0.type.id == "raider" || $0.type.id == "warchief")
     if unit != null {
-      Game.logEvent(Game.localizedStr(unit.type.id + "Title") + " is reborn as a mighty Beastlord!", LogLevels.positive, unit.coordinates)
+      Game.logEvent(Game.localizedStr(unit.type.title) + " is reborn as a mighty Beastlord!", LogLevels.positive, unit.coordinates)
       unit.setType("beastlord")
       unit.restoreHealth(unit.health)
       unit.setActions(0)
@@ -1152,7 +1152,7 @@ effect HorribleMisshaping {
       defense += randomUnit.type.d
       caster.owner.removeFromHand(randomUnit.id)
     }
-    Game.logEvent(Game.localizedStr(target.type.id + "Title") + " never felt more powerful, finally fused with its brothers in arms!", LogLevels.info, target.coordinates)
+    Game.logEvent(Game.localizedStr(target.type.title) + " never felt more powerful, finally fused with its brothers in arms!", LogLevels.info, target.coordinates)
     Game.animateVisualFx([
       [
         type: "boost",
@@ -1227,7 +1227,7 @@ effect ConvertToForehorn {
     }
     unit = caster.owner.ownedUnits.first(=> $0.type.id == "warrior")
     if unit != null {
-      Game.logEvent(Game.localizedStr(unit.type.id + "Title") + "'s hide is now thick, its limbs strong and its forehead horned!", LogLevels.info, unit.coordinates)
+      Game.logEvent(Game.localizedStr(unit.type.title) + "'s hide is now thick, its limbs strong and its forehead horned!", LogLevels.info, unit.coordinates)
       unit.setType("forehorn")
       unit.restoreHealth(unit.health)
       unit.setActions(0)
