@@ -1,0 +1,761 @@
+# On the Banks of Dair, mission 9: The Dair Runs Red. Chapter 1 reversed: Kagaalu and the united tribes cross the
+# Dair southward and burn Landfall, the outsiders' colony at the river mouth.
+#
+# The player runs a full Sanghoy base on the north bank. Landfall is played by a full Frenza bot (DairColonyAi:
+# NormalAi on normal, HardAi on hard), which builds, trains and sends its army across the river. The Imperial Navy
+# is scripted: ironclads patrol the river and fire on anything of the player's on the water (as in chapter 1), and
+# the flagship Resolute, at anchor off the beach, shells the player's units that come near it.
+#
+# Objectives: burn the Colonial Hall (wins); cross the Dair with Kagaalu to the ashes of Pyracmon's war camp, where
+# the south-bank clans raise a camp for him (a base on the far bank). Sinking an ironclad gets a line of dialog (it's
+# hard: they sail mid-river and mend), and the count is saved.
+# Defeat: every camp of the player's burns, or Kagaalu falls with no Runestone of Rogash to raise him.
+#
+# Map markers (cell comments): camp, muster, canoes, hall, airfield, colonyEdge, anchorage, riverMouth (3),
+# riverMid, riverEast, beachLanding, warCamp, ford. Everything that must survive a save is kept in objectives or
+# scenario extras. Dialogs only reach the human on their own turn, so anything that happens off-turn is queued
+# (see onStateChange).
+scenario TheDairRunsRed {
+  WATER = ["river", "sea"]
+  ARRIVE_DISTANCE = 2 # Kagaalu this close to the ashes of the war camp (a canoe landing below it will do)
+  SHOT_DAMAGE = 20 # an ironclad shot on normal; a canoe survives one (on hard they fire a real attack)
+  DEFAULT_TRIBES = 2 # clans that joined Kagaalu in A Turn of Tides, if that isn't known
+  MAX_TRIBES = 5
+  # What each clan turned in A Turn of Tides brings, in order.
+  TRIBE_BANDS = [["warrior", "raider"], ["warrior", "shadespear"], ["warchief", "warrior"], ["kavouros", "warrior"], ["raider", "shadespear"]]
+  BASE_ARMY = ["warrior", "warrior", "warrior", "shadespear"]
+  SOUTH_CLANS_NORMAL = ["warrior", "warrior", "raider"]
+  SOUTH_CLANS_HARD = ["warrior", "warrior"]
+  HARD_GARRISON = ["rifleman", "rifleman", "devilhornTank"]
+  MARINES_NORMAL = ["rifleman", "rifleman"]
+  MARINES_HARD = ["rifleman", "rifleman", "rifleman", "dragoon"]
+  VITARRON_LEVEL_NORMAL = 2
+  VITARRON_LEVEL_HARD = 4
+
+  OBJ_BURN = "burn"
+  OBJ_CROSS = "cross"
+
+  # Scenario extras
+  KEY_PATROL = "patrol" # the ironclads on the river, as ",id,id,"
+  KEY_PATROL_SIZE = "patrolSize"
+  KEY_SUNK = "sunk"
+  KEY_FLAGSHIP = "flagship"
+  KEY_HALL = "hall"
+  KEY_TRIBES = "tribes"
+  KEY_WAR_CAMP = "warCamp" # the camp the clans raised at the ashes
+  KEY_PENDING = "pending" # events waiting for the human's turn, as ",event,event,"
+  KEY_SEEN = "seen" # one-time events already told, as ",event,"
+  # Queued events, in the order they're told to the human.
+  EVENTS = ["firstShot", "canoeSunk", "canoeSunkSwim", "ironcladSunk", "raid", "warCampFell", "kagaaluFell", "kagaaluRaised", "vitarronFell", "marines", "hallFell"]
+
+  # ------------------------------------------------------------------ setup
+
+  onStart {
+    if Game.currentScenario.objectives.isEmpty { # a loaded game is already set up
+      @setUpMap()
+      @playIntro()
+    }
+  }
+
+  setUpMap {
+    player = @human()
+    landfall = @colony()
+    imperialNavy = @navy()
+    natureId = Game.nature.id
+    home = Game.grid.elementAt(Game.grid.startingLocations.0)
+    for unit in Game.grid.allUnits.where(=> $0.owner.id == natureId && $0.coordinates != null) {
+      typeId = unit.type.id
+      if typeId in ["sanghoyCamp", "runestoneOfRogash", "thrall", "canoe"] && home.distance(unit.coordinates) <= 6 {
+        unit.setOwner(player)
+      } else if typeId == "ironclad" {
+        unit.setOwner(imperialNavy)
+        @remember(KEY_FLAGSHIP, unit.id)
+      } else if typeId in ["colonialHall", "barracks", "factory", "magistratesCourt", "settler", "rifleman", "steamGolem", "vitarron"] {
+        unit.setOwner(landfall)
+        if typeId == "colonialHall" {
+          @remember(KEY_HALL, unit.id)
+        }
+      }
+    }
+    @raiseArmy(player)
+    @garrisonColony(landfall)
+    @summonPatrol(imperialNavy)
+
+    # The tribes have watched the colony for months.
+    hallAt = @markerAt("hall")
+    Game.currentScenario.addRevealedCell(hallAt)
+    for nearHall in Game.grid.ringAround(hallAt, 1) {
+      Game.currentScenario.addRevealedCell(nearHall.coordinates)
+    }
+    Game.currentScenario.addRevealedCell(@markerAt("warCamp"))
+    Game.currentScenario.addRevealedCell(@markerAt("ford"))
+    @remember(KEY_SUNK, 0)
+    Game.refreshState()
+  }
+
+  # Kagaalu, at the level he reached, and the clans that answered the drum.
+  raiseArmy(player) {
+    muster = @markerAt("muster")
+    kagaalu = @freeCellNear(muster).summon("kagaalu", player)
+    player.setHero(kagaalu)
+    player.addToHand("heroUpgrade", 0) # as if trained: the first level's upgrade
+    kagaalu.levelUpTo(@kagaaluLevel())
+    kagaalu.restoreHealth(kagaalu.health)
+    band = []
+    band.addAll(BASE_ARMY)
+    clans = @tribesTurned()
+    @remember(KEY_TRIBES, clans)
+    for i in 0..clans {
+      band.addAll(TRIBE_BANDS.(i))
+    }
+    for typeId in band {
+      spot = @freeCellNear(muster)
+      if spot != null {
+        spot.summon(typeId, player)
+      }
+    }
+    player.addEffect("TribalSenses") # Pyracmon's clans know every path of the jungle
+    if !@isHard() {
+      player.addEffect("RogashsBlessing") # normal: Kagaalu takes less damage and heals between fights
+    }
+  }
+
+  garrisonColony(landfall) {
+    viceroy = @unitOf(landfall, "vitarron")
+    if viceroy != null {
+      landfall.setHero(viceroy)
+      landfall.addToHand("heroUpgrade", 0)
+      viceroy.levelUpTo(if @isHard() VITARRON_LEVEL_HARD else VITARRON_LEVEL_NORMAL)
+      viceroy.restoreHealth(viceroy.health)
+    }
+    if @isHard() {
+      airfieldSite = @marker("airfield")
+      if airfieldSite != null && airfieldSite.content == null {
+        airfieldSite.summon("airfield", landfall)
+      }
+      edge = @markerAt("colonyEdge")
+      for typeId in HARD_GARRISON {
+        spot = @freeCellNear(edge)
+        if spot != null {
+          spot.summon(typeId, landfall)
+        }
+      }
+      landfall.addResources([g: 20, u: 3])
+    }
+  }
+
+  # The river patrol: two ironclads (three on hard), spread along the river. Their cells stay revealed, so the
+  # player can time the crossing.
+  summonPatrol(fleetOwner) {
+    starts = [[@marker("riverMouth"), "riverEast"], [@marker("riverMid"), "riverMouth"]]
+    if @isHard() {
+      starts.add([@marker("riverEast"), "riverMouth"])
+    }
+    for start in starts {
+      spot = start.0
+      if spot != null && spot.content == null {
+        boat = spot.summon("ironclad", fleetOwner)
+        @addToSet(KEY_PATROL, boat.id)
+        @remember("heading:" + boat.id, start.1)
+        Game.currentScenario.addRevealedCell(spot.coordinates)
+      }
+    }
+    @remember(KEY_PATROL_SIZE, starts.size)
+  }
+
+  playIntro {
+    @pauseTimer()
+    player = @human()
+    kagaalu = player.hero
+    Game.positionCamera(kagaalu.coordinates)
+    Game.zoomCamera(8)
+    Game.wait(0.5)
+    @kagaaluSays("dairIntro1")
+    clans = @recallNumber(KEY_TRIBES, 0)
+    if clans > 0 {
+      @say("kagaalu", player, "kagaaluTitle", null, @t("dairIntroClans").format([clans]))
+    } else {
+      @kagaaluSays("dairIntroNoClans")
+    }
+    @warchiefSays("dairIntro2")
+    Game.positionCamera(@markerAt("riverMid"))
+    @bombardmentSound()
+    @kagaaluSays("dairIntro3")
+    Game.positionCamera(@markerAt("hall"))
+    Game.wait(0.5)
+    @captainSays("dairIntro4")
+    @viceroySays("dairIntro5")
+    Game.positionCamera(kagaalu.coordinates)
+    @kagaaluSays("dairIntro6")
+    @startObjective(OBJ_BURN, "dairBurn", "colonialHall", null)
+    @startObjective(OBJ_CROSS, "dairCross", "sanghoyCamp", null)
+    @say("canoe", null, "canoeTitle", "dairCanoeHint", null)
+    @say("thrall", player, "dairSpeakerThrall", "dairBuildHint", null)
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ events
+
+  onMove(unit, from, to) {
+    if unit.owner.id == @human().id {
+      if !@wasSeen("riverHint") && @onChannel(to.coordinates) {
+        @markSeen("riverHint")
+        @pauseTimer()
+        @kagaaluSays("dairRiverHint")
+        @resumeTimer()
+      }
+      @checkCrossing()
+    }
+  }
+
+  onSkillCast(caster, skillId) {
+    if skillId == "unloadTransport" {
+      @checkCrossing()
+    }
+  }
+
+  onDie(unit) {
+    typeId = unit.type.id
+    playerId = @human().id
+    if unit.owner.id == playerId {
+      if typeId == "canoe" {
+        crewed = !unit.loadedUnits.isEmpty || @recall("abandoned:" + unit.id) == "yes"
+        @swimAshore(unit)
+        @queue(if crewed "canoeSunkSwim" else "canoeSunk")
+        if unit.loadedUnits.any(=> $0.type.id == "kagaalu") && !(@human().hero?.isAlive ?? false) {
+          @kagaaluDown()
+        }
+      } else if typeId == "kagaalu" {
+        @kagaaluDown()
+      } else if typeId == "runestoneOfRogash" && !(@human().hero?.isAlive ?? false) \
+          && @human().ownedUnits.count(=> $0.type.id == "runestoneOfRogash" && $0.id != unit.id) == 0 {
+        @defeat("dairKagaaluLost")
+      } else if typeId == "sanghoyCamp" && @human().ownedUnits.count(=> $0.type.id == "sanghoyCamp" && $0.id != unit.id && $0.coordinates != null) == 0 {
+        @defeat("dairCampsBurned")
+      } else if unit.id == @recall(KEY_WAR_CAMP) {
+        @queue("warCampFell")
+      }
+    } else if unit.id == @recall(KEY_HALL) {
+      @queue("hallFell")
+    } else if @inSet(KEY_PATROL, unit.id) {
+      @remember(KEY_SUNK, @recallNumber(KEY_SUNK, 0) + 1)
+      @queue("ironcladSunk")
+    } else if typeId == "vitarron" {
+      @queue("vitarronFell")
+    }
+  }
+
+  # Kagaalu fell (in a fight, or aboard a sunk canoe with nowhere to swim). The Runestone can raise him again.
+  kagaaluDown {
+    if @human().ownedUnits.any(=> $0.type.id == "runestoneOfRogash" && $0.coordinates != null) {
+      @queue("kagaaluFell")
+    } else {
+      @defeat("dairKagaaluLost")
+    }
+  }
+
+  onStateChange {
+    @trackCanoes()
+    @checkMarines()
+    if Game.currentPlayerIndex == 0 && (@recall(KEY_PENDING) ?? "") != "" {
+      events = @recall(KEY_PENDING)
+      @remember(KEY_PENDING, "")
+      @pauseTimer()
+      for event in EVENTS.where(=> ("," + $0 + ",") in events) {
+        @announce(event)
+      }
+      @resumeTimer()
+    }
+  }
+
+  onTurnStart {
+    for boat in @unitsIn(KEY_PATROL) {
+      @patrol(boat)
+    }
+    @flagshipFires()
+    @watchTheBanks()
+    @watchKagaalu()
+  }
+
+  checkVictory => null
+
+  announce(event) {
+    if event == "hallFell" {
+      @victory()
+    } else if event == "firstShot" {
+      @kagaaluSays("dairFirstShot")
+    } else if event == "canoeSunk" {
+      Game.showMessage(@t("dairCanoeSunk"))
+    } else if event == "canoeSunkSwim" {
+      Game.showMessage(@t("dairCanoeSunkSwim"))
+    } else if event == "ironcladSunk" {
+      @ironcladSunk()
+    } else if event == "raid" {
+      @warchiefSays("dairRaid")
+    } else if event == "warCampFell" {
+      @say("warrior", @human(), "dairSpeakerElder", "dairWarCampFell", null)
+    } else if event == "kagaaluFell" {
+      @warchiefSays("dairKagaaluFell")
+    } else if event == "kagaaluRaised" {
+      @kagaaluSays("dairKagaaluRaised")
+    } else if event == "vitarronFell" {
+      @captainSays("dairVitarronFell")
+    } else if event == "marines" {
+      @navySays("dairMarines1")
+      @captainSays("dairMarines2")
+    }
+  }
+
+  # ------------------------------------------------------------------ the crossing
+
+  checkCrossing {
+    kagaalu = @unitOf(@human(), "kagaalu")
+    if kagaalu == null || @distance(kagaalu.coordinates, @markerAt("warCamp")) > ARRIVE_DISTANCE {
+      return
+    }
+    if @isActive(OBJ_CROSS) {
+      @raiseTheWarCamp(kagaalu)
+    } else if @isActive(OBJ_BURN) && @recall(KEY_WAR_CAMP) != null && @unitById(@recall(KEY_WAR_CAMP)) == null {
+      @raiseItAgain()
+    }
+  }
+
+  # The outsiders burned the clans' camp: Kagaalu's return to the ashes rallies them to raise it once more.
+  raiseItAgain {
+    ashes = @marker("warCamp")
+    site = if ashes.content == null ashes else @freeCellNear(ashes.coordinates)
+    if site == null {
+      return
+    }
+    @pauseTimer()
+    camp = site.summon("sanghoyCamp", @human())
+    @remember(KEY_WAR_CAMP, camp.id)
+    Game.refreshState()
+    Game.positionCamera(ashes.coordinates)
+    @kagaaluSays("dairWarCampAgain")
+    @resumeTimer()
+  }
+
+  # The clans of the south bank, burned out of their camp by Captain Varrenne, come out of hiding for Kagaalu and
+  # raise the camp again: a base on the outsiders' side of the river.
+  raiseTheWarCamp(kagaalu) {
+    @pauseTimer()
+    player = @human()
+    @complete(OBJ_CROSS)
+    ashes = @marker("warCamp")
+    Game.positionCamera(ashes.coordinates)
+    Game.zoomCamera(7)
+    @kagaaluSays("dairWarCamp1")
+    site = if ashes.content == null ashes else @freeCellNear(ashes.coordinates)
+    if site != null {
+      @remember(KEY_WAR_CAMP, site.summon("sanghoyCamp", player).id)
+    }
+    for typeId in (if @isHard() SOUTH_CLANS_HARD else SOUTH_CLANS_NORMAL) {
+      spot = @freeCellNear(ashes.coordinates)
+      if spot != null {
+        spot.summon(typeId, player)
+      }
+    }
+    Game.refreshState()
+    @say("warrior", player, "dairSpeakerElder", "dairWarCamp2", null)
+    @kagaaluSays("dairWarCamp3")
+    if @isActive(OBJ_BURN) {
+      Game.currentScenario.updateObjective(OBJ_BURN, [description: @t("dairBurnDescriptionCrossed")])
+      Game.refreshState()
+    }
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ the end
+
+  victory {
+    if !@isActive(OBJ_BURN) {
+      return # already over
+    }
+    @pauseTimer()
+    player = @human()
+    @complete(OBJ_BURN)
+    if @isActive(OBJ_CROSS) {
+      @fail(OBJ_CROSS)
+    }
+    hallAt = @markerAt("hall")
+    Game.positionCamera(hallAt)
+    Game.zoomCamera(7)
+    Game.animateVisualFx([[type: "explosion", coordinates: hallAt]])
+    @kagaaluSays("dairVictory1")
+    @captainSays("dairVictory2")
+    Game.positionCamera(@markerAt("anchorage"))
+    @bombardmentSound()
+    @navySays("dairVictory3")
+    @viceroySays("dairVictory4")
+    Game.positionCamera(hallAt)
+    @kagaaluSays("dairVictory5")
+    @saveProgress()
+    Server.win(player)
+  }
+
+  # What later missions can build on.
+  saveProgress {
+    campaign = Game.campaign
+    if campaign != null {
+      progress = campaign.progressFor("TheDairRunsRed")
+      if progress != null {
+        progress.addOrUpdateExtra("kagaaluLevel", "kagaaluLevel", "", @human().hero?.level ?? 1)
+        progress.addOrUpdateExtra("turns", "turns", "", Game.turn)
+        progress.addOrUpdateExtra("ironcladsSunk", "ironcladsSunk", "", @recallNumber(KEY_SUNK, 0))
+      }
+      campaign.unlock("TheUsurper") # chapter 10
+      campaign.save()
+    }
+  }
+
+  defeat(lineKey) {
+    for objectiveId in [OBJ_BURN, OBJ_CROSS].where(=> @isActive($0)) {
+      @fail(objectiveId)
+    }
+    Game.showMessageToAll(@t(lineKey))
+    Game.lose(@human())
+    Game.refreshState()
+  }
+
+  # ------------------------------------------------------------------ the colony's defence
+
+  # When the Hall is down to half its health, the Resolute's boats land marines on the beach (once).
+  checkMarines {
+    if @wasSeen("marines") || !@isActive(OBJ_BURN) {
+      return
+    }
+    hallUnit = @unitById(@recall(KEY_HALL))
+    if hallUnit == null || hallUnit.coordinates == null || hallUnit.hp * 2 > hallUnit.health {
+      return
+    }
+    @markSeen("marines")
+    landfall = @colony()
+    landing = @markerAt("beachLanding")
+    for typeId in (if @isHard() MARINES_HARD else MARINES_NORMAL) {
+      spot = @freeCellNear(landing)
+      if spot != null {
+        spot.summon(typeId, landfall)
+      }
+    }
+    Game.refreshState()
+    @queue("marines")
+  }
+
+  # The first time the outsiders come over to the north bank.
+  watchTheBanks {
+    if @wasSeen("raid") {
+      return
+    }
+    landfallId = @colony().id
+    if Game.grid.allUnits.any(=> $0.owner.id == landfallId && $0.coordinates != null && !$0.isBuilding && $0.coordinates.2 >= 2) {
+      @markSeen("raid")
+      @queue("raid")
+    }
+  }
+
+  # Tells the player when the Runestone has brought Kagaalu back.
+  watchKagaalu {
+    if @recall("kagaaluDown") == "yes" && (@human().hero?.isAlive ?? false) {
+      @remember("kagaaluDown", "")
+      @queue("kagaaluRaised")
+    }
+  }
+
+  ironcladSunk {
+    @kagaaluSays(if @recallNumber(KEY_SUNK, 0) >= @recallNumber(KEY_PATROL_SIZE, 2) "dairFleetSunk" else "dairIroncladSunk")
+  }
+
+  # ------------------------------------------------------------------ the navy
+
+  # The flagship at anchor shells the player's unit nearest to death within reach of its guns.
+  flagshipFires {
+    flagship = @unitById(@recall(KEY_FLAGSHIP))
+    if flagship == null || flagship.coordinates == null {
+      return
+    }
+    reach = if @isHard() 5 else 4
+    here = Game.grid.elementAt(flagship.coordinates)
+    playerId = @human().id
+    inReach = Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null && !$0.isBuilding \
+      && here.distance($0.coordinates) <= reach)
+    if inReach.isEmpty {
+      return
+    }
+    target = inReach.minBy(=> $0.hp)
+    damage = if @isHard() 15 else 10
+    @abandonShip(target, damage)
+    Game.animateAttack(flagship, target)
+    Game.animateVisualFx([[type: "explosion", coordinates: target.coordinates]])
+    target.takeDamage(damage, flagship)
+  }
+
+  # Ironclads sail up and down the main channel of the river, between its mouth and the ford, and fire on anything
+  # of the player's on the water in range. They don't hunt: their cells stay revealed and their route is fixed, so
+  # the player can time the crossing. (Chapter 1's patrol.)
+  patrol(boat) {
+    origin = boat.coordinates
+    if origin == null {
+      return
+    }
+    fireRange = if @isHard() 4 else 3
+    steps = if @isHard() 4 else 3
+    target = @nearestOnChannel(origin, fireRange)
+    if target != null {
+      @fire(boat, target)
+    } else {
+      Game.currentScenario.removeRevealedCell(origin)
+      if !@sail(boat, @patrolGoal(boat), steps) {
+        @turnAround(boat) # blocked (e.g, by someone wading in the channel): patrol the other way
+      }
+      Game.currentScenario.addRevealedCell(boat.coordinates)
+      if @isHard() {
+        target = @nearestOnChannel(boat.coordinates, fireRange)
+        if target != null {
+          @fire(boat, target)
+        }
+      }
+    }
+  }
+
+  fire(boat, target) {
+    @abandonShip(target, if @isHard() boat.type.a + 15 else SHOT_DAMAGE) # only if this shot sinks it
+    if !@wasSeen("firstShot") {
+      @markSeen("firstShot")
+      @queue("firstShot")
+    }
+    if @isHard() {
+      boat.setActions(1)
+      Game.combat(boat, target)
+    } else {
+      targetAt = target.coordinates
+      Game.animateAttack(boat, target)
+      Game.animateVisualFx([[type: "explosion", coordinates: targetAt]])
+      Game.logEvent(@t("dairIroncladFires").format([@t(target.type.title), SHOT_DAMAGE]), LogLevels.info, targetAt)
+      target.takeDamage(SHOT_DAMAGE, boat)
+    }
+  }
+
+  patrolGoal(boat) {
+    heading = @recall("heading:" + boat.id) ?? "riverEast"
+    if @distance(boat.coordinates, @markerAt(heading)) <= 2 {
+      heading = @turnAround(boat)
+    }
+    return @markerAt(heading)
+  }
+
+  turnAround(boat) {
+    directionKey = "heading:" + boat.id
+    heading = if (@recall(directionKey) ?? "riverEast") == "riverEast" "riverMouth" else "riverEast"
+    @remember(directionKey, heading)
+    return heading
+  }
+
+  # The rows of the river's main channel, from the patrol markers. The creek the canoes hide in is outside it.
+  channelLow => @markers("riverMouth").map(=> $0.coordinates.2).minBy(=> $0)
+  channelHigh => @markers("riverMouth").map(=> $0.coordinates.2).maxBy(=> $0)
+  onChannel(coordinates) {
+    cell = Game.grid.elementAt(coordinates)
+    row = coordinates.2
+    return cell.terrain in WATER && row >= @channelLow() && row <= @channelHigh()
+  }
+
+  nearestOnChannel(origin, maxRange) {
+    playerId = @human().id
+    here = Game.grid.elementAt(origin)
+    best = null
+    bestDistance = maxRange + 1
+    for candidate in Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null) {
+      if @onChannel(candidate.coordinates) {
+        candidateDistance = here.distance(candidate.coordinates)
+        if candidateDistance < bestDistance {
+          best = candidate
+          bestDistance = candidateDistance
+        }
+      }
+    }
+    return best
+  }
+
+  # Boats sail by the river, not by sight: up to steps cells along the open water of the main channel, each one
+  # closer to goal.
+  sail(boat, goal, steps) {
+    origin = boat.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    laneLow = @channelLow()
+    laneHigh = @channelHigh()
+    at = Game.grid.elementAt(origin)
+    for i in 0..steps {
+      nextCell = null
+      nextDistance = at.distance(goal)
+      for water in Game.grid.ringAround(at.coordinates, 1) {
+        row = water.coordinates.2
+        if water.content == null && water.terrain in WATER && row >= laneLow && row <= laneHigh && water.distance(goal) < nextDistance {
+          nextCell = water
+          nextDistance = water.distance(goal)
+        }
+      }
+      if nextCell != null {
+        at = nextCell
+      }
+    }
+    if at.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, at.coordinates, 0)
+    return true
+  }
+
+  # ------------------------------------------------------------------ canoes (chapter 1)
+
+  # Before the outsiders sink a canoe, whoever is aboard jumps into the water next to it (if there's room). Without
+  # this they would sink with it: the engine drops the passengers of a destroyed transport.
+  abandonShip(target, maxDamage) {
+    if target.type.id == "canoe" && target.hp <= maxDamage {
+      canoeAt = target.coordinates
+      for passenger in target.loadedUnits {
+        spot = Game.grid.ringAround(canoeAt, 1).first(=> $0.content == null && $0.terrain != "sea")
+        if spot != null {
+          target.unload(spot.coordinates)
+          @remember("abandoned:" + target.id, "yes")
+        }
+      }
+    }
+  }
+
+  # Remembers where every canoe is: by the time a sunk canoe's onDie runs it's off the grid, and its passengers
+  # need somewhere to swim from.
+  trackCanoes {
+    for canoe in Game.grid.allUnits.where(=> $0.type.id == "canoe" && $0.coordinates != null) {
+      at = canoe.coordinates
+      @remember("canoeX:" + canoe.id, at.0)
+      @remember("canoeY:" + canoe.id, at.1)
+      @remember("canoeZ:" + canoe.id, at.2)
+    }
+  }
+
+  # Whoever was aboard a sunk canoe swims to a free cell next to it, if there is one (not out to sea).
+  swimAshore(canoe) {
+    x = @recall("canoeX:" + canoe.id)
+    if x == null {
+      return
+    }
+    canoeAt = [Math.round(x), @recallNumber("canoeY:" + canoe.id, 0), @recallNumber("canoeZ:" + canoe.id, 0)]
+    for passenger in canoe.loadedUnits {
+      spot = Game.grid.ringAround(canoeAt, 1).first(=> $0.content == null && $0.terrain != "sea")
+      if spot != null {
+        canoe.unload(spot.coordinates)
+      }
+    }
+    Game.refreshState()
+  }
+
+  # ------------------------------------------------------------------ carry-over
+
+  # Kagaalu's level from the last mission that recorded it.
+  kagaaluLevel {
+    for missionId in ["ATurnOfTides", "ShapingOfYon", "ThroughTheMire", "CalamityOnTheHorizon"] {
+      level = @progressValue(missionId, "kagaaluLevel")
+      if level != null {
+        return Math.max(1, Math.round(level)) # (progress values may come back from YAML as strings)
+      }
+    }
+    return 1
+  }
+
+  tribesTurned => Math.max(0, Math.min(MAX_TRIBES, Math.round(@progressValue("ATurnOfTides", "tribesTurned") ?? DEFAULT_TRIBES)))
+
+  progressValue(missionId, key) => Game.campaign?.progressFor(missionId)?.getExtraValue(key)
+
+  # ------------------------------------------------------------------ helpers
+
+  t(key) => Game.localizedStr(key)
+  # Cutscenes stop the turn timer; it starts again with the human's next action.
+  pauseTimer => Server.setTimeoutEnabled(false)
+  resumeTimer => Server.setTimeoutEnabledOnUserAction(true)
+  human => Game.players.0
+  colony => Game.players.1
+  navy => Game.players.2
+  isHard => Game.currentScenario.difficulty == "hard"
+
+  say(portrait, owner, titleKey, lineKey, text) {
+    Game.showDialog(portrait, owner?.id, @t(titleKey), text ?? @t(lineKey))
+  }
+  kagaaluSays(lineKey) => @say("kagaalu", @human(), "kagaaluTitle", lineKey, null)
+  warchiefSays(lineKey) => @say("warchief", @human(), "warchiefTitle", lineKey, null)
+  captainSays(lineKey) => @say("rifleman", @colony(), "lfSpeakerCaptain", lineKey, null)
+  navySays(lineKey) => @say("ironclad", @navy(), "lfSpeakerNavy", lineKey, null)
+  viceroySays(lineKey) => @say("vitarron", @colony(), "vitarronTitle", lineKey, null)
+
+  startObjective(objectiveId, keyBase, image, descriptionText) {
+    objective = [
+      id: objectiveId,
+      title: @t(keyBase + "Title"),
+      description: descriptionText ?? @t(keyBase + "Description"),
+      image: image,
+      state: ObjectiveStates.active
+    ]
+    Game.currentScenario.addObjective(objective)
+    Game.refreshState()
+  }
+  complete(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.completed])
+    Game.refreshState()
+  }
+  fail(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.failed])
+    Game.refreshState()
+  }
+  isActive(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.active
+
+  remember(key, value) {
+    Game.currentScenario.addOrUpdateExtra(key, key, "", value)
+  }
+  recall(key) => Game.currentScenario.getExtraValue(key)
+  # A loaded save gives extras back as strings ("3", not 3).
+  recallNumber(key, fallback) => Math.round(@recall(key) ?? fallback)
+  queue(event) {
+    pending = @recall(KEY_PENDING) ?? ""
+    if !(("," + event + ",") in pending) {
+      @remember(KEY_PENDING, (if pending == "" "," else pending) + event + ",")
+    }
+    if event == "kagaaluFell" {
+      @remember("kagaaluDown", "yes")
+    }
+  }
+  wasSeen(event) => ("," + event + ",") in (@recall(KEY_SEEN) ?? "")
+  markSeen(event) {
+    @remember(KEY_SEEN, (@recall(KEY_SEEN) ?? ",") + event + ",")
+  }
+  addToSet(key, unitId) {
+    @remember(key, (@recall(key) ?? ",") + unitId + ",")
+  }
+  inSet(key, unitId) => ("," + unitId + ",") in (@recall(key) ?? "")
+  unitsIn(key) {
+    members = @recall(key) ?? ""
+    return Game.grid.allUnits.where(=> $0.coordinates != null && ("," + $0.id + ",") in members)
+  }
+
+  marker(comment) => Game.grid.cells.first(=> $0.comment == comment)
+  markers(comment) => Game.grid.cells.where(=> $0.comment == comment)
+  markerAt(comment) => @marker(comment).coordinates
+  distance(a, b) => Game.grid.elementAt(a).distance(b)
+
+  unitOf(player, typeId) => player.ownedUnits.first(=> $0.type.id == typeId && $0.coordinates != null)
+  unitById(unitId) => if unitId == null null else Game.grid.allUnits.first(=> $0.id == unitId)
+
+  freeCellNear(center) {
+    for radius in 1...3 {
+      for candidate in Game.grid.ringAround(center, radius) {
+        if candidate.content == null && !(candidate.terrain in WATER) {
+          return candidate
+        }
+      }
+    }
+    return null
+  }
+
+  bombardmentSound => Game.playSound(@markerAt("riverMid"), "ironclad", SoundTypes.attack, true)
+}

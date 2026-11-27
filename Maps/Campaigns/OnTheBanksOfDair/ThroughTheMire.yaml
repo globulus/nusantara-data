@@ -1,0 +1,1133 @@
+id: ThroughTheMire
+title: Through the Mire
+description: Campaign03
+size: 10
+kind: Hexagonal
+maxPlayers: 4
+defaultTerrain: grass
+hexes:
+- c:
+  - -9
+  - 0
+  - 9
+  t: jungle
+- c:
+  - -9
+  - 1
+  - 8
+  t: forest
+- c:
+  - -9
+  - 2
+  - 7
+  t: jungle
+- c:
+  - -9
+  - 3
+  - 6
+  t: jungle
+- c:
+  - -9
+  - 4
+  - 5
+  t: sea
+- c:
+  - -9
+  - 5
+  - 4
+  t: sea
+- c:
+  - -9
+  - 6
+  - 3
+  t: jungle
+- c:
+  - -9
+  - 7
+  - 2
+  t: jungle
+- c:
+  - -9
+  - 8
+  - 1
+  t: jungle
+- c:
+  - -9
+  - 9
+  - 0
+  t: jungle
+- c:
+  - -8
+  - -1
+  - 9
+  t: forest
+- c:
+  - -8
+  - 0
+  - 8
+  t: forest
+  comment: ridgeAmbush
+- c:
+  - -8
+  - 1
+  - 7
+  t: jungle
+- c:
+  - -8
+  - 2
+  - 6
+  t: jungle
+- c:
+  - -8
+  - 3
+  - 5
+  t: sea
+- c:
+  - -8
+  - 4
+  - 4
+  t: sea
+- c:
+  - -8
+  - 5
+  - 3
+  t: jungle
+- c:
+  - -8
+  - 6
+  - 2
+  t: jungle
+- c:
+  - -8
+  - 7
+  - 1
+  t: jungle
+- c:
+  - -8
+  - 8
+  - 0
+  t: jungle
+- c:
+  - -8
+  - 9
+  - -1
+  t: jungle
+- c:
+  - -7
+  - -2
+  - 9
+  t: jungle
+- c:
+  - -7
+  - -1
+  - 8
+  t: jungle
+- c:
+  - -7
+  - 0
+  - 7
+  t: jungle
+  comment: ridgeAmbush
+- c:
+  - -7
+  - 1
+  - 6
+  t: jungle
+- c:
+  - -7
+  - 2
+  - 5
+  t: sea
+- c:
+  - -7
+  - 3
+  - 4
+  t: sea
+- c:
+  - -7
+  - 4
+  - 3
+  t: swamp
+- c:
+  - -7
+  - 5
+  - 2
+  t: jungle
+- c:
+  - -7
+  - 6
+  - 1
+  t: forest
+- c:
+  - -7
+  - 7
+  - 0
+  t: forest
+- c:
+  - -7
+  - 8
+  - -1
+  t: jungle
+- c:
+  - -7
+  - 9
+  - -2
+  t: jungle
+- c:
+  - -6
+  - -2
+  - 8
+  content: totem
+- c:
+  - -6
+  - -1
+  - 7
+  t: jungle
+- c:
+  - -6
+  - 0
+  - 6
+  t: jungle
+  comment: ridgeAmbush
+- c:
+  - -6
+  - 1
+  - 5
+  t: sea
+- c:
+  - -6
+  - 2
+  - 4
+  t: sea
+- c:
+  - -6
+  - 3
+  - 3
+  t: swamp
+- c:
+  - -6
+  - 4
+  - 2
+  t: jungle
+- c:
+  - -6
+  - 5
+  - 1
+  t: swamp
+- c:
+  - -6
+  - 6
+  - 0
+  t: jungle
+- c:
+  - -6
+  - 7
+  - -1
+  t: forest
+- c:
+  - -6
+  - 8
+  - -2
+  t: jungle
+- c:
+  - -6
+  - 9
+  - -3
+  t: jungle
+- c:
+  - -5
+  - -3
+  - 8
+  comment: roost
+- c:
+  - -5
+  - -2
+  - 7
+  t: jungle
+- c:
+  - -5
+  - -1
+  - 6
+  t: jungle
+- c:
+  - -5
+  - 0
+  - 5
+  t: jungle
+- c:
+  - -5
+  - 1
+  - 4
+  t: sea
+- c:
+  - -5
+  - 2
+  - 3
+  t: swamp
+- c:
+  - -5
+  - 5
+  - 0
+  content: sarcomancer
+  startingLocation: 3
+  comment: lair
+- c:
+  - -5
+  - 6
+  - -1
+  content: amalgam
+- c:
+  - -5
+  - 7
+  - -2
+  t: jungle
+- c:
+  - -5
+  - 8
+  - -3
+  t: jungle
+- c:
+  - -5
+  - 9
+  - -4
+  t: jungle
+- c:
+  - -4
+  - -4
+  - 8
+  content: sacrificialWell
+  comment: well
+- c:
+  - -4
+  - -3
+  - 7
+  content: goreilla
+- c:
+  - -4
+  - -2
+  - 6
+  t: jungle
+- c:
+  - -4
+  - -1
+  - 5
+  t: jungle
+  comment: ridge
+- c:
+  - -4
+  - 0
+  - 4
+  comment: corralGuard
+- c:
+  - -4
+  - 1
+  - 3
+  content: chironite
+- c:
+  - -4
+  - 3
+  - 1
+  t: forest
+- c:
+  - -4
+  - 4
+  - 0
+  t: swamp
+- c:
+  - -4
+  - 5
+  - -1
+  content: amalgam
+- c:
+  - -4
+  - 7
+  - -3
+  t: swamp
+- c:
+  - -4
+  - 8
+  - -4
+  t: jungle
+- c:
+  - -4
+  - 9
+  - -5
+  t: jungle
+- c:
+  - -3
+  - -5
+  - 8
+  content: ironBoar
+- c:
+  - -3
+  - -4
+  - 7
+  content: kingPython
+- c:
+  - -3
+  - -3
+  - 6
+  t: forest
+- c:
+  - -3
+  - -2
+  - 5
+  t: forest
+- c:
+  - -3
+  - 0
+  - 3
+  content: shaper
+  comment: corral
+- c:
+  - -3
+  - 1
+  - 2
+  content: kavouros
+- c:
+  - -3
+  - 2
+  - 1
+  t: swamp
+- c:
+  - -3
+  - 3
+  - 0
+  t: jungle
+- c:
+  - -3
+  - 4
+  - -1
+  t: forest
+- c:
+  - -3
+  - 5
+  - -2
+  t: swamp
+- c:
+  - -3
+  - 7
+  - -4
+  t: swamp
+- c:
+  - -3
+  - 8
+  - -5
+  t: swamp
+- c:
+  - -3
+  - 9
+  - -6
+  t: jungle
+- c:
+  - -2
+  - -7
+  - 9
+  t: jungle
+- c:
+  - -2
+  - -6
+  - 8
+  content: totem
+- c:
+  - -2
+  - -3
+  - 5
+  t: sea
+- c:
+  - -2
+  - -2
+  - 4
+  t: sea
+- c:
+  - -2
+  - -1
+  - 3
+  content: chironite
+- c:
+  - -2
+  - 0
+  - 2
+  content: kavouros
+- c:
+  - -2
+  - 1
+  - 1
+  t: swamp
+- c:
+  - -2
+  - 2
+  - 0
+  t: swamp
+- c:
+  - -2
+  - 3
+  - -1
+  t: swamp
+- c:
+  - -2
+  - 4
+  - -2
+  t: swamp
+- c:
+  - -2
+  - 5
+  - -3
+  t: swamp
+- c:
+  - -2
+  - 7
+  - -5
+  t: swamp
+- c:
+  - -2
+  - 8
+  - -6
+  t: swamp
+- c:
+  - -2
+  - 9
+  - -7
+  t: river
+- c:
+  - -1
+  - -8
+  - 9
+  t: jungle
+- c:
+  - -1
+  - -7
+  - 8
+  t: jungle
+- c:
+  - -1
+  - -6
+  - 7
+  t: jungle
+- c:
+  - -1
+  - -5
+  - 6
+  t: jungle
+- c:
+  - -1
+  - -4
+  - 5
+  t: sea
+- c:
+  - -1
+  - -3
+  - 4
+  t: sea
+- c:
+  - -1
+  - -1
+  - 2
+  content: goreilla
+- c:
+  - -1
+  - 0
+  - 1
+  t: swamp
+- c:
+  - -1
+  - 1
+  - 0
+  content: fangedAmalgam
+- c:
+  - -1
+  - 2
+  - -1
+  t: swamp
+- c:
+  - -1
+  - 3
+  - -2
+  t: swamp
+- c:
+  - -1
+  - 4
+  - -3
+  t: swamp
+- c:
+  - -1
+  - 5
+  - -4
+  t: swamp
+- c:
+  - -1
+  - 7
+  - -6
+  t: swamp
+- c:
+  - -1
+  - 8
+  - -7
+  t: swamp
+- c:
+  - -1
+  - 9
+  - -8
+  t: river
+- c:
+  - 0
+  - -9
+  - 9
+  t: jungle
+- c:
+  - 0
+  - -8
+  - 8
+  t: jungle
+- c:
+  - 0
+  - -7
+  - 7
+  t: jungle
+- c:
+  - 0
+  - -6
+  - 6
+  t: jungle
+- c:
+  - 0
+  - -5
+  - 5
+  t: sea
+- c:
+  - 0
+  - -4
+  - 4
+  t: sea
+- c:
+  - 0
+  - -2
+  - 2
+  t: swamp
+- c:
+  - 0
+  - -1
+  - 1
+  t: swamp
+- c:
+  - 0
+  - 0
+  - 0
+  t: swamp
+- c:
+  - 0
+  - 1
+  - -1
+  content: kingPython
+- c:
+  - 0
+  - 2
+  - -2
+  t: swamp
+- c:
+  - 0
+  - 3
+  - -3
+  t: swamp
+- c:
+  - 0
+  - 4
+  - -4
+  t: swamp
+- c:
+  - 0
+  - 5
+  - -5
+  t: swamp
+- c:
+  - 0
+  - 7
+  - -7
+  t: river
+- c:
+  - 0
+  - 8
+  - -8
+  t: river
+- c:
+  - 0
+  - 9
+  - -9
+  t: river
+- c:
+  - 1
+  - -9
+  - 8
+  t: jungle
+- c:
+  - 1
+  - -8
+  - 7
+  t: jungle
+- c:
+  - 1
+  - -7
+  - 6
+  t: jungle
+- c:
+  - 1
+  - -6
+  - 5
+  t: sea
+- c:
+  - 1
+  - -5
+  - 4
+  t: sea
+- c:
+  - 1
+  - -2
+  - 1
+  t: jungle
+- c:
+  - 1
+  - -1
+  - 0
+  t: swamp
+  comment: bogBeast
+- c:
+  - 1
+  - 0
+  - -1
+  t: jungle
+- c:
+  - 1
+  - 1
+  - -2
+  t: swamp
+- c:
+  - 1
+  - 2
+  - -3
+  t: swamp
+- c:
+  - 1
+  - 3
+  - -4
+  t: swamp
+- c:
+  - 1
+  - 4
+  - -5
+  t: swamp
+- c:
+  - 1
+  - 6
+  - -7
+  t: river
+- c:
+  - 1
+  - 7
+  - -8
+  t: river
+- c:
+  - 1
+  - 8
+  - -9
+  t: river
+- c:
+  - 2
+  - -9
+  - 7
+  t: forest
+- c:
+  - 2
+  - -8
+  - 6
+  t: forest
+- c:
+  - 2
+  - -7
+  - 5
+  t: sea
+- c:
+  - 2
+  - -6
+  - 4
+  t: sea
+- c:
+  - 2
+  - -4
+  - 2
+  t: swamp
+- c:
+  - 2
+  - -3
+  - 1
+  t: swamp
+- c:
+  - 2
+  - -2
+  - 0
+  t: swamp
+- c:
+  - 2
+  - -1
+  - -1
+  content: ironBoar
+- c:
+  - 2
+  - 0
+  - -2
+  t: swamp
+- c:
+  - 2
+  - 1
+  - -3
+  content: goreilla
+- c:
+  - 2
+  - 2
+  - -4
+  t: swamp
+  comment: fork
+- c:
+  - 2
+  - 3
+  - -5
+  t: swamp
+- c:
+  - 2
+  - 5
+  - -7
+  t: jungle
+- c:
+  - 2
+  - 6
+  - -8
+  t: river
+- c:
+  - 2
+  - 7
+  - -9
+  t: river
+- c:
+  - 3
+  - -9
+  - 6
+  t: jungle
+- c:
+  - 3
+  - -8
+  - 5
+  t: sea
+- c:
+  - 3
+  - -7
+  - 4
+  t: sea
+- c:
+  - 3
+  - -2
+  - -1
+  t: swamp
+- c:
+  - 3
+  - -1
+  - -2
+  t: swamp
+- c:
+  - 3
+  - 4
+  - -7
+  t: swamp
+- c:
+  - 3
+  - 5
+  - -8
+  t: river
+- c:
+  - 3
+  - 6
+  - -9
+  t: river
+- c:
+  - 4
+  - -9
+  - 5
+  t: sea
+- c:
+  - 4
+  - -8
+  - 4
+  t: sea
+- c:
+  - 4
+  - -7
+  - 3
+  t: swamp
+- c:
+  - 4
+  - -6
+  - 2
+  content: warrior
+  startingLocation: 4
+  comment: captive
+- c:
+  - 4
+  - -5
+  - 1
+  content: thrall
+  comment: captive
+- c:
+  - 4
+  - -4
+  - 0
+  comment: postGuard
+- c:
+  - 4
+  - -2
+  - -2
+  t: swamp
+- c:
+  - 4
+  - 0
+  - -4
+  t: jungle
+- c:
+  - 4
+  - 2
+  - -6
+  startingLocation: 1
+  comment: refuge
+- c:
+  - 4
+  - 4
+  - -8
+  t: river
+- c:
+  - 4
+  - 5
+  - -9
+  t: river
+- c:
+  - 5
+  - -9
+  - 4
+  t: sea
+- c:
+  - 5
+  - -7
+  - 2
+  content: warrior
+  comment: captive
+- c:
+  - 5
+  - -6
+  - 1
+  content: thrall
+  comment: captive
+- c:
+  - 5
+  - -5
+  - 0
+  content: warchief
+  startingLocation: 2
+  comment: slavePost
+- c:
+  - 5
+  - -4
+  - -1
+  content: warrior
+- c:
+  - 5
+  - -1
+  - -4
+  t: jungle
+- c:
+  - 5
+  - 0
+  - -5
+  t: swamp
+- c:
+  - 5
+  - 3
+  - -8
+  t: river
+- c:
+  - 5
+  - 4
+  - -9
+  t: river
+- c:
+  - 6
+  - -8
+  - 2
+  t: swamp
+- c:
+  - 6
+  - -5
+  - -1
+  content: warrior
+- c:
+  - 6
+  - -3
+  - -3
+  t: swamp
+- c:
+  - 6
+  - -2
+  - -4
+  t: swamp
+- c:
+  - 6
+  - -1
+  - -5
+  t: swamp
+- c:
+  - 6
+  - 0
+  - -6
+  t: swamp
+- c:
+  - 6
+  - 2
+  - -8
+  t: river
+- c:
+  - 6
+  - 3
+  - -9
+  t: river
+- c:
+  - 7
+  - -4
+  - -3
+  t: jungle
+- c:
+  - 7
+  - -3
+  - -4
+  t: swamp
+- c:
+  - 7
+  - -2
+  - -5
+  t: swamp
+- c:
+  - 7
+  - -1
+  - -6
+  t: swamp
+- c:
+  - 7
+  - 1
+  - -8
+  t: river
+- c:
+  - 7
+  - 2
+  - -9
+  t: river
+- c:
+  - 8
+  - -9
+  - 1
+  t: swamp
+- c:
+  - 8
+  - -8
+  - 0
+  t: swamp
+- c:
+  - 8
+  - -7
+  - -1
+  t: swamp
+  comment: pursuit
+- c:
+  - 8
+  - -6
+  - -2
+  t: jungle
+- c:
+  - 8
+  - -5
+  - -3
+  t: swamp
+- c:
+  - 8
+  - -4
+  - -4
+  t: swamp
+- c:
+  - 8
+  - -3
+  - -5
+  t: swamp
+- c:
+  - 8
+  - -2
+  - -6
+  t: swamp
+- c:
+  - 8
+  - -1
+  - -7
+  t: jungle
+- c:
+  - 8
+  - 0
+  - -8
+  t: river
+- c:
+  - 8
+  - 1
+  - -9
+  t: river
+- c:
+  - 9
+  - -9
+  - 0
+  t: swamp
+- c:
+  - 9
+  - -8
+  - -1
+  t: swamp
+- c:
+  - 9
+  - -7
+  - -2
+  t: swamp
+- c:
+  - 9
+  - -6
+  - -3
+  t: jungle
+- c:
+  - 9
+  - -5
+  - -4
+  t: swamp
+- c:
+  - 9
+  - -4
+  - -5
+  t: swamp
+- c:
+  - 9
+  - -3
+  - -6
+  t: swamp
+- c:
+  - 9
+  - -2
+  - -7
+  t: swamp
+- c:
+  - 9
+  - -1
+  - -8
+  t: river
+  comment: southBank
+- c:
+  - 9
+  - 0
+  - -9
+  t: river

@@ -1,0 +1,54 @@
+id: Landfall
+title: landfallTitle
+description: landfallDescription
+ruleset:
+  id: LandfallRuleset
+  inherits: DefaultCampaign
+  timeoutLength: 60 # building takes longer than marching; cutscenes pause it (see the script)
+  factionData:
+    frenza:
+      startingData:
+        resources:
+          g: 35 # a colony (25) and a barracks (9)
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+    sanghoy:
+      startingData:
+        resources:
+          g: 0
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+  bans:
+    skills:
+      - buildFactory
+      - buildAirfield
+      - buildMagistratesCourt
+      - buildMonument
+      - addMajorUpgrade
+      - addMinorUpgrade
+      - sendTribute
+      - foundPlantation
+      - buildRoad
+      - riseToWarchief
+      - pillage
+players:
+  - name: Player
+    color: blue
+    team: 1
+    faction: frenza
+  - name: Imperial Navy
+    color: orange
+    team: 1
+    faction: frenza
+    ai: PassiveAi
+  - name: Pyracmon's tribes
+    color: purple
+    team: 2
+    faction: sanghoy
+    ai: TerritorialAi

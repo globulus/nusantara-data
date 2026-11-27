@@ -1,0 +1,59 @@
+id: BattleOfBragi
+title: battleOfBragiTitle
+description: battleOfBragiDescription
+ruleset:
+  id: BattleOfBragiRuleset
+  inherits: DefaultCampaign
+  timeoutLength: 60 # building takes longer than marching; cutscenes pause it (see the script)
+  factionData:
+    frenza:
+      startingData:
+        resources:
+          g: 20 # the script takes some back on hard
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+      playerEffects:
+        - PayUpkeep
+        - StatusReport # Favor for the colony's territory, every 3 turns
+    sanghoy:
+      startingData:
+        resources:
+          g: 0
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+  bans:
+    skills:
+      - buildFactory
+      - buildAirfield
+      - buildMagistratesCourt
+      - addMajorUpgrade
+      - addMinorUpgrade
+      - buildRoad
+      - sendTribute # gold must not buy Favor: monuments and territory do
+      - riseToWarchief
+      - pillage
+      - trainAssassin
+      - trainVitarron
+      - trainTofan
+      - trainDenburhin
+      - reviveHero
+      - addReviveHeroToHand
+      - shipAirSuperiority
+      - shipEradicateThePest
+      - shipEmperorsFist # replaced by the mission's dearer bragiShipEmperorsFist (see the script)
+players:
+  - name: Player
+    color: blue
+    team: 1
+    faction: frenza
+  - name: Yon
+    color: purple
+    team: 2
+    faction: sanghoy
+    ai: PassiveAi

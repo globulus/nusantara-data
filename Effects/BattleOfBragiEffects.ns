@@ -1,0 +1,108 @@
+import "CommonEffects"
+
+# On the Banks of Dair, mission 6: Battle of Bragi. Yon's stitched hide and blood-fed fury, and the Magistrates
+# Court's dearer Emperor's Fist. The mission script gives Yon and the Court these skills (unit.addSkill), and they
+# only work while that mission runs (it sets the scenario extra "bragiActive"), so they stay inert anywhere else.
+
+BRAGI_JUGGERNAUT = "imperialJuggernaut"
+BRAGI_FIST_COST_NORMAL = 60
+BRAGI_FIST_COST_HARD = 75
+BRAGI_FIST_COST_STEP = 30
+
+fn bragiActive(unused) => (Game.currentScenario?.getExtraValue("bragiActive") ?? "") == "yes"
+fn bragiHideTorn(unused) => (Game.currentScenario?.getExtraValue("bragiHideTorn") ?? "") == "yes"
+fn bragiSeared(unused) => (Game.currentScenario?.getExtraValue("bragiSeared") ?? -1) == Game.turn
+
+# Damage in combat is attack * (1 - defense / 10). The hide sets Yon's defense per attacker: against the Imperial
+# Juggernaut it's his own defense (rounded down to an even number), against anything else it's 5 more than half of
+# that, which halves the damage exactly (1 - (5 + d/2) / 10 = (1 - d/10) / 2). The Juggernaut's Blaze of Glory tears
+# the stitches open (the script sets "bragiHideTorn"): from then on everyone hits him like the Juggernaut does, and
+# he stops healing (BragiYonFury).
+effect BragiStitchedHide {
+  trigger => Triggers.passive
+
+  juggernautDefense(caster) {
+    d = caster.type.d ?? 0
+    return d - d % 2
+  }
+
+  hideDefense(caster) => 5 + @juggernautDefense(caster) // 2
+
+  isTorn(caster) => bragiHideTorn(caster)
+
+  run(caster, target) {
+    if !bragiActive(caster) {
+      return [defense: ["+", 0]]
+    }
+    if @isTorn(caster) || target?.type?.id == BRAGI_JUGGERNAUT {
+      return [defense: ["=", @juggernautDefense(caster)]]
+    }
+    return [defense: ["=", @hideDefense(caster)]]
+  }
+
+  description(caster) {
+    if @isTorn(caster) {
+      return "The stitches are torn open: every blow lands in full (defense $(@juggernautDefense(caster)))."
+    }
+    return "Halves the damage of every blow except the Imperial Juggernaut's (defense $(@hideDefense(caster)), " \
+      + "$(@juggernautDefense(caster)) against the Juggernaut)."
+  }
+}
+
+# How much Blood Kagaalu poured into the Well beyond its need (chapter 5) decides how strong Yon is here. The
+# script works the numbers out at the start and keeps them on Yon as extras. The Juggernaut's shells sear: in a round
+# he fought one (the script notes it in "bragiSeared"), his wounds don't close; nor do they once the hide is torn.
+effect BragiYonFury {
+  trigger => Triggers.passive
+
+  bonus(caster, extraId) => caster.getExtraValue(extraId) ?? 0
+
+  run(caster, target) {
+    if !bragiActive(caster) {
+      return [attack: ["+", 0]]
+    }
+    if bragiHideTorn(caster) || bragiSeared(caster) {
+      return [attack: ["+", @bonus(caster, "bragiAttackBonus")], regeneration: ["=", 0]]
+    }
+    return [
+      attack: ["+", @bonus(caster, "bragiAttackBonus")],
+      regeneration: ["+", @bonus(caster, "bragiRegenerationBonus")]
+    ]
+  }
+
+  description(caster) {
+    attackBonus = @bonus(caster, "bragiAttackBonus")
+    regenerationBonus = @bonus(caster, "bragiRegenerationBonus")
+    if bragiHideTorn(caster) {
+      return "Gorged on Blood: +$attackBonus attack. Burned stitches don't knit: no regeneration."
+    }
+    return "Gorged on Blood: +$attackBonus attack, +$regenerationBonus regeneration. " \
+      + "No regeneration in a round he fought the Imperial Juggernaut."
+  }
+}
+
+# The Magistrates Court's Emperor's Fist for this mission: the Emperor doesn't lend his Fist cheaply to a colony in
+# trouble. Costs far more Favor than the usual shipment, 30 more for every Fist already sent ("bragiFistsShipped",
+# counted by the script), and only one Juggernaut at a time.
+effect BragiShipEmperorsFist is AddCardToHand {
+  init {
+    super.init("emperorsFistShipment", 2, 0, BRAGI_FIST_COST_NORMAL, 2)
+  }
+
+  favorCost(caster) => (if Game.currentScenario?.difficulty == "hard" BRAGI_FIST_COST_HARD else BRAGI_FIST_COST_NORMAL) \
+    + BRAGI_FIST_COST_STEP * (Game.currentScenario?.getExtraValue("bragiFistsShipped") ?? 0)
+
+  cost(caster) => [g: 0, u: @favorCost(caster), ap: 2]
+
+  fistsOut(caster) => caster.owner.ownedUnits.count(=> $0.type.id == BRAGI_JUGGERNAUT) \
+    + caster.owner.hand.count(=> $0.type.id == "emperorsFistShipment")
+
+  isEnabled(caster) => [
+    [bragiActive(caster), "Only in the Battle of Bragi."],
+    [caster.owner.canAddCards, "Your hand is full!"],
+    [@fistsOut(caster) == 0, "The Emperor sends one Fist at a time."]
+  ]
+
+  description(caster) => "Requisition an Imperial Juggernaut for $(@favorCost(caster)) Favor. " \
+    + "The shipment card is ready to play two turns later. One Juggernaut at a time, and each costs 30 more than the last."
+}

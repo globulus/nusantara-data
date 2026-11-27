@@ -1,0 +1,773 @@
+# On the Banks of Dair, mission 6: Battle of Bragi. The outsiders' side again: Yon, the cyclops amalgam Kagaalu
+# raised from the Well, crosses the Dair and walks the colony's outposts one by one towards Bragi on the coast.
+#
+# Yon follows a fixed route: outpost1, outpost2, outpost3, then Bragi's Colonial Hall. Every round he hurls a rock
+# now and then, fights anything living that stands next to him (bait: it costs him his walk), otherwise walks a
+# couple of cells and smashes the Hall in front of him. A fallen outpost takes its buildings down with it and buries
+# the settlers next to it, and Yon rests a turn over the ruins. His stitched hide halves all damage except the
+# Imperial Juggernaut's, and his strength comes from the Blood Kagaalu offered beyond the Well's need in chapter 5
+# (both in Effects/BattleOfBragiEffects.ns).
+#
+# The player gathers Favor (monuments, territory) to requisition the Juggernaut at the Magistrates Court, for 60 Favor
+# (75 on hard) instead of the usual 15, and kills Yon with it and the army. Bragi's Colonial Hall must stand.
+# Optional: get the outposts' settlers away before Yon gets there.
+#
+# Map markers (cell comments): bragi, outpost1, outpost2, outpost3, yonSpawn, escort (hard).
+# Everything that must survive a save is kept in objectives, scenario extras and unit extras.
+# Dialogs only reach the human on their own turn, so anything that happens off-turn is queued (see onStateChange).
+scenario BattleOfBragi {
+  DEFAULT_BLOOD_SURPLUS = 15 # a moderately strong Yon when chapter 5 wasn't won in this campaign
+  BLOOD_PER_TIER = 10
+  MAX_TIER = 4
+  YON_FIRST_TURN = 2 # Yon sets out on the second round
+  OUTPOSTS = 3 # the route is the three outposts, then Bragi
+  ROUTE_LENGTH = 4
+  OUTPOST_HEALTH_NORMAL = 100 # outposts are small: two or three blows bring one down
+  OUTPOST_HEALTH_HARD = 90
+  RAZE_RADIUS = 2 # buildings this close to a fallen outpost go down with it
+  CRUSH_RADIUS = 1 # settlers this close are buried in the ruins
+  ROCK_RANGE = 3
+  BLAZE_REACH = 2 # Yon this close to the Juggernaut's Blaze of Glory has his stitches torn open
+  WATER = ["river", "sea"]
+  CLAIMED_TYPES = ["colonialHall", "barracks", "magistratesCourt", "settler", "rifleman"]
+  JUGGERNAUT = "imperialJuggernaut"
+  YON_SKILLS = ["bragiStitchedHide", "bragiYonFury"]
+  COURT_SKILL = "bragiShipEmperorsFist"
+
+  OBJ_YON = "yon"
+  OBJ_FIST = "fist"
+  OBJ_SETTLERS = "settlers"
+
+  # Scenario extras
+  KEY_ACTIVE = "bragiActive" # read by the mission effects
+  KEY_TORN = "bragiHideTorn" # read by the stitched hide
+  KEY_SEARED = "bragiSeared" # the round Yon last fought a Juggernaut: he doesn't heal that round (BragiYonFury)
+  KEY_YON = "yonId"
+  KEY_BRAGI = "bragiHallId"
+  KEY_ROUTE = "route:" # route:0 .. route:3, the Halls Yon walks to, in order
+  KEY_REST_UNTIL = "restUntil"
+  KEY_NEXT_ROCK = "nextRock"
+  KEY_FALLEN = "fallenOutpost" # route index of the outpost that fell last
+  KEY_HIT = "hitOutpost" # route index of the Hall Yon hit last
+  KEY_SETTLERS = "outpostSettlers"
+  KEY_SETTLER_COUNT = "outpostSettlerCount"
+  KEY_ESCORT = "escort"
+  KEY_JUGGERNAUTS = "juggernauts"
+  KEY_FISTS = "bragiFistsShipped" # read by BragiShipEmperorsFist: every Fist costs more than the last
+  KEY_FIST_DOWN = "fistDown" # a Juggernaut that died on the human's turn: blown up (Blaze of Glory) or cut down?
+  KEY_SHOWN_FAVOR = "shownFavor"
+  KEY_SHOWN_FAVOR_TURN = "shownFavorTurn"
+  KEY_WARNED = "warnedAtBragi" # the Viceroy panics only once
+  KEY_SHOWN_SETTLERS = "shownSettlers"
+  KEY_PENDING = "pending" # events waiting for the human's turn, as ",event,event,"
+  # Queued events, in the order they're told to the human.
+  EVENTS = ["settlerLost", "outpostHit", "outpostFell", "bragiHit", "juggernautFell", "victory"]
+
+  # ------------------------------------------------------------------ setup
+
+  onStart {
+    if Game.currentScenario.objectives.isEmpty { # a loaded game is already set up
+      @setUpMap()
+      @arm()
+      @playIntro()
+    } else {
+      @arm()
+    }
+  }
+
+  setUpMap {
+    player = @human()
+    natureId = Game.nature.id
+    for unit in Game.grid.allUnits.where(=> $0.owner.id == natureId && $0.coordinates != null && $0.type.id in CLAIMED_TYPES) {
+      unit.setOwner(player)
+    }
+    bragi = @marker("bragi").content
+    @remember(KEY_BRAGI, bragi.id)
+    settlerCount = 0
+    for index in 0..OUTPOSTS {
+      outpost = @marker("outpost" + (index + 1)).content
+      outpost.setHealth(if @isHard() OUTPOST_HEALTH_HARD else OUTPOST_HEALTH_NORMAL)
+      @remember(KEY_ROUTE + index, outpost.id)
+      for settler in player.ownedUnits.where(=> $0.type.id == "settler" && @distance($0.coordinates, outpost.coordinates) <= 2) {
+        @addToSet(KEY_SETTLERS, settler.id)
+        settlerCount += 1
+      }
+    }
+    @remember(KEY_ROUTE + OUTPOSTS, bragi.id)
+    @remember(KEY_SETTLER_COUNT, settlerCount)
+
+    # Yon, and how much Blood went into him
+    shaper = Game.players.1
+    cyclops = @marker("yonSpawn").summon("yon", shaper)
+    @remember(KEY_YON, cyclops.id)
+    tier = @yonTier()
+    cyclops.addOrUpdateExtra("bragiTier", "bragiTier", "", tier)
+    cyclops.addOrUpdateExtra("bragiAttackBonus", "bragiAttackBonus", "", 3 * tier)
+    cyclops.addOrUpdateExtra("bragiRegenerationBonus", "bragiRegenerationBonus", "", 4 + 2 * tier)
+    if @isHard() {
+      for spot in @markers("escort") {
+        @addToSet(KEY_ESCORT, spot.summon("warrior", shaper).id)
+      }
+      player.pay([g: 8])
+    }
+    @remember(KEY_REST_UNTIL, 0)
+    @remember(KEY_NEXT_ROCK, YON_FIRST_TURN + 1)
+    @remember(KEY_PENDING, "")
+    @trackYon(cyclops)
+    Game.refreshState()
+  }
+
+  # The mission's skills: Yon's hide and fury, the Court's dearer Fist. Units don't keep skills added at runtime in a
+  # save, so this runs on every start, loaded games included.
+  arm {
+    @remember(KEY_ACTIVE, "yes")
+    cyclops = @yonUnit()
+    if cyclops != null {
+      for skillId in YON_SKILLS {
+        cyclops.addSkill(skillId)
+      }
+    }
+    for court in @human().ownedUnits.where(=> $0.type.id == "magistratesCourt") {
+      court.addSkill(COURT_SKILL)
+    }
+    Game.refreshState()
+  }
+
+  # addSkill may change the unit type for the rest of the session: take the skills off again when the mission ends
+  # (they're inert outside it anyway, see BattleOfBragiEffects.ns).
+  disarm(cyclops) {
+    @remember(KEY_ACTIVE, "no")
+    if cyclops != null {
+      for skillId in YON_SKILLS {
+        cyclops.removeSkill(skillId)
+      }
+    }
+    for court in @human().ownedUnits.where(=> $0.type.id == "magistratesCourt") {
+      court.removeSkill(COURT_SKILL)
+    }
+  }
+
+  playIntro {
+    @pauseTimer()
+    Game.positionCamera(@markerAt("yonSpawn"))
+    Game.zoomCamera(8)
+    Game.wait(0.5)
+    @say("kagaalu", Game.players.1, "kagaaluTitle", "bragiIntroKagaalu")
+    Game.positionCamera(@markerAt("bragi"))
+    @viceroySays("bragiIntro1")
+    @captainSays("bragiIntro2")
+    @say("settler", @human(), "bragiSpeakerRider", "bragiIntro3")
+    @captainSays("bragiIntro4")
+    @viceroySays("bragiIntro5")
+    @captainSays("bragiIntro6")
+    @startObjective(OBJ_YON, "bragiYon", "yon", @yonDescription())
+    @startObjective(OBJ_FIST, "bragiFist", JUGGERNAUT, @fistDescription())
+    @startObjective(OBJ_SETTLERS, "bragiSettlers", "settler", @settlersDescription())
+    @remember(KEY_SHOWN_FAVOR, @favor())
+    @remember(KEY_SHOWN_SETTLERS, @settlersAlive())
+    Game.showMessage(@t("bragiYonStrength").format([@yonTierLine(), @yonAttack(), @yonRegeneration()]))
+    @say("colonialHall", @human(), "colonialHallTitle", "bragiHintMonuments")
+    @say("magistratesCourt", @human(), "magistratesCourtTitle", @t("bragiHintFist").format([@fistCost()]))
+    @say("settler", @human(), "settlerTitle", "bragiHintSettlers")
+    @say("rifleman", @human(), "riflemanTitle", "bragiHintBait")
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ events
+
+  onTurnStart {
+    if (@recall(KEY_FIST_DOWN) ?? "") != "" { # crushed by a rock, say
+      @remember(KEY_FIST_DOWN, "")
+      @queue("juggernautFell")
+    }
+    @yonActs()
+    @escortActs()
+  }
+
+  onSkillCast(caster, skillId) {
+    if skillId == "blazeOfGlory" && @inSet(KEY_JUGGERNAUTS, caster.id) { # it's off the grid by now
+      @blaze()
+    } else if skillId == COURT_SKILL && caster.owner?.id == @human().id {
+      @remember(KEY_FISTS, (@recall(KEY_FISTS) ?? 0) + 1)
+      if @isActive(OBJ_FIST) {
+        Game.currentScenario.updateObjective(OBJ_FIST, [description: @t("bragiFistDone"), state: ObjectiveStates.completed])
+        Game.refreshState()
+      }
+      @viceroySays("bragiFistRequested")
+    }
+  }
+
+  onCardPlay(card) {
+    if Game.currentPlayerIndex == 0 && card.type.id == "emperorsFistShipment" {
+      @fistArrives()
+    }
+  }
+
+  onDie(unit) {
+    if unit.id == @recall(KEY_BRAGI) {
+      @defeat("bragiHallFell")
+    } else if unit.id == @recall(KEY_YON) {
+      for skillId in YON_SKILLS {
+        unit.removeSkill(skillId) # the skills were added to his unit type (see disarm)
+      }
+      @queue("victory")
+    } else if @inSet(KEY_SETTLERS, unit.id) {
+      @queue("settlerLost")
+    } else if @inSet(KEY_JUGGERNAUTS, unit.id) {
+      # Off the human's turn Yon killed it. On it, either it blew itself up (onSkillCast says so) or Yon hit back
+      # (onAttack says so); both come after this.
+      if Game.currentPlayerIndex == 0 {
+        @remember(KEY_FIST_DOWN, unit.id)
+      } else {
+        @queue("juggernautFell")
+      }
+    }
+  }
+
+  onAttack(attacker, defender) {
+    yonId = @recall(KEY_YON)
+    if (attacker?.id == yonId && @isFist(defender)) || (defender?.id == yonId && @isFist(attacker)) {
+      @remember(KEY_SEARED, Game.turn)
+    }
+    downId = @recall(KEY_FIST_DOWN) ?? ""
+    if downId != "" && (attacker?.id == downId || defender?.id == downId) {
+      @remember(KEY_FIST_DOWN, "")
+      @queue("juggernautFell")
+    }
+  }
+
+  onStateChange {
+    @trackJuggernaut()
+    if Game.currentPlayerIndex != 0 || !@isActive(OBJ_YON) {
+      return
+    }
+    if (@recall(KEY_PENDING) ?? "") != "" {
+      events = @recall(KEY_PENDING)
+      @remember(KEY_PENDING, "")
+      @pauseTimer()
+      for event in EVENTS.where(=> ("," + $0 + ",") in events) {
+        @announce(event)
+      }
+      @resumeTimer()
+    }
+    @refreshProgress()
+  }
+
+  checkVictory => null
+
+  announce(event) {
+    if event == "victory" {
+      @victory()
+    } else if event == "outpostFell" {
+      @outpostFellNews()
+    } else if event == "outpostHit" {
+      Game.showMessage(@t("bragiOutpostHit").format([@outpostName(@recall(KEY_HIT) ?? 0)]))
+    } else if event == "bragiHit" {
+      if @recall(KEY_WARNED) == null {
+        @remember(KEY_WARNED, "yes")
+        @viceroySays("bragiAtTheGates1")
+        @captainSays("bragiAtTheGates2")
+      } else {
+        Game.showMessage(@t("bragiHallHit").format([@unitById(@recall(KEY_BRAGI))?.hp ?? 0]))
+      }
+    } else if event == "settlerLost" {
+      Game.showMessage(@t("bragiSettlerLost"))
+      @refreshProgress()
+      if @isActive(OBJ_SETTLERS) {
+        @fail(OBJ_SETTLERS)
+      }
+    } else if event == "juggernautFell" {
+      @captainSays("bragiFistFell")
+    }
+  }
+
+  # Keeps the objectives' numbers current, on the human's turn only. Favor changes all the time, so its count is
+  # updated once a turn, and as soon as there's enough for the Fist.
+  refreshProgress {
+    favorNow = @favor()
+    shownFavor = @recall(KEY_SHOWN_FAVOR) ?? 0
+    newTurn = Game.turn != (@recall(KEY_SHOWN_FAVOR_TURN) ?? 0)
+    enough = favorNow >= @fistCost() && shownFavor < @fistCost()
+    if @isActive(OBJ_FIST) && favorNow != shownFavor && (newTurn || enough) {
+      @remember(KEY_SHOWN_FAVOR, favorNow)
+      @remember(KEY_SHOWN_FAVOR_TURN, Game.turn)
+      Game.currentScenario.updateObjective(OBJ_FIST, [description: @fistDescription()])
+      Game.refreshState()
+    }
+    alive = @settlersAlive()
+    if alive != @recall(KEY_SHOWN_SETTLERS) {
+      @remember(KEY_SHOWN_SETTLERS, alive)
+      if Game.currentScenario.objectiveState(OBJ_SETTLERS) != null {
+        Game.currentScenario.updateObjective(OBJ_SETTLERS, [description: @settlersDescription()])
+        Game.refreshState()
+      }
+    }
+  }
+
+  # ------------------------------------------------------------------ Yon
+
+  marchSteps => 2
+  restTurns => if @isHard() 0 else 1
+  rockEvery => if @isHard() 1 else 2
+  rockDamage => 15 + 5 * (@yonUnit()?.getExtraValue("bragiTier") ?? 1)
+
+  # How strong Yon is: every BLOOD_PER_TIER Blood offered beyond the Well's need in chapter 5 makes him stronger, one
+  # step more on hard, up to MAX_TIER (he can only hold so much).
+  yonTier {
+    surplus = Game.campaign?.progressFor("ShapingOfYon")?.getExtraValue("bloodSurplus") ?? DEFAULT_BLOOD_SURPLUS
+    tier = Math.max(0, Math.floor(surplus / BLOOD_PER_TIER)) + (if @isHard() 1 else 0)
+    return Math.min(MAX_TIER, tier)
+  }
+
+  bloodSurplusKnown => Game.campaign?.progressFor("ShapingOfYon")?.getExtraValue("bloodSurplus") != null
+  yonTierLine => if @bloodSurplusKnown() @t("bragiYonFed").format([Game.campaign.progressFor("ShapingOfYon").getExtraValue("bloodSurplus")]) else @t("bragiYonFedUnknown")
+  yonAttack => (@yonUnit()?.type?.a ?? 0) + (@yonUnit()?.getExtraValue("bragiAttackBonus") ?? 0)
+  yonRegeneration => @yonUnit()?.regeneration ?? 0
+
+  # Runs at the start of every round, before the human's turn.
+  yonActs {
+    cyclops = @yonUnit()
+    if cyclops == null || Game.turn < YON_FIRST_TURN {
+      return
+    }
+    @hurlRock(cyclops)
+    resting = Game.turn <= (@recall(KEY_REST_UNTIL) ?? 0)
+    steps = if resting 0 else @marchSteps()
+    struck = false
+    bait = @preyNextTo(cyclops)
+    if bait != null {
+      # Anything alive next to him gets his attention first. If it dies, he only has time for a step.
+      baitId = bait.id
+      @strike(cyclops, bait)
+      struck = true
+      if cyclops.coordinates == null {
+        return
+      }
+      steps = if @unitById(baitId) == null Math.min(steps, 1) else 0
+    }
+    goal = @currentTarget()
+    if goal == null {
+      return
+    }
+    if steps > 0 && @distance(cyclops.coordinates, goal.coordinates) > 1 {
+      @trek(cyclops, goal.coordinates, steps)
+    }
+    if !struck && !resting {
+      if @distance(cyclops.coordinates, goal.coordinates) <= 1 {
+        @smash(cyclops, goal)
+      } else {
+        bait = @preyNextTo(cyclops) ?? @blockerOf(cyclops, goal.coordinates)
+        if bait != null {
+          @strike(cyclops, bait)
+        }
+      }
+    }
+    if cyclops.coordinates != null {
+      @trackYon(cyclops)
+    }
+  }
+
+  # Yon hits the Hall in front of him; if it falls, the outpost is razed.
+  smash(cyclops, hall) {
+    index = @routeIndexOf(hall.id)
+    at = hall.coordinates
+    @strike(cyclops, hall)
+    if @unitById(hall.id) != null {
+      @remember(KEY_HIT, index)
+      @queue(if index >= OUTPOSTS "bragiHit" else "outpostHit")
+    } else if index < OUTPOSTS && cyclops.coordinates != null {
+      @raze(cyclops, index, at)
+    }
+  }
+
+  raze(cyclops, index, at) {
+    player = @human()
+    for building in player.ownedUnits.where(=> $0.coordinates != null && $0.isBuilding && @distance($0.coordinates, at) <= RAZE_RADIUS) {
+      Game.animateVisualFx([[type: "explosion", coordinates: building.coordinates]])
+      building.destroy(cyclops)
+    }
+    for settler in player.ownedUnits.where(=> $0.coordinates != null && $0.type.id == "settler" && @distance($0.coordinates, at) <= CRUSH_RADIUS) {
+      settler.destroy(cyclops)
+    }
+    @remember(KEY_FALLEN, index)
+    @remember(KEY_REST_UNTIL, Game.turn + @restTurns())
+    @queue("outpostFell")
+    Game.refreshState()
+  }
+
+  outpostFellNews {
+    index = @recall(KEY_FALLEN) ?? 0
+    if @isActive(OBJ_YON) {
+      Game.currentScenario.updateObjective(OBJ_YON, [description: @yonDescription()])
+      Game.refreshState()
+    }
+    @captainSays(@t("bragiOutpostFell").format([@outpostName(index)]))
+    if index == 0 {
+      @viceroySays("bragiOutpostFellViceroy")
+    }
+    if @restTurns() > 0 {
+      Game.showMessage(@t("bragiYonRests"))
+    }
+  }
+
+  # Now and then he tears a rock out of the ground and hurls it at whoever is shooting at him (the weakest soldier
+  # in reach; a settler only when there's nobody else).
+  hurlRock(cyclops) {
+    if Game.turn < (@recall(KEY_NEXT_ROCK) ?? 0) {
+      return
+    }
+    playerId = @human().id
+    here = Game.grid.elementAt(cyclops.coordinates)
+    inReach = Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null && !$0.isBuilding \
+      && here.distance($0.coordinates) >= 2 && here.distance($0.coordinates) <= ROCK_RANGE)
+    if inReach.isEmpty {
+      return
+    }
+    armed = inReach.where(=> ($0.type.a ?? 0) > 0)
+    victim = if armed.isEmpty inReach.minBy(=> $0.hp) else armed.minBy(=> $0.hp)
+    @remember(KEY_NEXT_ROCK, Game.turn + @rockEvery())
+    Game.animateAttack(cyclops, victim)
+    Game.animateVisualFx([[type: "hit", coordinates: victim.coordinates]])
+    Game.logEvent(@t("bragiRockLog").format([Game.localizedStr(victim.type.title), @rockDamage()]), LogLevels.warn, victim.coordinates)
+    victim.takeDamage(@rockDamage(), cyclops)
+  }
+
+  # On hard, two of Kagaalu's warriors walk with Yon and fight whatever comes close.
+  escortActs {
+    cyclops = @yonUnit()
+    for warrior in @unitsIn(KEY_ESCORT) {
+      bait = @preyNextTo(warrior)
+      if bait == null {
+        goal = cyclops?.coordinates ?? @currentTarget()?.coordinates
+        if goal != null && @distance(warrior.coordinates, goal) > 2 {
+          @trek(warrior, goal, 2)
+        }
+        bait = @preyNextTo(warrior)
+      }
+      if bait != null && warrior.coordinates != null {
+        @strike(warrior, bait)
+      }
+    }
+  }
+
+  strike(attacker, victim) {
+    if attacker.ap <= 0 {
+      attacker.setActions(1)
+    }
+    Server.attack(attacker.coordinates, victim.coordinates, attacker.coordinates, 0)
+  }
+
+  # The weakest living thing of the human's next to `unit`, or null.
+  preyNextTo(unit) {
+    playerId = @human().id
+    here = Game.grid.elementAt(unit.coordinates)
+    near = Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null && !$0.isBuilding \
+      && here.distance($0.coordinates) == 1)
+    return if near.isEmpty null else near.minBy(=> $0.hp)
+  }
+
+  # When there's no free cell that brings him closer to goal, Yon tears through whatever of the human's stands in
+  # the way (the building or unit closest to goal), or null if nothing does.
+  blockerOf(unit, goal) {
+    here = Game.grid.elementAt(unit.coordinates)
+    closer = Game.grid.ringAround(unit.coordinates, 1).where(=> !($0.terrain in WATER) && $0.distance(goal) < here.distance(goal))
+    if closer.any(=> $0.content == null) {
+      return null
+    }
+    playerId = @human().id
+    blocking = closer.where(=> $0.content?.owner?.id == playerId)
+    return if blocking.isEmpty null else blocking.minBy(=> $0.distance(goal)).content
+  }
+
+  # The first Hall on Yon's route that still stands.
+  currentTarget {
+    for index in 0..ROUTE_LENGTH {
+      hall = @unitById(@recall(KEY_ROUTE + index))
+      if hall != null {
+        return hall
+      }
+    }
+    return null
+  }
+
+  routeIndexOf(unitId) {
+    for index in 0..ROUTE_LENGTH {
+      if @recall(KEY_ROUTE + index) == unitId {
+        return index
+      }
+    }
+    return ROUTE_LENGTH
+  }
+
+  outpostsStanding => [0, 1, 2].count(=> @unitById(@recall(KEY_ROUTE + $0)) != null)
+  outpostsLost => OUTPOSTS - @outpostsStanding()
+  outpostName(index) => @t("bragiOutpost" + index)
+
+  # The colony's lookouts never lose sight of him: the cells around him stay revealed.
+  trackYon(cyclops) {
+    lastX = @recall("yonX")
+    if lastX != null {
+      last = [lastX, @recall("yonY"), @recall("yonZ")]
+      Game.currentScenario.removeRevealedCell(last)
+      for near in Game.grid.ringAround(last, 1) {
+        Game.currentScenario.removeRevealedCell(near.coordinates)
+      }
+    }
+    at = cyclops.coordinates
+    @remember("yonX", at.0)
+    @remember("yonY", at.1)
+    @remember("yonZ", at.2)
+    Game.currentScenario.addRevealedCell(at)
+    for near in Game.grid.ringAround(at, 1) {
+      Game.currentScenario.addRevealedCell(near.coordinates)
+    }
+  }
+
+  # ------------------------------------------------------------------ the Emperor's Fist
+
+  # what the next Fist costs (BragiShipEmperorsFist works it out the same way)
+  fistCost => (if @isHard() 75 else 60) + 30 * (@recall(KEY_FISTS) ?? 0)
+  veteranXp => if @isHard() 0 else 80 # the crew's champion experience; 80 is a level
+
+  fistArrives {
+    player = @human()
+    landed = player.ownedUnits.where(=> $0.type.id == JUGGERNAUT && $0.coordinates != null && !@inSet(KEY_JUGGERNAUTS, $0.id))
+    if landed.isEmpty {
+      return
+    }
+    @pauseTimer()
+    first = (@recall(KEY_JUGGERNAUTS) ?? "") == ""
+    for fist in landed {
+      @addToSet(KEY_JUGGERNAUTS, fist.id)
+      if @veteranXp() > 0 && fist.getExtraValue("championXp") != null {
+        fist.updateExtra("championXp", @veteranXp())
+      }
+    }
+    Game.positionCamera(landed.0.coordinates)
+    if first {
+      @viceroySays("bragiFistLands1")
+      @say(JUGGERNAUT, player, "imperialJuggernautTitle", "bragiFistLands2")
+      @captainSays("bragiFistLands3")
+      @say(JUGGERNAUT, player, "blazeOfGloryTitle", "bragiHintBlaze")
+    } else {
+      @captainSays("bragiFistAgain")
+    }
+    @resumeTimer()
+  }
+
+  # Remembers where the Juggernaut is: once it blows itself up, it's off the grid.
+  trackJuggernaut {
+    fist = @unitsIn(KEY_JUGGERNAUTS).first(=> true)
+    if fist != null && (fist.coordinates.0 != @recall("fistX") || fist.coordinates.1 != @recall("fistY")) {
+      at = fist.coordinates
+      @remember("fistX", at.0)
+      @remember("fistY", at.1)
+      @remember("fistZ", at.2)
+    }
+  }
+
+  # Blaze of Glory next to Yon tears his stitches open: from then on, everything hits him like the Juggernaut does,
+  # and he stops healing (BattleOfBragiEffects.ns reads KEY_TORN).
+  blaze {
+    @remember(KEY_FIST_DOWN, "")
+    @unqueue("juggernautFell")
+    cyclops = @yonUnit()
+    fistX = @recall("fistX")
+    if cyclops == null {
+      return
+    }
+    if @recall(KEY_TORN) == "yes" {
+      @captainSays("bragiBlazeAgain")
+      return
+    }
+    if fistX == null {
+      @captainSays("bragiBlazeMissed")
+      return
+    }
+    if @distance(cyclops.coordinates, [fistX, @recall("fistY"), @recall("fistZ")]) > BLAZE_REACH {
+      @captainSays("bragiBlazeMissed")
+      return
+    }
+    @pauseTimer()
+    @remember(KEY_TORN, "yes")
+    Game.animateVisualFx([[type: "blood", coordinates: cyclops.coordinates]])
+    Game.positionCamera(cyclops.coordinates)
+    @captainSays("bragiHideTorn")
+    Game.refreshState()
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ the end
+
+  victory {
+    if !@isActive(OBJ_YON) {
+      return # already over
+    }
+    @pauseTimer()
+    player = @human()
+    @complete(OBJ_YON)
+    if @isActive(OBJ_FIST) {
+      @complete(OBJ_FIST)
+    }
+    if @isActive(OBJ_SETTLERS) {
+      @complete(OBJ_SETTLERS)
+    }
+    Game.positionCamera(@markerAt("bragi"))
+    @captainSays("bragiVictory1")
+    @viceroySays("bragiVictory2")
+    @captainSays(if @outpostsLost() == 0 "bragiVictory3Spared" else "bragiVictory3")
+    @saveProgress()
+    @disarm(null)
+    Server.win(player)
+  }
+
+  # What later missions can build on.
+  saveProgress {
+    campaign = Game.campaign
+    if campaign != null {
+      progress = campaign.progressFor("BattleOfBragi")
+      if progress != null {
+        progress.addOrUpdateExtra("outpostsLost", "outpostsLost", "", @outpostsLost())
+        progress.addOrUpdateExtra("juggernautSurvived", "juggernautSurvived", "", @unitsIn(KEY_JUGGERNAUTS).count(=> true) > 0)
+        progress.addOrUpdateExtra("settlersSaved", "settlersSaved", "", @settlersAlive())
+        progress.addOrUpdateExtra("turns", "turns", "", Game.turn)
+      }
+      campaign.unlock("ATurnOfTides") # chapter 7
+      campaign.save()
+    }
+  }
+
+  defeat(lineKey) {
+    for objectiveId in [OBJ_YON, OBJ_FIST, OBJ_SETTLERS].where(=> @isActive($0)) {
+      @fail(objectiveId)
+    }
+    Game.showMessageToAll(@t(lineKey))
+    @disarm(@yonUnit())
+    Game.lose(@human())
+    Game.refreshState()
+  }
+
+  # ------------------------------------------------------------------ objectives
+
+  # The human's Favor. player.resources is a snapshot that doesn't follow later changes, but canPay reads the live
+  # pool, so this finds the largest amount the human can pay (up to 2047).
+  favor {
+    player = @human()
+    found = 0
+    step = 1024
+    for i in 0..11 {
+      if player.canPay([u: found + step]) {
+        found += step
+      }
+      step = step // 2
+    }
+    return found
+  }
+  settlersAlive => @unitsIn(KEY_SETTLERS).count(=> true)
+  yonDescription => @t("bragiYonDescription").format([@outpostsStanding(), OUTPOSTS])
+  fistDescription => @t("bragiFistDescription").format([@fistCost(), Math.min(@favor(), @fistCost())])
+  settlersDescription => @t("bragiSettlersDescription").format([@settlersAlive(), @recall(KEY_SETTLER_COUNT) ?? 0])
+
+  # ------------------------------------------------------------------ helpers
+
+  t(key) => Game.localizedStr(key)
+  # Cutscenes stop the turn timer; it starts again with the human's next action.
+  pauseTimer => Server.setTimeoutEnabled(false)
+  resumeTimer => Server.setTimeoutEnabledOnUserAction(true)
+  human => Game.players.0
+  isHard => Game.currentScenario.difficulty == "hard"
+  yonUnit => @unitById(@recall(KEY_YON))
+
+  say(portrait, owner, titleKey, line) {
+    Game.showDialog(portrait, owner?.id, @t(titleKey), if line.startsWith("bragi") @t(line) else line)
+  }
+  captainSays(line) => @say("rifleman", @human(), "bragiSpeakerCaptain", line)
+  viceroySays(line) => @say("vitarron", @human(), "vitarronTitle", line)
+
+  startObjective(objectiveId, keyBase, image, descriptionText) {
+    objective = [
+      id: objectiveId,
+      title: @t(keyBase + "Title"),
+      description: descriptionText ?? @t(keyBase + "Description"),
+      image: image,
+      state: ObjectiveStates.active
+    ]
+    Game.currentScenario.addObjective(objective)
+    Game.refreshState()
+  }
+  complete(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.completed])
+    Game.refreshState()
+  }
+  fail(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.failed])
+    Game.refreshState()
+  }
+  isActive(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.active
+
+  remember(key, value) {
+    Game.currentScenario.addOrUpdateExtra(key, key, "", value)
+  }
+  recall(key) => Game.currentScenario.getExtraValue(key)
+  queue(event) {
+    pending = @recall(KEY_PENDING) ?? ""
+    if !(("," + event + ",") in pending) {
+      @remember(KEY_PENDING, (if pending == "" "," else pending) + event + ",")
+    }
+  }
+  unqueue(event) {
+    pending = @recall(KEY_PENDING) ?? ""
+    kept = ","
+    for other in EVENTS.where(=> $0 != event && ("," + $0 + ",") in pending) {
+      kept += other + ","
+    }
+    @remember(KEY_PENDING, if kept == "," "" else kept)
+  }
+  addToSet(key, unitId) {
+    @remember(key, (@recall(key) ?? ",") + unitId + ",")
+  }
+  inSet(key, unitId) => ("," + unitId + ",") in (@recall(key) ?? "")
+  isFist(unit) => unit != null && @inSet(KEY_JUGGERNAUTS, unit.id)
+  unitsIn(key) {
+    members = @recall(key) ?? ""
+    return Game.grid.allUnits.where(=> $0.coordinates != null && ("," + $0.id + ",") in members)
+  }
+  unitById(unitId) {
+    if unitId == null {
+      return null
+    }
+    return Game.grid.allUnits.first(=> $0.id == unitId && $0.coordinates != null)
+  }
+
+  marker(comment) => Game.grid.cells.first(=> $0.comment == comment)
+  markers(comment) => Game.grid.cells.where(=> $0.comment == comment)
+  markerAt(comment) => @marker(comment).coordinates
+  distance(a, b) => Game.grid.elementAt(a).distance(b)
+
+  # Up to steps cells over land, each one closer to goal (whatever the terrain: nothing slows Yon down).
+  trek(walker, goal, steps) {
+    origin = walker.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    at = Game.grid.elementAt(origin)
+    for i in 0..steps {
+      nextCell = null
+      nextDistance = at.distance(goal)
+      for land in Game.grid.ringAround(at.coordinates, 1) {
+        if land.content == null && !(land.terrain in WATER) && land.distance(goal) < nextDistance {
+          nextCell = land
+          nextDistance = land.distance(goal)
+        }
+      }
+      if nextCell != null {
+        at = nextCell
+      }
+    }
+    if at.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, at.coordinates, 0)
+    return true
+  }
+}

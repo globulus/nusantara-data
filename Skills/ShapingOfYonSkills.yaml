@@ -1,0 +1,9 @@
+# Mission 5 of On the Banks of Dair: Shaping of Yon
+- id: yonOfferBlood # added to the Sacrificial Well by the mission script
+  title: yonOfferBloodTitle
+  image: ../Factions/Sanghoy/Images/bloodToRogash
+  effect: YonOfferBlood
+- id: yonRockLob # Yon's rock lob (the campaign's RockLob has no cost, so it could be cast without limit)
+  title: rockLobTitle
+  image: OnTheBanksOfDair/rockLob
+  effect: YonRockLob

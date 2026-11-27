@@ -1,0 +1,76 @@
+# Mission 6: Battle of Bragi
+battleOfBragiTitle: Battle of Bragi
+battleOfBragiDescription: Kagaalu's cyclops has crossed the Dair. Outpost by outpost, it is walking to Bragi.
+battleOfBragiLoadingText: The lookouts at Eastford saw it first, wading the ford at dawn. By noon the riders were in Bragi, and nobody believed them.
+
+# Skills
+bragiStitchedHideTitle: Stitched Hide
+bragiYonFuryTitle: Gorged on Blood
+bragiShipEmperorsFistTitle: Requisition the Emperor's Fist
+
+# Speakers
+bragiSpeakerCaptain: Captain Varrenne
+bragiSpeakerRider: Rider from Eastford
+
+# Places
+bragiOutpost0: Eastford
+bragiOutpost1: Kemang Mill
+bragiOutpost2: Lower Ferry
+bragiOutpost3: Bragi
+
+# Objectives
+bragiYonTitle: The cyclops
+bragiYonDescription: "Kill Yon before he tears down Bragi's Colonial Hall. He walks the outposts first: Eastford, Kemang Mill, Lower Ferry. Outposts standing: {0} of {1}."
+bragiFistTitle: The Emperor's Fist
+bragiFistDescription: "Gather {0} Favor and requisition the Imperial Juggernaut at the Magistrates Court. Monuments earn Favor every turn, the colony's territory every third turn. Favor: {1} of {0}."
+bragiFistDone: The Emperor's Fist is on its way. Play the shipment on your territory once it's ready.
+bragiSettlersTitle: Evacuate the outposts
+bragiSettlersDescription: "(Optional) Get the outposts' settlers away before Yon arrives. A fallen outpost buries everyone next to it, and Yon eats what he catches. Settlers alive: {0} of {1}."
+
+# Opening
+bragiIntroKagaalu: Go, Yon. Walk through their villages, one by one, all the way to the sea.
+bragiIntro1: A cyclops? Here? Captain, I was promised a pacified delta.
+bragiIntro2: You were promised a delta, Viceroy. It came with neighbours.
+bragiIntro3: It came over the ford at dawn. We shot at it. It didn't even look at us. It just keeps walking.
+bragiIntro4: Eastford first, then the mill, then the ferry. Then us.
+bragiIntro5: Then I shall write to the Emperor. His Fist will settle this. It will cost us, of course. His Majesty's Favor is not cheap.
+bragiIntro6: Then we earn it. Monuments, land, whatever pleases the court. And we get the settlers out of the outposts.
+bragiYonFed: "Kagaalu poured {0} Blood into the Well beyond its need, and Yon is gorged on it."
+bragiYonFedUnknown: Nobody knows how much Blood went into him. Too much, by the look of him.
+bragiYonStrength: "{0} Yon hits for {1} and closes {2} wounds a turn. His stitched hide halves every blow but the Imperial Juggernaut's, and in a round he fights the Juggernaut his wounds don't close."
+
+# Hints
+bragiHintMonuments: "Select a Colonial Hall and use <b>Build Monument</b>. Every monument earns Favor each turn, and each Hall can raise one of each kind next to it. The colony's territory earns Favor too, every third turn."
+bragiHintFist: "Once you have {0} Favor, select the Magistrates Court and use <b>Requisition the Emperor's Fist</b>. Two turns later, play the shipment on your territory."
+bragiHintSettlers: "Move the outposts' settlers out before Yon gets there: when an outpost falls, it buries everyone next to it, buildings and all. A settler can mine gold, or found a new colony out of his way."
+bragiHintBait: "Yon fights whatever living thing stands next to him before he walks on. A soldier in his way buys the colony time, at a price. He hurls rocks at whatever is a little further off."
+bragiHintBlaze: "When the Juggernaut is down to a fifth of its health, its <b>Blaze of Glory</b> next to Yon tears his stitches open: after that every rifle hurts him, and his wounds stop closing. Another Fist can be requisitioned, but each one costs more."
+
+# During the fight
+bragiOutpostHit: "Yon is tearing at the walls of {0}!"
+bragiOutpostFell: "{0} is gone. Everything near it, too."
+bragiOutpostFellViceroy: Eastford! I had the plans for a customs house drawn up for Eastford.
+bragiYonRests: Yon squats in the ruins and feeds. It won't last long.
+bragiSettlerLost: One of the outposts' settlers is dead.
+bragiRockLog: "Yon hurls a rock at {0} for {1} damage."
+bragiAtTheGates1: He is at the Hall! Captain, do something!
+bragiAtTheGates2: Doing it, Viceroy.
+bragiHallHit: "Yon is tearing at Bragi's Colonial Hall! It has {0} health left."
+bragiFistRequested: My letter is on its way to the Emperor, with the colony's compliments. The Fist will land in two days.
+bragiFistLands1: Behold, Captain. The Emperor's Fist.
+bragiFistLands2: Crew of the Fist, reporting. Point us at it.
+bragiFistLands3: Its hide turns bullets, not your shells, and where your shells burn it, it doesn't heal. Hit it, and keep hitting it.
+bragiFistAgain: Another Fist. Let's not waste this one.
+bragiFistFell: The Fist is down. We'll need another one, or a miracle.
+bragiHideTorn: The blast tore him open, and the wounds aren't closing! Every rifle, fire!
+bragiBlazeMissed: The Fist went up in flames too far from him. The cyclops is still walking.
+bragiBlazeAgain: Another Fist gone up in flames. He's burning, he's bleeding, and he's still standing.
+
+# Ending
+bragiVictory1: It's down. It's actually down.
+bragiVictory2: Naturally. I shall tell the Emperor of the colony's gratitude. And of my part in it.
+bragiVictory3: Tell him about the outposts too, Viceroy. We'll be rebuilding them for a year.
+bragiVictory3Spared: Every outpost still standing. Tell him that, Viceroy. He won't believe it.
+
+# Defeat
+bragiHallFell: Bragi's Colonial Hall has fallen. Yon walks on to the sea, and the colony goes with him.

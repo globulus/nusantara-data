@@ -1,0 +1,871 @@
+# On the Banks of Dair, mission 3: Through the Mire. Kagaalu leads a small band from the tribe's hiding place in Moheela
+# swamp, north of the mouth of the Dair, to an abandoned camp whose Sacrificial Well can keep the tribe alive.
+#
+# The march: two ways north to the only dry crossing of the black mere. The causeway in the west is dry but long, and
+# Uzhaal the Stitcher holds it with his amalgams (they live only by his rites: kill him and they rot). The bog in the
+# middle is short but slow, and its beasts bite. At the crossing a shaper keeps a corral: kill him and his beasts
+# follow Rogash's favourite. Optional: free the captives at Pyracmon's slave post east of the bog. Pyracmon's men
+# ambush the band on the way: from the south bank (unless Landfall's assassins killed the clans' warchiefs), on the
+# jungle ridge north of the mere, and from the post if its captives are freed.
+# The end: drive the beasts from the camp and bring Kagaalu to the Well. It answers him (it becomes the player's), and
+# one of the band is given to it with its own Sacrifice of Blood; then the camp is the tribe's. (If nobody of the band is
+# left, Kagaalu gives his own blood.) Lost if Kagaalu dies, or if the Well is destroyed.
+#
+# Map markers (cell comments): refuge, southBank, fork, lair, bogBeast, corral, corralGuard, slavePost,
+# postGuard, captive, pursuit, ridge, ridgeAmbush, well, roost. Everything that must survive a save is kept in
+# objectives or in scenario extras. Dialogs only reach the human on their own turn: anything that happens off-turn is
+# queued (see onStateChange).
+scenario ThroughTheMire {
+  MAX_WARRIORS = 5
+  DEFAULT_SURVIVORS = 2 # Calamity on the Horizon's survivors, if it wasn't played
+  SIGHT_RANGE = 3 # a unit of the band this close to a place has seen it
+  CAMP_RANGE = 3 # Kagaalu this close to the Well has reached the camp
+  ROOST_RADIUS = 3 # beasts this close to the Well roost in the camp (as in ThroughTheMireEffects)
+  CORRAL_RADIUS = 2
+  POST_RADIUS = 3
+  SOUTH_BANK_TURN = 4 # the south-bank clans cross by this turn even if the band dawdles
+  HUNT_KAGAALU_RANGE = 5 # on hard, Pyracmon's men go for Kagaalu when he's this close
+  SHAPER_HEALTH_NORMAL = 25
+  AMALGAM_HEALTH_NORMAL = 55 # half-rotten already; his rites keep them at this, no more
+  AMALGAM_HEALTH_HARD = 70
+  BEAST_AGGRESSION_NORMAL = 0.4 # chance a beast attacks someone in reach each round
+  BEAST_AGGRESSION_HARD = 0.7
+  CORRAL_AGGRESSION_NORMAL = 0.6 # the shaper's beasts guard their pen more fiercely
+  CORRAL_AGGRESSION_HARD = 0.7
+  AMALGAM_DECAY = 10 # an amalgam's regeneration is -10; the Stitcher's rites make it up while he lives
+  DEEP_WATER = ["sea", "ocean"]
+  CORRAL_TYPES = ["shaper", "chironite", "kavouros"]
+  GUARD_TYPES = ["warchief", "warrior", "raider", "shadespear"]
+  CAMP_TYPES = ["totem", "sacrificialWell"]
+
+  OBJ_WELL = "well"
+  OBJ_CORRAL = "corral"
+  OBJ_CAPTIVES = "captives"
+
+  # Scenario extras
+  KEY_STAGE = "stage" # march, clear (beasts in the camp), wake (bring Kagaalu to the Well), rite (sacrifice), done
+  KEY_STITCHER = "stitcher"
+  KEY_AMALGAMS = "amalgams"
+  KEY_SHAPER = "shaper"
+  KEY_CORRAL = "corralBeasts"
+  KEY_GUARDS = "guards"
+  KEY_CAPTIVES = "captives"
+  KEY_FREED = "freed"
+  KEY_ROOST = "roost"
+  KEY_HUNTERS = "hunters"
+  KEY_FIRED = "fired" # ambushes and sightings already played, as ",southBank,lair,..."
+  KEY_QUIET_SOUTH = "quietSouth" # Landfall's assassins left the south-bank clans without warchiefs
+  KEY_PENDING = "pending" # events waiting for the human's turn, as ",event,event,"
+  # Queued events, in the order they're told to the human.
+  EVENTS = ["southBank", "southBankQuiet", "ormuFell", "stitcherFell", "shaperFell", "guardFell", "freed", "pursuit", "roostCleared", "alone"]
+
+  # ------------------------------------------------------------------ setup
+
+  onStart {
+    if Game.currentScenario.objectives.isEmpty { # a loaded game is already set up
+      @setUpMap()
+      @playIntro()
+    }
+  }
+
+  setUpMap {
+    player = @human()
+    pyracmon = @tribesPlayer()
+    outcastsPlayer = @outcasts()
+    captivesPlayer = @captiveHolder()
+    natureId = Game.nature.id
+    post = Game.grid.elementAt(@markerAt("slavePost"))
+    corralAt = Game.grid.elementAt(@markerAt("corral"))
+    wellAt = Game.grid.elementAt(@markerAt("well"))
+
+    if @isHard() {
+      @summonAt("bogBeast", "ironBoar", null)
+      @summonAt("corralGuard", "chironite", null)
+      @summonAt("postGuard", "warrior", null)
+      @summonAt("roost", "ironBoar", null) # (not a beast with a big bounty: its prize could be cards the band can't play)
+    }
+
+    for unit in Game.grid.allUnits.where(=> $0.owner.id == natureId && $0.coordinates != null) {
+      typeId = unit.type.id
+      cell = Game.grid.elementAt(unit.coordinates)
+      if cell.comment == "captive" {
+        unit.setOwner(captivesPlayer)
+        @addToSet(KEY_CAPTIVES, unit.id)
+      } else if typeId in GUARD_TYPES && post.distance(unit.coordinates) <= POST_RADIUS {
+        unit.setOwner(pyracmon)
+        @addToSet(KEY_GUARDS, unit.id)
+      } else if typeId == "sarcomancer" {
+        unit.setOwner(outcastsPlayer)
+        @addToSet(KEY_STITCHER, unit.id)
+      } else if typeId == "amalgam" {
+        unit.setOwner(outcastsPlayer)
+        @addToSet(KEY_AMALGAMS, unit.id)
+        unit.setHealth(if @isHard() AMALGAM_HEALTH_HARD else AMALGAM_HEALTH_NORMAL)
+      } else if typeId in CORRAL_TYPES && corralAt.distance(unit.coordinates) <= CORRAL_RADIUS {
+        # The shaper's beasts stay in their pen (nature's, like the bog's beasts): they bite whoever comes close.
+        @addToSet(KEY_CORRAL, unit.id)
+        if typeId == "shaper" {
+          @addToSet(KEY_SHAPER, unit.id)
+          if !@isHard() {
+            unit.setHealth(SHAPER_HEALTH_NORMAL)
+          }
+        }
+      } else if (unit.type.a ?? 0) > 0 && wellAt.distance(unit.coordinates) <= ROOST_RADIUS {
+        @addToSet(KEY_ROOST, unit.id)
+      }
+    }
+
+    # Kagaalu's band: Kagaalu, Ormu, and the warriors who made it across the Dair.
+    refuge = Game.grid.elementAt(Game.grid.startingLocations.0)
+    leader = refuge.summon("kagaalu", player)
+    player.setHero(leader)
+    level = @priorKagaaluLevel()
+    if level > 1 {
+      leader.levelUpTo(level)
+    }
+    @freeCellNear(refuge.coordinates, false).summon("ormu", player)
+    for i in 0..@startingWarriors() {
+      spot = @freeCellNear(refuge.coordinates, false)
+      if spot != null {
+        spot.summon("warrior", player)
+      }
+    }
+    player.addEffect("MireMarch")
+    if !@isHard() {
+      player.addEffect("RogashsBlessing") # normal: Kagaalu and Ormu heal between fights
+      player.addEffect("MireRemedies") # and so does the rest of the band, more slowly
+    }
+    pyracmon.addEffect("TribalSenses")
+    pyracmon.addEffect("TribalPaths")
+    outcastsPlayer.addEffect("TribalSenses")
+
+    # Kagaalu saw the camp in his visions; the rest of the swamp is unknown.
+    Game.currentScenario.addRevealedCell(wellAt.coordinates)
+    for near in Game.grid.ringAround(wellAt.coordinates, 1) {
+      Game.currentScenario.addRevealedCell(near.coordinates)
+    }
+    @remember(KEY_STAGE, "march")
+    @remember(KEY_FREED, 0)
+    @remember(KEY_QUIET_SOUTH, if @priorAssassinations() >= 2 "yes" else "no")
+    Game.refreshState()
+  }
+
+  summonAt(markerName, typeId, owner) {
+    spot = @marker(markerName)
+    if spot != null && spot.content == null {
+      return spot.summon(typeId, owner ?? Game.nature)
+    }
+    return null
+  }
+
+  playIntro {
+    @pauseTimer()
+    leader = @kagaaluUnit()
+    Game.positionCamera(leader.coordinates)
+    Game.zoomCamera(7)
+    Game.wait(0.5)
+    @kagaaluSays(if @playedCalamity() "mireIntro1Crossed" else "mireIntro1")
+    @ormuSays("mireIntro2")
+    @kagaaluSays("mireIntro3")
+    Game.positionCamera(@markerAt("well"))
+    Game.wait(0.5)
+    @kagaaluSays("mireIntro4")
+    @startObjective(OBJ_WELL, "mireWell", "sacrificialWell", null)
+    Game.positionCamera(leader.coordinates)
+    @ormuSays("mireIntro5")
+    @kagaaluSays("mireIntro6")
+    @ormuSays("mireIntro7")
+    @startObjective(OBJ_CAPTIVES, "mireCaptives", "thrall", @captivesDescription())
+    Game.showMessage(@t("mireHintSwamp"))
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ events
+
+  onMove(unit, from, to) {
+    if unit.owner.id == @human().id && @recall(KEY_STAGE) != "done" {
+      at = to.coordinates
+      @noticePlaces(at)
+      if !@fired("southBank") && at.2 >= @markerAt("fork").2 {
+        @southBankAmbush()
+      }
+      if !@fired("ridge") && at.2 >= @markerAt("ridge").2 - 1 {
+        @ridgeAmbush()
+      }
+      if unit.type.id == "kagaalu" {
+        @checkCamp(unit)
+      }
+    }
+  }
+
+  onSkillCast(caster, skillId) {
+    if skillId == "sacrificeOfBlood" && caster.type.id == "sacrificialWell" && caster.owner?.id == @human().id && @recall(KEY_STAGE) == "rite" {
+      @wakeTheWell(@kagaaluUnit(), false)
+    }
+  }
+
+  onDie(unit) {
+    if @recall(KEY_STAGE) == "done" {
+      return
+    }
+    typeId = unit.type.id
+    if unit.owner.id == @human().id {
+      if typeId == "kagaalu" {
+        @defeat(if @recall(KEY_STAGE) == "rite" "mireKagaaluSacrificed" else "mireKagaaluDied")
+      } else if typeId == "sacrificialWell" {
+        @defeat("mireWellBroken")
+      } else {
+        if typeId == "ormu" {
+          @queue("ormuFell")
+        }
+        if @recall(KEY_STAGE) in ["wake", "rite"] {
+          @queue("alone") # maybe the last of the band: then Kagaalu gives the Well his own blood
+        }
+      }
+    } else if typeId == "sacrificialWell" {
+      @defeat("mireWellBroken") # broken before it woke: the tribe has nothing to come to
+    } else if @inSet(KEY_STITCHER, unit.id) {
+      @queue("stitcherFell")
+    } else if @inSet(KEY_SHAPER, unit.id) {
+      @shaperFell()
+    } else if @inSet(KEY_GUARDS, unit.id) {
+      if @unitsIn(KEY_GUARDS).count(=> $0.id != unit.id) == 0 {
+        @freeCaptives()
+      } else {
+        @queue("guardFell")
+      }
+    } else if @inSet(KEY_ROOST, unit.id) {
+      if @unitsIn(KEY_ROOST).count(=> $0.id != unit.id) == 0 && @recall(KEY_STAGE) == "clear" {
+        @remember(KEY_STAGE, "wake")
+        @queue("roostCleared")
+      } else if @recall(KEY_STAGE) == "clear" {
+        @updateWellObjective()
+      }
+    }
+  }
+
+  onStateChange {
+    if Game.currentPlayerIndex == 0 && (@recall(KEY_PENDING) ?? "") != "" {
+      events = @recall(KEY_PENDING)
+      @remember(KEY_PENDING, "")
+      @pauseTimer()
+      for event in EVENTS.where(=> ("," + $0 + ",") in events) {
+        @announce(event)
+      }
+      @resumeTimer()
+    }
+  }
+
+  onTurnStart {
+    if @recall(KEY_STAGE) == "done" {
+      return
+    }
+    if !@fired("southBank") && Game.turn >= SOUTH_BANK_TURN {
+      @southBankAmbush()
+    }
+    @tendAmalgams()
+    @marchHunters()
+    @beastsBite()
+  }
+
+  checkVictory => null
+
+  announce(event) {
+    if event == "southBank" {
+      @southBankDialog()
+    } else if event == "southBankQuiet" {
+      @ormuOrKagaaluSays("mireSouthBankQuiet1")
+      @kagaaluSays("mireSouthBankQuiet2")
+    } else if event == "ormuFell" {
+      @kagaaluSays("mireOrmuFell")
+    } else if event == "stitcherFell" {
+      @kagaaluSays("mireStitcherFell")
+    } else if event == "shaperFell" {
+      @shaperFellDialog()
+    } else if event == "guardFell" {
+      @updateCaptives()
+    } else if event == "freed" {
+      @freedDialog()
+    } else if event == "pursuit" {
+      @ormuOrKagaaluSays("mirePursuit")
+    } else if event == "roostCleared" {
+      @roostCleared()
+    } else if event == "alone" {
+      leader = @kagaaluUnit()
+      if leader != null {
+        @answerKagaalu(leader)
+        @riteAlone(leader)
+      }
+    }
+  }
+
+  # ------------------------------------------------------------------ places along the way
+
+  noticePlaces(at) {
+    if !@fired("lair") && @distance(at, @markerAt("lair")) <= SIGHT_RANGE {
+      @fire("lair")
+      @meetTheStitcher()
+    }
+    if !@fired("corral") && @distance(at, @markerAt("corral")) <= SIGHT_RANGE {
+      @fire("corral")
+      @findTheCorral()
+    }
+    if !@fired("post") && @distance(at, @markerAt("slavePost")) <= SIGHT_RANGE {
+      @fire("post")
+      @findThePost()
+    }
+  }
+
+  meetTheStitcher {
+    found = @unitsIn(KEY_STITCHER)
+    if found.isEmpty {
+      return
+    }
+    stitcher = found.0
+    @pauseTimer()
+    Game.positionCamera(stitcher.coordinates)
+    @say("sarcomancer", @outcasts(), "mireSpeakerStitcher", "mireLair1")
+    @kagaaluSays("mireLair2")
+    @say("sarcomancer", @outcasts(), "mireSpeakerStitcher", "mireLair3")
+    @kagaaluSays("mireLair4")
+    @resumeTimer()
+  }
+
+  # The amalgams come apart without the Stitcher: their regeneration is -10, and his rites make it up while he lives
+  # (up to what they started with: their wounds stay).
+  tendAmalgams {
+    if @unitsIn(KEY_STITCHER).isEmpty {
+      return
+    }
+    cap = if @isHard() AMALGAM_HEALTH_HARD else AMALGAM_HEALTH_NORMAL
+    for amalgam in @unitsIn(KEY_AMALGAMS) {
+      gap = cap - amalgam.hp
+      if gap > 0 {
+        amalgam.restoreHealth(if gap < AMALGAM_DECAY gap else AMALGAM_DECAY)
+      }
+    }
+  }
+
+  findTheCorral {
+    @pauseTimer()
+    shaperAlive = !@unitsIn(KEY_SHAPER).isEmpty
+    Game.positionCamera(@markerAt("corral"))
+    @ormuOrKagaaluSays("mireCorral1")
+    @kagaaluSays("mireCorral2")
+    if shaperAlive {
+      @say("shaper", null, "mireSpeakerShaper", "mireCorral3")
+      @startObjective(OBJ_CORRAL, "mireCorral", "shaper", null)
+    }
+    @resumeTimer()
+  }
+
+  # The shaper is dead: his beasts know Rogash's favourite and follow Kagaalu.
+  shaperFell {
+    player = @human()
+    for beast in @unitsIn(KEY_CORRAL) {
+      beast.setOwner(player)
+    }
+    if @isActive(OBJ_CORRAL) {
+      @complete(OBJ_CORRAL)
+    }
+    Game.refreshState()
+    @queue("shaperFell")
+  }
+
+  shaperFellDialog {
+    beasts = @unitsIn(KEY_CORRAL).where(=> $0.owner.id == @human().id)
+    if !beasts.isEmpty {
+      Game.positionCamera(beasts.0.coordinates)
+    }
+    @kagaaluSays("mireShaperFell1")
+    if @ormuAlive() {
+      @ormuSays("mireShaperFell2")
+    }
+    if beasts.any(=> $0.type.id == "kavouros") {
+      Game.showMessage(@t("mireKavourosHint"))
+    }
+  }
+
+  findThePost {
+    @pauseTimer()
+    Game.positionCamera(@markerAt("slavePost"))
+    @say("thrall", @captiveHolder(), "mireSpeakerCaptive", "mirePost1")
+    @kagaaluSays("mirePost2")
+    @resumeTimer()
+  }
+
+  # The last guard of the slave post is dead: the captives join the band, and the post's hunters come back for them.
+  freeCaptives {
+    player = @human()
+    freed = 0
+    for captive in @unitsIn(KEY_CAPTIVES) {
+      captive.setOwner(player)
+      freed += 1
+    }
+    @remember(KEY_FREED, freed)
+    if @isActive(OBJ_CAPTIVES) {
+      if freed > 0 {
+        Game.currentScenario.updateObjective(OBJ_CAPTIVES, [description: @t("mireCaptivesFreedDescription").format([freed]), state: ObjectiveStates.completed])
+      } else {
+        @fail(OBJ_CAPTIVES)
+      }
+    }
+    @spawnHunters("pursuit", if @isHard() ["warrior", "warrior", "warrior", "raider"] else ["warrior", "warrior"])
+    Game.refreshState()
+    @queue("freed")
+    @queue("pursuit")
+  }
+
+  freedDialog {
+    if @num(KEY_FREED) == 0 {
+      return
+    }
+    Game.positionCamera(@markerAt("slavePost"))
+    @say("thrall", @human(), "mireSpeakerCaptive", "mireFreed1")
+    @kagaaluSays("mireFreed2")
+  }
+
+  updateCaptives {
+    if @isActive(OBJ_CAPTIVES) {
+      Game.currentScenario.updateObjective(OBJ_CAPTIVES, [description: @captivesDescription()])
+      Game.refreshState()
+    }
+  }
+
+  captivesDescription => @t("mireCaptivesDescription").format([@unitsIn(KEY_GUARDS).count(=> true)])
+
+  # ------------------------------------------------------------------ Pyracmon's ambushes
+
+  # The south-bank clans wade across the Dair behind the band, unless Landfall's assassins left them without warchiefs.
+  southBankAmbush {
+    @fire("southBank")
+    if @recall(KEY_QUIET_SOUTH) == "yes" {
+      @queue("southBankQuiet")
+    } else {
+      @spawnHunters("southBank", if @isHard() ["warrior", "warrior", "warrior"] else ["warrior", "warrior"])
+      Game.refreshState()
+      @queue("southBank")
+    }
+  }
+
+  southBankDialog {
+    hunters = @unitsIn(KEY_HUNTERS)
+    if !hunters.isEmpty {
+      Game.positionCamera(hunters.0.coordinates)
+    }
+    @ormuOrKagaaluSays("mireSouthBank1")
+    @kagaaluSays("mireSouthBank2")
+  }
+
+  ridgeAmbush {
+    @fire("ridge")
+    @pauseTimer()
+    @spawnHunters("ridgeAmbush", if @isHard() ["warrior", "warrior", "warrior", "raider", "shadespear"] else ["warrior", "warrior", "raider"])
+    Game.refreshState()
+    Game.positionCamera(@markerAt("ridge"))
+    @ormuOrKagaaluSays("mireRidge1")
+    @kagaaluSays("mireRidge2")
+    @resumeTimer()
+  }
+
+  # Pyracmon's men come out of the reeds near the marker(s) and hunt the band from then on.
+  spawnHunters(markerName, typeIds) {
+    pyracmon = @tribesPlayer()
+    spots = @markers(markerName)
+    index = 0
+    for typeId in typeIds {
+      origin = spots.(index % spots.size).coordinates
+      spot = @freeCellNear(origin, true)
+      if spot != null {
+        @addToSet(KEY_HUNTERS, spot.summon(typeId, pyracmon).id)
+      }
+      index += 1
+    }
+  }
+
+  # Hunters march by the script, not by sight: towards the nearest of the band (on hard, Kagaalu when he's close), as
+  # far as a walker of the band would go in a turn and a bit more: they know the bog. Next to one of the band they stop,
+  # and the tribes' own turn does the fighting.
+  marchHunters {
+    budget = if @isHard() 10 else 8
+    for hunter in @unitsIn(KEY_HUNTERS) {
+      at = hunter.coordinates
+      if @nearestBandUnit(at, 1) == null {
+        prey = @nearestBandUnit(at, 99)
+        leader = @kagaaluUnit()
+        if @isHard() && leader != null && @distance(at, leader.coordinates) <= HUNT_KAGAALU_RANGE {
+          prey = leader
+        }
+        if prey != null {
+          @stalk(hunter, prey.coordinates, budget)
+        }
+      }
+    }
+  }
+
+  # The swamp is dangerous: beasts attack whoever of the band lingers next to them (each beast only some of the time,
+  # so a band slogging past isn't ground down by every hummock). The shaper's beasts are among them until he dies:
+  # they guard his pen and don't leave it.
+  beastsBite {
+    playerId = @human().id
+    for creep in Game.nature.ownedUnits.where(=> $0.coordinates != null && ($0.type.a ?? 0) > 0) {
+      aggression = @biteChance(@inSet(KEY_CORRAL, creep.id))
+      creepAt = creep.coordinates
+      here = Game.grid.elementAt(creepAt)
+      inReach = Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null && here.distance($0.coordinates) <= 1)
+      if !inReach.isEmpty && Math.randomFloat() < aggression {
+        prey = inReach.randomItem
+        if creep.ap <= 0 {
+          creep.setActions(1)
+        }
+        Server.attack(creepAt, prey.coordinates, creepAt, 0)
+      }
+    }
+  }
+
+  biteChance(corralBeast) {
+    if corralBeast {
+      return if @isHard() CORRAL_AGGRESSION_HARD else CORRAL_AGGRESSION_NORMAL
+    }
+    return if @isHard() BEAST_AGGRESSION_HARD else BEAST_AGGRESSION_NORMAL
+  }
+
+  # ------------------------------------------------------------------ the camp and the Well
+
+  checkCamp(leader) {
+    stage = @recall(KEY_STAGE)
+    if stage == "march" && @distance(leader.coordinates, @markerAt("well")) <= CAMP_RANGE {
+      @reachTheCamp(leader)
+    } else if stage == "wake" {
+      @answerKagaalu(leader)
+    } else if stage == "rite" {
+      @riteAlone(leader)
+    }
+  }
+
+  # Kagaalu beside the cleared Well: it answers him and is the band's, and wants one of them.
+  answerKagaalu(leader) {
+    well = @wellUnit()
+    if well == null || leader.coordinates == null || @distance(leader.coordinates, well.coordinates) > 1 || @recall(KEY_STAGE) != "wake" {
+      return
+    }
+    @remember(KEY_STAGE, "rite")
+    @pauseTimer()
+    well.setOwner(@human())
+    well.setActions(1)
+    Game.refreshState()
+    Game.positionCamera(well.coordinates)
+    Game.animateVisualFx([[type: "boost", coordinates: well.coordinates, color: "#FF0000"]])
+    @kagaaluSays("mireRite1")
+    @updateWellObjective()
+    Game.showMessage(@t("mireHintRite"))
+    @riteAlone(leader)
+    @resumeTimer()
+  }
+
+  reachTheCamp(leader) {
+    @pauseTimer()
+    Game.positionCamera(@markerAt("well"))
+    for near in Game.grid.cells.where(=> $0.distance(@markerAt("well")) <= ROOST_RADIUS) {
+      Game.currentScenario.addRevealedCell(near.coordinates)
+    }
+    Game.refreshState()
+    if @unitsIn(KEY_ROOST).isEmpty {
+      @remember(KEY_STAGE, "wake")
+      @kagaaluSays("mireCampEmpty")
+      @roostCleared()
+    } else {
+      @remember(KEY_STAGE, "clear")
+      @kagaaluSays("mireCamp1")
+      if @ormuAlive() {
+        @ormuSays("mireCamp2")
+      }
+      @updateWellObjective()
+    }
+    @resumeTimer()
+  }
+
+  roostCleared {
+    @updateWellObjective()
+    @kagaaluSays("mireRoostCleared")
+    leader = @kagaaluUnit()
+    if leader != null {
+      @answerKagaalu(leader)
+    }
+  }
+
+  updateWellObjective {
+    stage = @recall(KEY_STAGE)
+    text = @t("mireWellDescription")
+    if stage == "clear" {
+      text = @t("mireWellClearDescription").format([@unitsIn(KEY_ROOST).count(=> true)])
+    } else if stage == "wake" {
+      text = @t("mireWellWakeDescription")
+    } else if stage == "rite" {
+      text = @t("mireWellRiteDescription")
+    }
+    if @isActive(OBJ_WELL) {
+      Game.currentScenario.updateObjective(OBJ_WELL, [description: text])
+      Game.refreshState()
+    }
+  }
+
+  # If nobody of the band is left to give, Kagaalu gives his own blood.
+  riteAlone(leader) {
+    well = @wellUnit()
+    if well == null || leader.coordinates == null || @distance(leader.coordinates, well.coordinates) > 1 || @recall(KEY_STAGE) != "rite" {
+      return
+    }
+    if @human().ownedUnits.count(=> $0.id != leader.id && $0.coordinates != null && !$0.isBuilding && "organic" in $0.type.tags) == 0 {
+      @wakeTheWell(leader, true)
+    }
+  }
+
+  wakeTheWell(leader, alone) {
+    if @recall(KEY_STAGE) == "done" {
+      return
+    }
+    @remember(KEY_STAGE, "done")
+    @pauseTimer()
+    player = @human()
+    well = @wellUnit()
+    Game.positionCamera(well?.coordinates ?? leader.coordinates)
+    if alone {
+      @kagaaluSays("mireWakeAlone")
+      Game.animateVisualFx([[type: "blood", coordinates: leader.coordinates]])
+      leader.setHealth(Math.max(1, leader.hp - leader.hp // 2))
+    }
+    @kagaaluSays("mireWake1")
+    if well != null {
+      Game.animateVisualFx([[type: "bonefire", coordinates: well.coordinates], [type: "boost", coordinates: well.coordinates, color: "#FF0000"]])
+    }
+    for building in Game.grid.allUnits.where(=> $0.coordinates != null && $0.type.id in CAMP_TYPES && $0.owner.id != player.id \
+      && @distance($0.coordinates, @markerAt("well")) <= 5) {
+      building.setOwner(player)
+    }
+    Game.refreshState()
+    Game.wait(0.5)
+    @complete(OBJ_WELL)
+    if @isActive(OBJ_CORRAL) {
+      @fail(OBJ_CORRAL)
+    }
+    if @isActive(OBJ_CAPTIVES) {
+      @fail(OBJ_CAPTIVES)
+    }
+    @kagaaluSays("mireWake2")
+    if @ormuAlive() {
+      @ormuSays("mireWake3")
+    }
+    @kagaaluSays("mireWake4")
+    @saveProgress(leader)
+    Server.win(player)
+  }
+
+  # What later missions can build on.
+  saveProgress(leader) {
+    campaign = Game.campaign
+    if campaign != null {
+      progress = campaign.progressFor("ThroughTheMire")
+      if progress != null {
+        bandSize = @human().ownedUnits.count(=> !$0.isBuilding && $0.coordinates != null)
+        progress.addOrUpdateExtra("kagaaluLevel", "kagaaluLevel", "", leader.level)
+        progress.addOrUpdateExtra("bandSize", "bandSize", "", bandSize)
+        progress.addOrUpdateExtra("captivesFreed", "captivesFreed", "", @num(KEY_FREED))
+      }
+      campaign.unlock("IndustrialDevastation") # chapter 4
+      campaign.save()
+    }
+  }
+
+  defeat(lineKey) {
+    @remember(KEY_STAGE, "done")
+    for objectiveId in [OBJ_WELL, OBJ_CORRAL, OBJ_CAPTIVES].where(=> @isActive($0)) {
+      @fail(objectiveId)
+    }
+    Game.showMessageToAll(@t(lineKey))
+    Game.lose(@human())
+    Game.refreshState()
+  }
+
+  # ------------------------------------------------------------------ carry-over
+
+  # (progress values may come back from the campaign file as strings or other number types: round them to integers)
+  priorKagaaluLevel => Math.round(Game.campaign?.progressFor("CalamityOnTheHorizon")?.getExtraValue("kagaaluLevel") ?? 1)
+
+  # Calamity on the Horizon's survivors (everyone who made it across, Kagaalu and Ormu included) come as warriors.
+  startingWarriors {
+    survivors = Math.round(Game.campaign?.progressFor("CalamityOnTheHorizon")?.getExtraValue("survivors") ?? DEFAULT_SURVIVORS)
+    if survivors > MAX_WARRIORS {
+      return MAX_WARRIORS
+    }
+    if survivors < 1 {
+      return 1
+    }
+    return survivors
+  }
+
+  priorAssassinations => Math.round(Game.campaign?.progressFor("Landfall")?.getExtraValue("warchiefsAssassinated") ?? 0)
+
+  # Whether the human won Calamity on the Horizon in this campaign.
+  playedCalamity => Game.campaign?.progressFor("CalamityOnTheHorizon")?.getExtraValue("survivors") != null
+
+  # ------------------------------------------------------------------ helpers
+
+  t(key) => Game.localizedStr(key)
+  # Cutscenes stop the turn timer; it starts again with the human's next action.
+  pauseTimer => Server.setTimeoutEnabled(false)
+  resumeTimer => Server.setTimeoutEnabledOnUserAction(true)
+  human => Game.players.0
+  tribesPlayer => Game.players.1
+  outcasts => Game.players.2
+  captiveHolder => Game.players.3
+  isHard => Game.currentScenario.difficulty == "hard"
+
+  say(portrait, owner, titleKey, lineKey) {
+    Game.showDialog(portrait, owner?.id, @t(titleKey), @t(lineKey))
+  }
+  ormuSays(lineKey) => @say("ormu", @human(), "ormuTitle", lineKey)
+  kagaaluSays(lineKey) => @say("kagaalu", @human(), "kagaaluTitle", lineKey)
+  # Ormu's lines, said by Kagaalu if Ormu has fallen
+  ormuOrKagaaluSays(lineKey) {
+    if @ormuAlive() {
+      @ormuSays(lineKey)
+    } else {
+      @kagaaluSays(lineKey)
+    }
+  }
+
+  startObjective(objectiveId, keyBase, image, descriptionText) {
+    objective = [
+      id: objectiveId,
+      title: @t(keyBase + "Title"),
+      description: descriptionText ?? @t(keyBase + "Description"),
+      image: image,
+      state: ObjectiveStates.active
+    ]
+    Game.currentScenario.addObjective(objective)
+    Game.refreshState()
+  }
+  complete(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.completed])
+    Game.refreshState()
+  }
+  fail(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.failed])
+    Game.refreshState()
+  }
+  isActive(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.active
+
+  remember(key, value) {
+    Game.currentScenario.addOrUpdateExtra(key, key, "", value)
+  }
+  recall(key) => Game.currentScenario.getExtraValue(key)
+  # numbers come back from a saved game as strings
+  num(key) => Math.round(@recall(key) ?? 0)
+  queue(event) {
+    pending = @recall(KEY_PENDING) ?? ""
+    if !(("," + event + ",") in pending) {
+      @remember(KEY_PENDING, (if pending == "" "," else pending) + event + ",")
+    }
+  }
+  fire(name) {
+    @remember(KEY_FIRED, (@recall(KEY_FIRED) ?? ",") + name + ",")
+  }
+  fired(name) => ("," + name + ",") in (@recall(KEY_FIRED) ?? "")
+  addToSet(key, unitId) {
+    @remember(key, (@recall(key) ?? ",") + unitId + ",")
+  }
+  inSet(key, unitId) => ("," + unitId + ",") in (@recall(key) ?? "")
+  unitsIn(key) {
+    members = @recall(key) ?? ""
+    return Game.grid.allUnits.where(=> $0.coordinates != null && ("," + $0.id + ",") in members)
+  }
+
+  marker(comment) => Game.grid.cells.first(=> $0.comment == comment)
+  markers(comment) => Game.grid.cells.where(=> $0.comment == comment)
+  markerAt(comment) => @marker(comment).coordinates
+  distance(a, b) => Game.grid.elementAt(a).distance(b)
+
+  kagaaluUnit => @human().ownedUnits.first(=> $0.type.id == "kagaalu" && $0.coordinates != null)
+  ormuAlive => @human().ownedUnits.any(=> $0.type.id == "ormu" && $0.coordinates != null)
+  wellUnit => Game.grid.allUnits.first(=> $0.type.id == "sacrificialWell" && $0.coordinates != null)
+
+  # A free cell near center, out of the deep water (and, unless allowed, out of the river too).
+  freeCellNear(center, allowRiver) {
+    for radius in 1...3 {
+      for candidate in Game.grid.ringAround(center, radius) {
+        if candidate.content == null && !(candidate.terrain in DEEP_WATER) && (allowRiver || candidate.terrain != "river") {
+          return candidate
+        }
+      }
+    }
+    return null
+  }
+
+  nearestBandUnit(origin, maxRange) {
+    if origin == null {
+      return null
+    }
+    playerId = @human().id
+    here = Game.grid.elementAt(origin)
+    best = null
+    bestDistance = maxRange + 1
+    for candidate in Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null && !$0.isBuilding) {
+      candidateDistance = here.distance(candidate.coordinates)
+      if candidateDistance < bestDistance {
+        best = candidate
+        bestDistance = candidateDistance
+      }
+    }
+    return best
+  }
+
+  # What a step onto this cell costs a walker.
+  stepCost(cell) {
+    terrainId = cell.terrain
+    if terrainId in DEEP_WATER {
+      return 1000
+    }
+    if terrainId in ["grass", "beach", "road"] {
+      return 2
+    }
+    if terrainId in ["forest", "river"] {
+      return 3
+    }
+    return 4
+  }
+
+  # Cell by cell towards goal, each step closer to it, while the budget lasts.
+  stalk(walker, goal, budget) {
+    origin = walker.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    at = Game.grid.elementAt(origin)
+    left = budget
+    for i in 0..6 {
+      nextCell = null
+      nextDistance = at.distance(goal)
+      nextCost = 1000
+      for land in Game.grid.ringAround(at.coordinates, 1) {
+        landDistance = land.distance(goal)
+        landCost = @stepCost(land)
+        if land.content == null && landCost <= left && (landDistance < nextDistance || (landDistance == nextDistance && nextCell != null && landCost < nextCost)) {
+          nextCell = land
+          nextDistance = landDistance
+          nextCost = landCost
+        }
+      }
+      if nextCell == null {
+        break
+      }
+      at = nextCell
+      left -= nextCost
+    }
+    if at.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, at.coordinates, 0)
+    return true
+  }
+}

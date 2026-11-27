@@ -1,0 +1,67 @@
+# Mission 8: Air Superiority
+airSuperiorityTitle: Air Superiority
+airSuperiorityDescription: Bloodbats roost on the jungle plateaus upriver, where no road climbs. The Viceroy sends Skyfleet.
+airSuperiorityLoadingText: "Only fliers reach the plateaus. Cargo dirigibles can set riflemen down on top: shots from the jungle below barely scratch a nest."
+
+# The new terrain (a core terrain: this key belongs with the other terrain titles in test.yaml)
+plateauTitle: Plateau
+
+# Skills and effects
+airOutOfReachTitle: Out of reach
+airTreetopTerrorTitle: Treetop Terror
+airTradeWindsTitle: Trade winds
+
+# Speakers
+airSpeakerCaptain: Captain Denburhin
+airSpeakerViceroy: The Viceroy
+airSpeakerLookout: Lookout
+
+# Objectives
+airNestsTitle: Burn the roosts
+airNestsDescription: "Destroy the bloodbat nests on the plateaus before the new moon. Denburhin must survive. Nests left: {0}. Days until the new moon: {1}."
+airAlooqTitle: The Treetop Terror
+airAlooqDescription: (Optional) Kill Alooq before the last nest burns.
+
+# Opening
+airIntro1: Captain Denburhin. Something in the jungle upriver has taken three of my supply dirigibles this month.
+airIntro2: Bloodbats, Excellency. As big as oxen. They roost on the plateaus above the river.
+airIntro3: Then burn the roosts. No road climbs those cliffs, so the army is no use to me. Skyfleet is.
+airIntro4: The natives say the brood takes wing at the new moon.
+airIntro5: "Then you have until the new moon. {0} days, Captain. I will not be chased out of my own colony by bats."
+airIntroBragi: Bragi's settlers sent gold upriver for you. They remember who got them out.
+airIntro6: Something bigger roosts with them. The crews call it Alooq, the Treetop Terror.
+
+# Hints
+airDropHint: "Riflemen can't climb the cliffs. Select a Cargo Dirigible next to a Rifleman and use <b>Load</b>. Fly it next to a plateau, then use <b>Unload</b> on an empty plateau cell."
+airAirshipHint: "Only fliers, and troops standing on a plateau, can harm a nest. Skyfleet sends another Assault Airship every few days."
+
+# During the fight
+airOutOfReach: We're firing straight up a cliff, sir. We barely scratch it from down here.
+airHatched: Fresh bats hatch at the nests.
+airReinforcements: Skyfleet sends another Assault Airship to the airfield.
+airNestFell: "That roost is burning. {0} to go."
+airNestFellLast: One roost left.
+airWarning: "{0} days to the new moon."
+airLastDay: The new moon rises tomorrow night. This is our last chance.
+airBailOut: The riflemen aboard the downed dirigible jump clear.
+
+# Alooq
+airAlooqFirst1: Captain! Something came up out of the trees, right under us!
+airAlooqFirst2: Alooq. Keep the airships together, and keep your eyes on the canopy.
+airAlooqHint: Alooq hides in the jungle and shows himself only to strike, or to feed at his nests when he's hurt.
+airAlooqStrikes: Alooq strikes from the canopy!
+airAlooqFlees: He's hurt, and he's going to feed. Follow him, or burn his nest out from under him.
+airAlooqFeeds: Alooq flees to a nest to feed.
+airAlooqKilled: Alooq is down. The Treetop Terror won't take another airship.
+
+# Ending
+airVictory1: The last roost is burning.
+airVictory2: Well done, Captain. Skyfleet has earned its keep.
+airVictory3: Alooq got away. He'll be back, and we'll be waiting.
+airVictory3Alooq: And the crews can sleep without looking at the trees.
+airVictory4: Captain, smoke across the river. Hundreds of campfires.
+airVictory5: The sarcomancer's tribes. They're gathering on the far bank of the Dair.
+
+# Defeat
+airNewMoon: The new moon rises. The brood takes wing, and the sky over the Dair goes dark.
+airFlagshipDown: Denburhin's flagship is down. Skyfleet turns for home.

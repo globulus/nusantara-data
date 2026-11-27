@@ -1,0 +1,805 @@
+# On the Banks of Dair, mission 8: Air Superiority. Skyfleet's side of the story: Captain Denburhin and his airships
+# burn the bloodbat nests on the jungle plateaus upriver before the new moon, when the brood takes wing.
+#
+# The nests stand on plateaus that only fliers can reach (terrain `plateau`). Riflemen get up there by cargo
+# dirigible; from the jungle below their shots only chip the rock (the nests' airOutOfReach skill).
+# Every few turns each nest hatches a blood bat (up to a cap); the bats guard their nest, and those whose nest burned
+# hunt on their own. Alooq, the Treetop Terror, lurks in canopy cells the player can't see, swoops on the airships,
+# and flees to a nest to feed when he's hurt (his perch is revealed while he feeds). Optional: kill him before the
+# last nest burns. Lost when the new moon rises (the turn limit) or when Denburhin falls.
+#
+# Players: 0 the human (Skyfleet), 1 the brood (nests and bats, TerritorialAi), 2 Alooq (PassiveAi; the script
+# flies him). Map markers (cell comments): skyfleet (reinforcements come in there), lair (Alooq's first hiding place).
+# Everything that must survive a save is kept in objectives or in scenario extras (strings and numbers only).
+# Dialogs only reach the human on their own turn, so anything that happens off-turn is queued (see onStateChange).
+scenario AirSuperiority {
+  TURN_LIMIT_NORMAL = 20
+  TURN_LIMIT_HARD = 20 # the same moon as normal; hard is harder through faster hatching and a stronger Alooq
+  ALOOQ_LEVEL_NORMAL = 2
+  ALOOQ_LEVEL_HARD = 3
+  WARN_DAYS_LEFT = 5
+  DENBURHIN_LEVEL = 2 # a veteran captain; his first mission in the campaign
+  BRAGI_GOLD_PER_SETTLER = 3
+  BRAGI_MAX_SETTLERS = 5
+  BAT_GUARD_RANGE = 4 # bats go for the human's units this close to their nest
+  BAT_LEASH = 2 # otherwise they circle their nest within this range
+  BAT_STEPS = 2
+  STRAY_CHASE_RANGE = 6 # bats whose nest burned hunt this far, or join the nearest nest
+  ALOOQ_FLEE_AT = 0.45 # of his health: below this he flies off to feed
+  ALOOQ_FED_AT = 0.9
+  ALOOQ_FEED_NORMAL = 15 # health he restores each turn at a nest
+  ALOOQ_FEED_HARD = 20
+  ALOOQ_FIRST_STRIKE = 3 # the turn he may strike first
+  ALOOQ_FLY_STEPS = 4
+  ALOOQ_LURK_STEPS = 3
+  ALOOQ_HIDE_DISTANCE = 2 # he lurks no closer than this to the human's units
+  CANOPY = ["jungle", "forest"]
+  PLATEAU = "plateau"
+  OPEN_WATER = ["sea", "ocean"]
+  SKYFLEET_TYPES = ["colonialHall", "airfield", "barracks", "denburhin", "assaultAirship", "cargoDirigible", "rifleman"]
+  FLIER_TYPES = ["assaultAirship", "cargoDirigible", "denburhin"]
+  AIRSHIP_TYPES = ["assaultAirship", "cargoDirigible"]
+
+  OBJ_NESTS = "nests"
+  OBJ_ALOOQ = "alooq"
+
+  # Scenario extras
+  KEY_LIMIT = "turnLimit"
+  KEY_NESTS = "nests" # ",id,id," of the nests (burned ones drop out of unitsIn)
+  KEY_BATS = "bats" # every bat the nests hatched; "batNest:<bat id>" is its nest
+  KEY_NEXT_HATCH = "nextHatch"
+  KEY_ALOOQ = "alooqId"
+  KEY_ALOOQ_MODE = "alooqMode" # lurk or feed
+  KEY_ALOOQ_REST = "alooqRest" # the turn he may strike again
+  KEY_ROOST = "roost" # "roost:0".."roost:2": the cell revealed while he feeds
+  KEY_REINFORCEMENTS = "reinforcements"
+  KEY_NEXT_REINFORCEMENT = "nextReinforcement"
+  KEY_FLAGS = "flags" # one-off lines already said, as ",flag,flag,"
+  KEY_OVER = "over"
+  KEY_PENDING = "pending" # events waiting for the human's turn, as ",event,event,"
+  # Queued events, in the order they're told to the human.
+  EVENTS = ["reinforcements", "hatched", "alooqStrike", "alooqFlees", "outOfReach", "nestFell", "alooqKilled", "warning",
+    "lastDay", "victory"]
+
+  # ------------------------------------------------------------------ setup
+
+  onStart {
+    if Game.currentScenario.objectives.isEmpty { # a loaded game is already set up
+      @setUpMap()
+      @playIntro()
+    }
+  }
+
+  setUpMap {
+    player = @human()
+    brood = @broodPlayer()
+    natureId = Game.nature.id
+    airfield = Game.grid.elementAt(Game.grid.startingLocations.0)
+    for unit in Game.grid.allUnits.where(=> $0.owner.id == natureId && $0.coordinates != null) {
+      typeId = unit.type.id
+      if typeId in SKYFLEET_TYPES && airfield.distance(unit.coordinates) <= 4 {
+        unit.setOwner(player)
+      } else if typeId == "bloodbatNest" {
+        unit.setOwner(brood)
+      }
+    }
+    flagship = @unitOf(player, "denburhin")
+    if flagship != null {
+      player.setHero(flagship)
+      flagship.levelUpTo(DENBURHIN_LEVEL)
+    }
+    player.addEffect("AirTradeWinds")
+    @remember(KEY_LIMIT, if @isHard() TURN_LIMIT_HARD else TURN_LIMIT_NORMAL)
+
+    for nest in @broodUnits("bloodbatNest") {
+      @addToSet(KEY_NESTS, nest.id)
+      @hatch(nest) # one bat each to start with
+    }
+    @remember(KEY_NEXT_HATCH, 1 + @hatchEvery())
+    # The plateaus tower over the canopy: everyone can see them, and whatever sits on top.
+    for cell in Game.grid.cells.where(=> $0.terrain == PLATEAU) {
+      Game.currentScenario.addRevealedCell(cell.coordinates)
+    }
+
+    terror = @marker("lair").summon("alooq", @alooqPlayer())
+    terror.levelUpTo(if @isHard() ALOOQ_LEVEL_HARD else ALOOQ_LEVEL_NORMAL)
+    @remember(KEY_ALOOQ, terror.id)
+    @remember(KEY_ALOOQ_MODE, "lurk")
+    @remember(KEY_ALOOQ_REST, ALOOQ_FIRST_STRIKE)
+
+    @remember(KEY_REINFORCEMENTS, 0)
+    @remember(KEY_NEXT_REINFORCEMENT, 1 + @reinforceEvery())
+    bonus = @bragiSettlers() * BRAGI_GOLD_PER_SETTLER
+    if bonus > 0 {
+      player.addResources([g: bonus])
+    }
+    Game.refreshState()
+  }
+
+  playIntro {
+    @pauseTimer()
+    Game.positionCamera(Game.grid.startingLocations.0)
+    Game.zoomCamera(8)
+    Game.wait(0.5)
+    @viceroySays("airIntro1")
+    @captainSays("airIntro2")
+    @viceroySays("airIntro3")
+    @captainSays("airIntro4")
+    Game.showDialog("vitarron", @human().id, @t("airSpeakerViceroy"), @t("airIntro5").format([@turnLimit()]))
+    if @bragiSettlers() > 0 {
+      @viceroySays("airIntroBragi")
+    }
+    Game.positionCamera(Game.grid.startingLocations.1)
+    @captainSays("airIntro6")
+    @startObjective(OBJ_NESTS, "airNests", "bloodbatNest", @nestsDescription())
+    @startObjective(OBJ_ALOOQ, "airAlooq", "alooq", null)
+    Game.positionCamera(Game.grid.startingLocations.0)
+    @say("cargoDirigible", @human(), "cargoDirigibleTitle", "airDropHint")
+    @say("assaultAirship", @human(), "assaultAirshipTitle", "airAirshipHint")
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ events
+
+  # Nobody climbs the cliffs: the movement types already price plateaus out of every walker's range, and this sends
+  # back anyone who still ends a move on one (the server takes a move's cost on trust). Riflemen get up there only
+  # by dirigible, which unloads them without a move.
+  onMove(unit, from, to) {
+    if to != null && from != null && to.terrain == PLATEAU && unit.movementType != "fly" {
+      Server.move(to.coordinates, from.coordinates, 0)
+      Game.refreshState()
+    }
+  }
+
+  onAttack(attacker, defender) {
+    # Shots from the jungle at a nest: say once why they barely scratch it.
+    if attacker != null && defender != null && defender.type.id == "bloodbatNest" && attacker.owner?.id == @human().id \
+        && attacker.movementType != "fly" && attacker.coordinates != null \
+        && Game.grid.elementAt(attacker.coordinates).terrain != PLATEAU && !@flagged("outOfReach") {
+      @queue("outOfReach")
+    }
+  }
+
+  onDie(unit) {
+    if @recall(KEY_OVER) == "yes" {
+      return
+    }
+    typeId = unit.type.id
+    if unit.owner.id == @human().id {
+      if typeId == "denburhin" {
+        @defeat("airFlagshipDown")
+      } else if typeId == "cargoDirigible" {
+        @bailOut(unit)
+      }
+    } else if @inSet(KEY_NESTS, unit.id) {
+      @queue("nestFell")
+      if @unitsIn(KEY_NESTS).isEmpty {
+        @queue("victory")
+      }
+    } else if unit.id == @recall(KEY_ALOOQ) {
+      @hideRoost()
+      @queue("alooqKilled")
+    }
+  }
+
+  onStateChange {
+    @trackDirigibles()
+    if Game.currentPlayerIndex == 0 && (@recall(KEY_PENDING) ?? "") != "" {
+      events = @recall(KEY_PENDING)
+      @remember(KEY_PENDING, "")
+      @pauseTimer()
+      for event in EVENTS.where(=> ("," + $0 + ",") in events) {
+        @announce(event)
+      }
+      @resumeTimer()
+    }
+  }
+
+  onTurnStart {
+    if @recall(KEY_OVER) == "yes" {
+      return
+    }
+    if Game.turn > @turnLimit() && !@unitsIn(KEY_NESTS).isEmpty {
+      @defeat("airNewMoon")
+      return
+    }
+    @reinforce()
+    @hatchBats()
+    @moveBats()
+    @alooqActs()
+    @updateNests()
+    left = @daysLeft()
+    if left == WARN_DAYS_LEFT {
+      @queue("warning")
+    } else if left == 1 {
+      @queue("lastDay")
+    }
+  }
+
+  checkVictory => null
+
+  announce(event) {
+    if event == "victory" {
+      @victory()
+    } else if event == "nestFell" {
+      @nestFell()
+    } else if event == "alooqKilled" {
+      @alooqKilled()
+    } else if event == "alooqStrike" {
+      @alooqStruck()
+    } else if event == "alooqFlees" {
+      @alooqFled()
+    } else if event == "outOfReach" {
+      @flag("outOfReach")
+      @say("rifleman", @human(), "riflemanTitle", "airOutOfReach")
+    } else if event == "hatched" {
+      Game.showMessage(@t("airHatched"))
+    } else if event == "reinforcements" {
+      Game.showMessage(@t("airReinforcements"))
+    } else if event == "warning" {
+      Game.showDialog("denburhin", @human().id, @t("airSpeakerCaptain"), @t("airWarning").format([WARN_DAYS_LEFT]))
+    } else if event == "lastDay" {
+      @captainSays("airLastDay")
+    }
+  }
+
+  # ------------------------------------------------------------------ the nests
+
+  nestFell {
+    if !@isActive(OBJ_NESTS) {
+      return
+    }
+    @updateNests()
+    left = @unitsIn(KEY_NESTS).count(=> true)
+    if left > 0 {
+      line = @t(if left == 1 "airNestFellLast" else "airNestFell").format([left])
+      Game.showDialog("denburhin", @human().id, @t("airSpeakerCaptain"), line)
+    }
+  }
+
+  updateNests {
+    if @isActive(OBJ_NESTS) {
+      Game.currentScenario.updateObjective(OBJ_NESTS, [description: @nestsDescription()])
+      Game.refreshState()
+    }
+  }
+
+  nestsDescription => @t("airNestsDescription").format([@unitsIn(KEY_NESTS).count(=> true), @daysLeft()])
+
+  # Every few turns each nest hatches a bat, unless it already has its fill of them.
+  hatchBats {
+    if Game.turn < (@recall(KEY_NEXT_HATCH) ?? 99) {
+      return
+    }
+    @remember(KEY_NEXT_HATCH, Game.turn + @hatchEvery())
+    hatched = false
+    for nest in @unitsIn(KEY_NESTS) {
+      if @batsOf(nest.id).count(=> true) < @maxBats() && @hatch(nest) != null {
+        hatched = true
+      }
+    }
+    if hatched {
+      Game.refreshState()
+      @queue("hatched")
+    }
+  }
+
+  # A new bat next to the nest: off the plateau if there's room, so the dirigibles keep somewhere to land.
+  hatch(nest) {
+    spots = Game.grid.ringAround(nest.coordinates, 1).where(=> $0.content == null && !($0.terrain in OPEN_WATER))
+    if spots.isEmpty {
+      return null
+    }
+    spot = spots.first(=> $0.terrain != PLATEAU) ?? spots.first(=> true)
+    bat = spot.summon("bloodBat", @broodPlayer())
+    @addToSet(KEY_BATS, bat.id)
+    @remember("batNest:" + bat.id, nest.id)
+    return bat
+  }
+
+  batsOf(nestId) => @unitsIn(KEY_BATS).where(=> @recall("batNest:" + $0.id) == nestId)
+
+  # Bats fly by the script, not by sight: towards the human's units that come near their nest, otherwise back to it.
+  # Next to a human's unit they stay put; the brood's own turn does the fighting. A bat whose nest burned hunts
+  # whatever is near, or joins the nearest nest still standing.
+  moveBats {
+    for bat in @unitsIn(KEY_BATS) {
+      at = bat.coordinates
+      if @nearestPlayerUnit(at, 1, false) == null {
+        nest = @unitInSet(KEY_NESTS, @recall("batNest:" + bat.id))
+        if nest != null {
+          intruder = @nearestPlayerUnit(nest.coordinates, BAT_GUARD_RANGE, false)
+          if intruder != null {
+            @fly(bat, intruder.coordinates, BAT_STEPS, 1)
+          } else if @distance(at, nest.coordinates) > BAT_LEASH {
+            @fly(bat, nest.coordinates, BAT_STEPS, 1)
+          }
+        } else {
+          prey = @nearestPlayerUnit(at, STRAY_CHASE_RANGE, false)
+          if prey != null {
+            @fly(bat, prey.coordinates, BAT_STEPS, 1)
+          } else {
+            refuge = @nearestNest(at)
+            if refuge != null {
+              @remember("batNest:" + bat.id, refuge.id)
+              @fly(bat, refuge.coordinates, BAT_STEPS, 1)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  nearestNest(origin) {
+    here = Game.grid.elementAt(origin)
+    nests = @unitsIn(KEY_NESTS)
+    if nests.isEmpty {
+      return null
+    }
+    return nests.minBy(=> here.distance($0.coordinates))
+  }
+
+  # ------------------------------------------------------------------ Alooq
+
+  # Runs at the start of every round. He feeds at a nest while he's hurt (and can be seen there), otherwise he
+  # swoops on the nearest airship in reach when he's rested, and in between he lurks in the canopy out of sight.
+  alooqActs {
+    terror = @alooqUnit()
+    if terror == null {
+      return
+    }
+    @hideRoost()
+    health = terror.health
+    if @recall(KEY_ALOOQ_MODE) == "feed" {
+      if @nestNear(terror.coordinates) != null {
+        terror.restoreHealth(if @isHard() ALOOQ_FEED_HARD else ALOOQ_FEED_NORMAL)
+        Game.animateVisualFx([[type: "blood", coordinates: terror.coordinates]])
+        if terror.hp >= health * ALOOQ_FED_AT {
+          @remember(KEY_ALOOQ_MODE, "lurk")
+          @lurk(terror, ALOOQ_FLY_STEPS)
+        } else {
+          @showRoost(terror)
+        }
+        return
+      }
+      if @goFeed(terror) {
+        return
+      }
+      @remember(KEY_ALOOQ_MODE, "lurk") # no nest left to feed at
+    } else if terror.hp < health * ALOOQ_FLEE_AT && !@unitsIn(KEY_NESTS).isEmpty {
+      @remember(KEY_ALOOQ_MODE, "feed")
+      @queue("alooqFlees")
+      if @goFeed(terror) {
+        return
+      }
+    }
+    if Game.turn >= (@recall(KEY_ALOOQ_REST) ?? 0) && @swoop(terror) {
+      @remember(KEY_ALOOQ_REST, Game.turn + @alooqRest())
+      @queue("alooqStrike")
+      return
+    }
+    @lurk(terror, ALOOQ_LURK_STEPS)
+  }
+
+  # Flies to a free cell next to the nearest nest (on its plateau if there's room); true if he can feed there.
+  goFeed(terror) {
+    at = terror.coordinates
+    here = Game.grid.elementAt(at)
+    best = null
+    bestScore = 9999
+    for nest in @unitsIn(KEY_NESTS) {
+      for spot in Game.grid.ringAround(nest.coordinates, 1).where(=> $0.content == null) {
+        score = here.distance(spot.coordinates) * 2 + (if spot.terrain == PLATEAU 0 else 1)
+        if score < bestScore {
+          best = spot
+          bestScore = score
+        }
+      }
+    }
+    if best == null {
+      return false
+    }
+    @fly(terror, best.coordinates, ALOOQ_FLY_STEPS, 0)
+    if @nestNear(terror.coordinates) != null {
+      @showRoost(terror)
+    }
+    return true
+  }
+
+  nestNear(origin) => @unitsIn(KEY_NESTS).first(=> Game.grid.elementAt(origin).distance($0.coordinates) <= 1)
+
+  # He strikes the weakest airship within reach (Denburhin's flagship only when there's no other), from the canopy
+  # next to it if he can.
+  swoop(terror) {
+    at = terror.coordinates
+    here = Game.grid.elementAt(at)
+    inReach = @human().ownedUnits.where(=> $0.coordinates != null && $0.type.id in FLIER_TYPES \
+      && here.distance($0.coordinates) <= @strikeRange())
+    if inReach.isEmpty {
+      return false
+    }
+    airships = inReach.where(=> $0.type.id in AIRSHIP_TYPES)
+    prey = (if airships.isEmpty inReach else airships).minBy(=> $0.hp)
+    spots = Game.grid.ringAround(prey.coordinates, 1).where(=> $0.content == null || $0.distance(at) == 0)
+    if spots.isEmpty {
+      return false
+    }
+    spot = spots.minBy(=> $0.distance(at) * 2 + (if $0.terrain in CANOPY 0 else 1))
+    if spot.distance(at) > 0 {
+      Server.move(at, spot.coordinates, 0)
+    }
+    if terror.ap <= 0 {
+      terror.setActions(1)
+    }
+    Game.playSound(spot.coordinates, "alooq", SoundTypes.attack, true)
+    Server.attack(spot.coordinates, prey.coordinates, spot.coordinates, 0)
+    return true
+  }
+
+  # Moves up to `steps` cells to a canopy cell the human can't see, no closer than ALOOQ_HIDE_DISTANCE to their
+  # units, as near as that allows to the human's airships (so he's in reach to strike again). With no such cell in
+  # reach (say, by the airfield) he searches further, and failing that heads back towards his lair.
+  lurk(terror, steps) {
+    at = terror.coordinates
+    here = Game.grid.elementAt(at)
+    fliers = @human().ownedUnits.where(=> $0.coordinates != null && $0.type.id in FLIER_TYPES)
+    goal = @markerAt("lair")
+    if !fliers.isEmpty {
+      goal = fliers.minBy(=> here.distance($0.coordinates)).coordinates
+    }
+    best = @hidingPlace(at, steps, goal)
+    if best == null && steps < ALOOQ_FLY_STEPS {
+      best = @hidingPlace(at, ALOOQ_FLY_STEPS, goal)
+    }
+    if best == null {
+      @fly(terror, @markerAt("lair"), ALOOQ_FLY_STEPS, 0)
+    } else if best.distance(at) > 0 {
+      Server.move(at, best.coordinates, 0)
+    }
+  }
+
+  hidingPlace(at, steps, goal) {
+    seen = "," + Game.grid.visibleCells(@human()).map(=> @cellKey($0.coordinates)).join(",") + ","
+    near = @human().ownedUnits.where(=> $0.coordinates != null)
+    best = null
+    bestDistance = 9999
+    for cell in Game.grid.cells.where(=> $0.terrain in CANOPY && ($0.content == null || $0.distance(at) == 0) \
+        && $0.distance(at) <= steps && !(("," + @cellKey($0.coordinates) + ",") in seen)) {
+      exposed = false
+      for unit in near {
+        if cell.distance(unit.coordinates) < ALOOQ_HIDE_DISTANCE {
+          exposed = true
+        }
+      }
+      cellDistance = cell.distance(goal)
+      if !exposed && cellDistance < bestDistance {
+        best = cell
+        bestDistance = cellDistance
+      }
+    }
+    return best
+  }
+
+  # While he feeds, the airships' lamps find him: his cell is revealed until he moves on.
+  showRoost(terror) {
+    at = terror.coordinates
+    Game.currentScenario.addRevealedCell(at)
+    @remember(KEY_ROOST + ":0", at.0)
+    @remember(KEY_ROOST + ":1", at.1)
+    @remember(KEY_ROOST + ":2", at.2)
+    Game.refreshState()
+  }
+
+  hideRoost {
+    x = @recall(KEY_ROOST + ":0")
+    if x != null {
+      roost = [x, @recall(KEY_ROOST + ":1"), @recall(KEY_ROOST + ":2")]
+      if Game.grid.elementAt(roost).terrain != PLATEAU { # the plateaus stay revealed
+        Game.currentScenario.removeRevealedCell(roost)
+      }
+      Game.currentScenario.addOrUpdateExtra(KEY_ROOST + ":0", KEY_ROOST + ":0", "", null)
+    }
+  }
+
+  alooqStruck {
+    terror = @alooqUnit()
+    if terror != null {
+      Game.positionCamera(terror.coordinates)
+    }
+    if !@flagged("alooqStruck") {
+      @flag("alooqStruck")
+      @lookoutSays("airAlooqFirst1")
+      @captainSays("airAlooqFirst2")
+      @say("alooq", @alooqPlayer(), "alooqTitle", "airAlooqHint")
+    } else {
+      Game.showMessage(@t("airAlooqStrikes"))
+    }
+  }
+
+  alooqFled {
+    terror = @alooqUnit()
+    if terror != null {
+      Game.positionCamera(terror.coordinates)
+    }
+    if !@flagged("alooqFled") {
+      @flag("alooqFled")
+      @captainSays("airAlooqFlees")
+    } else {
+      Game.showMessage(@t("airAlooqFeeds"))
+    }
+  }
+
+  alooqKilled {
+    if !@isActive(OBJ_ALOOQ) {
+      return
+    }
+    @complete(OBJ_ALOOQ)
+    @captainSays("airAlooqKilled")
+  }
+
+  # ------------------------------------------------------------------ Skyfleet
+
+  # Every few turns Skyfleet sends another assault airship to the airfield.
+  reinforce {
+    count = @recall(KEY_REINFORCEMENTS) ?? 0
+    if count >= @maxReinforcements() || Game.turn < (@recall(KEY_NEXT_REINFORCEMENT) ?? 99) {
+      return
+    }
+    @remember(KEY_REINFORCEMENTS, count + 1)
+    @remember(KEY_NEXT_REINFORCEMENT, Game.turn + @reinforceEvery())
+    spot = @freeCellNear(@markerAt("skyfleet"))
+    if spot != null {
+      spot.summon("assaultAirship", @human())
+      Game.refreshState()
+      @queue("reinforcements")
+    }
+  }
+
+  # Remembers where every cargo dirigible is: by the time a downed one's onDie runs it's off the grid, and its
+  # riflemen need somewhere to jump to.
+  trackDirigibles {
+    for dirigible in @human().ownedUnits.where(=> $0.type.id == "cargoDirigible" && $0.coordinates != null) {
+      at = dirigible.coordinates
+      @remember("dirigibleX:" + dirigible.id, at.0)
+      @remember("dirigibleY:" + dirigible.id, at.1)
+      @remember("dirigibleZ:" + dirigible.id, at.2)
+    }
+  }
+
+  # The riflemen aboard a downed dirigible jump before it hits the canopy, to free cells around the wreck. (Without
+  # this they'd go down with it: the engine drops the passengers of a destroyed transport.)
+  bailOut(dirigible) {
+    x = @recall("dirigibleX:" + dirigible.id)
+    if x == null {
+      return
+    }
+    wreck = [x, @recall("dirigibleY:" + dirigible.id), @recall("dirigibleZ:" + dirigible.id)]
+    jumped = 0
+    for passenger in dirigible.loadedUnits {
+      spot = @freeCellNear(wreck)
+      if spot != null {
+        dirigible.unload(spot.coordinates)
+        jumped += 1
+      }
+    }
+    if jumped > 0 {
+      Game.logEvent(@t("airBailOut"), LogLevels.info, wreck)
+    }
+    Game.refreshState()
+  }
+
+  # ------------------------------------------------------------------ the end
+
+  victory {
+    if !@isActive(OBJ_NESTS) {
+      return # already over
+    }
+    @remember(KEY_OVER, "yes")
+    @pauseTimer()
+    @complete(OBJ_NESTS)
+    if @isActive(OBJ_ALOOQ) {
+      @fail(OBJ_ALOOQ)
+    }
+    flagship = @unitOf(@human(), "denburhin")
+    if flagship != null {
+      Game.positionCamera(flagship.coordinates)
+    }
+    @captainSays("airVictory1")
+    @viceroySays("airVictory2")
+    @captainSays(if @isDone(OBJ_ALOOQ) "airVictory3Alooq" else "airVictory3")
+    @lookoutSays("airVictory4")
+    @captainSays("airVictory5")
+    @saveProgress()
+    Server.win(@human())
+  }
+
+  # What later missions can build on.
+  saveProgress {
+    campaign = Game.campaign
+    if campaign != null {
+      progress = campaign.progressFor("AirSuperiority")
+      if progress != null {
+        flagship = @unitOf(@human(), "denburhin")
+        progress.addOrUpdateExtra("denburhinLevel", "denburhinLevel", "", flagship?.level ?? DENBURHIN_LEVEL)
+        progress.addOrUpdateExtra("alooqKilled", "alooqKilled", "", @isDone(OBJ_ALOOQ))
+        progress.addOrUpdateExtra("turnsLeft", "turnsLeft", "", Math.max(0, @turnLimit() - Game.turn))
+      }
+      campaign.unlock("TheDairRunsRed") # chapter 9
+      campaign.save()
+    }
+  }
+
+  defeat(lineKey) {
+    if @recall(KEY_OVER) == "yes" {
+      return
+    }
+    @remember(KEY_OVER, "yes")
+    for objectiveId in [OBJ_NESTS, OBJ_ALOOQ].where(=> @isActive($0)) {
+      @fail(objectiveId)
+    }
+    Game.showMessageToAll(@t(lineKey))
+    Game.lose(@human())
+    Game.refreshState()
+  }
+
+  # ------------------------------------------------------------------ helpers
+
+  t(key) => Game.localizedStr(key)
+  # Cutscenes stop the turn timer; it starts again with the human's next action.
+  pauseTimer => Server.setTimeoutEnabled(false)
+  resumeTimer => Server.setTimeoutEnabledOnUserAction(true)
+  human => Game.players.0
+  broodPlayer => Game.players.1
+  alooqPlayer => Game.players.2
+  isHard => Game.currentScenario.difficulty == "hard"
+
+  turnLimit => @recall(KEY_LIMIT) ?? TURN_LIMIT_NORMAL
+  daysLeft => Math.max(0, @turnLimit() - Game.turn + 1) # counting today
+  hatchEvery => if @isHard() 2 else 3
+  maxBats => 2 # living bats per nest
+  reinforceEvery => if @isHard() 6 else 5
+  maxReinforcements => if @isHard() 2 else 3
+  alooqRest => 2 # turns between his strikes
+  strikeRange => if @isHard() 5 else 4
+
+  # How many settlers the human evacuated in Battle of Bragi (0 if that wasn't won in this campaign). Winning it
+  # unlocked A Turn of Tides; checking that first keeps progressFor from adding an empty entry for Bragi to the save.
+  bragiSettlers {
+    campaign = Game.campaign
+    if campaign == null || !("ATurnOfTides" in campaign.unlockedScenarios) {
+      return 0
+    }
+    return Math.min(BRAGI_MAX_SETTLERS, campaign.progressFor("BattleOfBragi")?.getExtraValue("settlersSaved") ?? 0)
+  }
+
+  alooqUnit {
+    alooqId = @recall(KEY_ALOOQ)
+    return Game.grid.allUnits.first(=> $0.id == alooqId && $0.coordinates != null)
+  }
+
+  say(portrait, owner, titleKey, lineKey) {
+    Game.showDialog(portrait, owner?.id, @t(titleKey), @t(lineKey))
+  }
+  captainSays(lineKey) => @say("denburhin", @human(), "airSpeakerCaptain", lineKey)
+  viceroySays(lineKey) => @say("vitarron", @human(), "airSpeakerViceroy", lineKey)
+  lookoutSays(lineKey) => @say("assaultAirship", @human(), "airSpeakerLookout", lineKey)
+
+  startObjective(objectiveId, keyBase, image, descriptionText) {
+    objective = [
+      id: objectiveId,
+      title: @t(keyBase + "Title"),
+      description: descriptionText ?? @t(keyBase + "Description"),
+      image: image,
+      state: ObjectiveStates.active
+    ]
+    Game.currentScenario.addObjective(objective)
+    Game.refreshState()
+  }
+  complete(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.completed])
+    Game.refreshState()
+  }
+  fail(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.failed])
+    Game.refreshState()
+  }
+  isActive(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.active
+  isDone(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.completed
+
+  remember(key, value) {
+    Game.currentScenario.addOrUpdateExtra(key, key, "", value)
+  }
+  recall(key) => Game.currentScenario.getExtraValue(key)
+  queue(event) {
+    pending = @recall(KEY_PENDING) ?? ""
+    if !(("," + event + ",") in pending) {
+      @remember(KEY_PENDING, (if pending == "" "," else pending) + event + ",")
+    }
+  }
+  flag(name) {
+    @addToSet(KEY_FLAGS, name)
+  }
+  flagged(name) => @inSet(KEY_FLAGS, name)
+  addToSet(key, member) {
+    @remember(key, (@recall(key) ?? ",") + member + ",")
+  }
+  inSet(key, member) => ("," + member + ",") in (@recall(key) ?? "")
+  unitsIn(key) {
+    members = @recall(key) ?? ""
+    return Game.grid.allUnits.where(=> $0.coordinates != null && ("," + $0.id + ",") in members)
+  }
+  unitInSet(key, unitId) {
+    if unitId == null || !@inSet(key, unitId) {
+      return null
+    }
+    return Game.grid.allUnits.first(=> $0.id == unitId && $0.coordinates != null)
+  }
+
+  cellKey(coordinates) => "" + coordinates.0 + ":" + coordinates.1
+  marker(comment) => Game.grid.cells.first(=> $0.comment == comment)
+  markerAt(comment) => @marker(comment).coordinates
+  distance(a, b) => Game.grid.elementAt(a).distance(b)
+  unitOf(player, typeId) => player.ownedUnits.first(=> $0.type.id == typeId && $0.coordinates != null)
+  broodUnits(typeId) {
+    broodId = @broodPlayer().id
+    return Game.grid.allUnits.where(=> $0.owner.id == broodId && $0.type.id == typeId && $0.coordinates != null)
+  }
+
+  freeCellNear(center) {
+    for radius in 1...3 {
+      for candidate in Game.grid.ringAround(center, radius) {
+        if candidate.content == null && !(candidate.terrain in OPEN_WATER) {
+          return candidate
+        }
+      }
+    }
+    return null
+  }
+
+  nearestPlayerUnit(origin, maxRange, fliersOnly) {
+    if origin == null {
+      return null
+    }
+    playerId = @human().id
+    here = Game.grid.elementAt(origin)
+    best = null
+    bestDistance = maxRange + 1
+    for candidate in Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null) {
+      if !fliersOnly || candidate.type.id in FLIER_TYPES {
+        candidateDistance = here.distance(candidate.coordinates)
+        if candidateDistance < bestDistance {
+          best = candidate
+          bestDistance = candidateDistance
+        }
+      }
+    }
+    return best
+  }
+
+  # Fliers go by the script, not by sight: to the free cell within `steps` of them (any terrain; they fly over
+  # whatever stands in the way) that is nearest to goal, but no nearer than `stopAt`.
+  fly(flier, goal, steps, stopAt) {
+    origin = flier.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    here = Game.grid.elementAt(origin)
+    best = here
+    bestDistance = here.distance(goal)
+    if bestDistance <= stopAt {
+      return false
+    }
+    for cell in Game.grid.cells.where(=> $0.content == null && $0.distance(origin) <= steps) {
+      cellDistance = Math.max(stopAt, cell.distance(goal))
+      if cellDistance < bestDistance || (cellDistance == bestDistance && cell.distance(origin) < best.distance(origin)) {
+        best = cell
+        bestDistance = cellDistance
+      }
+    }
+    if best.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, best.coordinates, 0)
+    return true
+  }
+}

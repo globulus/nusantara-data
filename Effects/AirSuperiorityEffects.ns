@@ -1,0 +1,70 @@
+# Effects for mission 8 of On the Banks of Dair: Air Superiority.
+import "CommonEffects"
+
+AIR_PLATEAU = "plateau"
+AIR_TRADE_WINDS_SPEED = 1
+AIR_OUT_OF_REACH_DEFENSE = 100 # each point of defense takes 10% off; damage never drops below 1
+AIR_HUNTER_BONUS = 2
+
+fn airOnPlateau(unit) => Game.grid.locate(unit)?.terrain == AIR_PLATEAU
+
+# The bloodbat nests sit on top of the plateaus: shots fired from the jungle below only chip the rock. Fliers, and
+# troops a dirigible has set down on a plateau, hit them in full.
+effect AirOutOfReach {
+  trigger = Triggers.passive
+
+  check(caster, target) => target != null && target.movementType != "fly" && !airOnPlateau(target)
+
+  run(caster, target) => [
+    defense: ["+", AIR_OUT_OF_REACH_DEFENSE]
+  ]
+
+  description(caster) => "Out of reach: only fliers and troops standing on a plateau can harm it."
+}
+
+# Alooq: a passive that only explains what the script does with him, plus a little extra bite against fliers.
+effect AirTreetopTerror {
+  trigger = Triggers.passive
+
+  check(caster, target) => target != null && target.movementType == "fly"
+
+  run(caster, target) => [
+    attack: ["+", AIR_HUNTER_BONUS]
+  ]
+
+  description(caster) => "Hides in the canopy and strikes airships from it (+$AIR_HUNTER_BONUS attack against fliers). Flees to his nests to feed when hurt."
+}
+
+# The dry-season winds carry Skyfleet upriver: the human's airships and Denburhin's flagship fly one cell further.
+effect AirTradeWindsModifier is AuraModifier {
+  run(caster, target) => [
+    speed: ["+", AIR_TRADE_WINDS_SPEED]
+  ]
+
+  sprite => "heliumPockets"
+
+  title => "airTradeWindsTitle"
+}
+
+effect AirTradeWinds is Aura {
+  stacks = false
+  modifierId = "AirTradeWindsModifier"
+
+  range(caster) => Game.grid.size
+
+  # a player effect: the caster is the player, and only its own airships benefit
+  isValidTarget(caster, target) => target.owner.id == caster.id && target.type.id in ["assaultAirship", "cargoDirigible", "denburhin"]
+
+  modifier(caster, target) => AirTradeWindsModifier()
+
+  affect(unit, caster) {
+    super.affect(unit, caster)
+    unit.restoreActions(AIR_TRADE_WINDS_SPEED)
+  }
+
+  sprite => "heliumPockets"
+
+  title => "airTradeWindsTitle"
+
+  description(caster) => "Your airships fly $AIR_TRADE_WINDS_SPEED cell further each turn."
+}

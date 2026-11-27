@@ -1,0 +1,114 @@
+id: TheDairRunsRed
+title: theDairRunsRedTitle
+description: theDairRunsRedDescription
+ruleset:
+  id: TheDairRunsRedRuleset
+  inherits: DefaultCampaign
+  timeoutLength: 90 # a base to run and a big map; cutscenes pause it (see the script)
+  factionData:
+    sanghoy:
+      startingData:
+        resources:
+          g: 25
+          u: 8
+        cards: { }
+        units: [ ] # the camp is on the map; the army is summoned by the script
+      upgradeTree:
+        nodes:
+          - type: obsidianWeapons
+          - type: slaveAuctions
+          - type: thickShell # kavouros that carry two across the river (moved up from under Beastmastery)
+          - type: strengthInUnity
+            subnodes:
+              - type: ironForging
+              - type: ransackers
+              - type: karrish
+                subnodes:
+                  - type: thunderousHooves
+                  - type: onslaught
+              - type: reignOfBeastlords
+                subnodes:
+                  - type: eyeToEyeClawToClaw
+                  - type: tasteOfManflesh
+          - type: ritesOfRogash
+            subnodes:
+              - type: harbingersOfChange
+              - type: theDreamFuel
+              - type: excrescence
+                subnodes:
+                  - type: shapingCorral
+                  - type: toTheSkies
+              - type: beastmastery
+                subnodes:
+                  - type: daringTamers
+    frenza:
+      startingData:
+        resources:
+          g: 15
+          u: 0
+        cards: { }
+        units: [ ] # the colony is on the map; its gold mines are small, and nearly worked out
+      upgradeTree:
+        nodes:
+          - type: taxCollectors
+          - type: masterSculptors
+          - type: hardenedVeterans
+            subnodes:
+              - type: horsebackTraining
+              - type: sniperSchool
+              - type: viciousVanguard
+                subnodes:
+                  - type: heliumPockets
+                  - type: uncommonValor
+              - type: deathSquads
+                subnodes:
+                  - type: superspread
+                  - type: infantryFormations
+          - type: intensiveIndustrialization
+            subnodes:
+              - type: theThirdShift
+              - type: automatedDefenses
+              - type: engineKits
+                subnodes:
+                  - type: combatEngineers
+                  - type: scrapyardColossus
+              - type: harnessingTheLightning
+                subnodes:
+                  - type: differentialMachines
+                  - type: voltWalkers
+      playerEffects:
+        - PayUpkeep
+        - StatusReport
+        - UncommonValor
+  bans:
+    skills:
+      - foundColony # Landfall has one Colonial Hall, the one that must burn
+      - foundPlantation
+      - buildMonument
+      - buildRoad
+      - shipEndlessExpansion # it ships in more Colonial Halls
+      - shipEmperorsFist # the Juggernaut is Battle of Bragi's
+      - shipEradicateThePest # favor shipments grew the colony's army faster than the tribes could ever match
+      - shipAirSuperiority
+      - mountToDragoon # a rifleman who mounts no longer counts as one, so the bot's riflemen never got dearer
+      - insurrection # the Viceroy isn't ready for that yet
+      - trainVitarron
+      - trainTofan
+      - trainDenburhin
+      - trainPyracmon
+      - trainMaim
+players:
+  - name: Player
+    color: red
+    team: 1
+    faction: sanghoy
+  - name: Landfall
+    color: blue
+    team: 2
+    faction: frenza
+    ai: DairColonyAi # NormalAi on normal, HardAi on hard (Effects/TheDairRunsRedEffects.ns)
+  - name: Imperial Navy
+    color: orange
+    team: 2
+    faction: frenza
+    ai: PassiveAi

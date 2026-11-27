@@ -1,0 +1,59 @@
+id: AirSuperiority
+title: airSuperiorityTitle
+description: airSuperiorityDescription
+ruleset:
+  id: AirSuperiorityRuleset
+  inherits: DefaultCampaign
+  timeoutLength: 45 # cutscenes pause it (see the script)
+  factionData:
+    frenza:
+      startingData:
+        resources:
+          g: 15 # the script adds a little for the settlers saved at Bragi
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+    sanghoy:
+      startingData:
+        resources:
+          g: 0
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+  bans:
+    skills:
+      # Skyfleet's airfield: no factories, courts or colonies, and no shortcuts onto the plateaus
+      - trainSettler
+      - buildFactory
+      - buildMagistratesCourt
+      - buildMonument
+      - sendTribute
+      - addMajorUpgrade
+      - addMinorUpgrade
+      - foundPlantation
+      - buildRoad
+      - trainAssassin
+      - trainAssaultAirship # Skyfleet sends them (see the script); training one needs a Major Upgrade
+      - addParadrop
+      - airlift
+      - riseToWarchief
+      - pillage
+players:
+  - name: Player
+    color: blue
+    team: 1
+    faction: frenza
+  - name: The brood
+    color: red
+    team: 2
+    faction: sanghoy
+    ai: TerritorialAi
+  - name: Alooq
+    color: purple
+    team: 2
+    faction: sanghoy
+    ai: PassiveAi

@@ -1,0 +1,712 @@
+# On the Banks of Dair, mission 5: Shaping of Yon. The Sanghoy side again.
+#
+# Kagaalu holds the Well camp he woke in chapter 3. The Sacrificial Well wants Blood: the player pours it in with the
+# Well's Offer Blood skill (yonOfferBlood, see Effects/ShapingOfYonEffects.ns), which moves the player's Blood into the
+# Well's tally (scenario extra "bloodOffered"). Blood comes from fighting (collectBlood) and from the Well's own
+# Sacrifice of Blood; sarcomancy and shaping spend the same Blood. Meanwhile the outsiders' forward base, east along
+# the road, sends waves of mechs at the Well, an airship drops autoturrets at the edge of the camp, and MEVs patch up
+# the mechs around them.
+# When the tally reaches the goal (150 on normal, 200 on hard), Yon rises next to the Well and joins the player. The
+# last objective: destroy the forward base (its factory and barracks). Blood offered beyond the goal feeds Yon (and
+# makes him stronger in chapter 6: `bloodSurplus`).
+#
+# Map markers (cell comments): well, base (the factory and the barracks), spawn (where the waves form), drop (where the
+# airship drops autoturrets, in order), freed (where chapter 3's freed captives gather).
+# Everything that must survive a save is kept in objectives or in scenario extras (read back with recallNum: a loaded
+# save can return numbers as text). Dialogs only reach the human on their own turn, so anything that happens off-turn
+# is queued (see onStateChange).
+scenario ShapingOfYon {
+  GOAL_NORMAL = 150
+  GOAL_HARD = 200
+  FIRST_WAVE = 3
+  WAVE_EVERY_NORMAL = 4
+  WAVE_EVERY_HARD = 3
+  MAX_ALIVE_NORMAL = 5 # the base holds its next wave while this many of its machines are still in the field
+  MAX_ALIVE_HARD = 7
+  RISE_RADIUS = 3 # Yon's rising shakes the ground: outsider machines this close to the Well take RISE_DAMAGE
+  RISE_DAMAGE = 30
+  MARCH_STEPS = 3 # cells a wave advances along the road each round, before its own turn
+  BASE_GUARD_RANGE = 2 # once Yon has risen, the machines hold this close to their base
+  CHASE_RANGE = 3 # a mech goes for the nearest of the tribe this close, otherwise for the Well
+  MEV_REPAIR = 10 # health an MEV restores to each mech next to it, every round
+  CREW_BLOOD = 5 # Blood the tribe gets when a mech is destroyed (its crew's), 8 for a devilhorn tank
+  CREW_BLOOD_TANK = 8
+  FEED_HEAL = 2 # Yon's health restored per Blood offered once he has risen
+  OPEN_GROUND = ["grass", "road", "forest", "hills", "beach", "desert"] # where the mechs march
+  WATER = ["river", "sea", "ocean"]
+  PLAYER_TYPES = ["sacrificialWell", "kagaalu", "sanghoyCamp", "totem", "thrall", "shaper", "warrior"]
+  OUTSIDER_TYPES = ["factory", "barracks", "autoturret"]
+  SKILL_OFFER = "yonOfferBlood"
+
+  OBJ_WELL = "well"
+  OBJ_BASE = "base"
+
+  # Scenario extras
+  KEY_OFFERED = "bloodOffered" # the Well's tally (written by the Offer Blood effect)
+  KEY_SEEN = "bloodSeen" # the tally the script last answered to
+  KEY_BASE = "baseBuildings"
+  KEY_WAVES = "waveUnits"
+  KEY_WAVE_COUNT = "waves"
+  KEY_NEXT_WAVE = "nextWave"
+  KEY_DROPS = "drops"
+  KEY_SEEN_MEV = "seenMev"
+  KEY_WELL_HIT = "wellHit"
+  KEY_SKILL_DONE = "offerSkillDone" # set once the Well's mission skill has been taken away again
+  KEY_RISEN = "yonRisen"
+  KEY_YON = "yon"
+  KEY_PENDING = "pending" # events waiting for the human's turn, as ",event,event,"
+  # Queued events, in the order they're told to the human.
+  EVENTS = ["firstWave", "wave", "mev", "wellHit", "firstDrop", "drop", "lastStand", "wellLost", "baseHit", "victory"]
+
+  # ------------------------------------------------------------------ setup
+
+  onStart {
+    if Game.currentScenario.objectives.isEmpty { # a loaded game is already set up
+      @setUpMap()
+      @playIntro()
+    }
+  }
+
+  setUpMap {
+    player = @human()
+    outsiders = @outsidersPlayer()
+    natureId = Game.nature.id
+    for unit in Game.grid.allUnits.where(=> $0.owner.id == natureId && $0.coordinates != null) {
+      typeId = unit.type.id
+      if typeId in PLAYER_TYPES {
+        unit.setOwner(player)
+      } else if typeId in OUTSIDER_TYPES {
+        unit.setOwner(outsiders)
+      }
+    }
+    kagaalu = @unitOf(player, "kagaalu")
+    player.setHero(kagaalu)
+    kagaalu.levelUpTo(@carriedLevel())
+    @ensureOfferSkill()
+    for building in outsiders.ownedUnits.where(=> $0.type.id in ["factory", "barracks"]) {
+      @addToSet(KEY_BASE, building.id)
+      # Kagaalu's scouts have seen the outsiders' iron nest.
+      Game.currentScenario.addRevealedCell(building.coordinates)
+      for near in Game.grid.ringAround(building.coordinates, 1) {
+        Game.currentScenario.addRevealedCell(near.coordinates)
+      }
+    }
+    outsiders.addEffect("YonOutsiderScopes")
+    if !@isHard() {
+      player.addEffect("RogashsBlessing") # normal: Kagaalu takes less damage and heals between fights
+    }
+    if @captivesFreed() {
+      freed = @markerAt("freed")
+      @freeCellNear(freed, true).summon("warrior", player)
+      @freeCellNear(freed, true).summon("thrall", player)
+    }
+    @remember(KEY_OFFERED, 0)
+    @remember(KEY_SEEN, 0)
+    @remember(KEY_WAVE_COUNT, 0)
+    @remember(KEY_NEXT_WAVE, FIRST_WAVE)
+    @remember(KEY_DROPS, 0)
+    Game.refreshState()
+  }
+
+  playIntro {
+    @pauseTimer()
+    wellAt = @markerAt("well")
+    Game.positionCamera(wellAt)
+    Game.zoomCamera(8)
+    Game.wait(0.5)
+    @kagaaluSays("yonIntro1")
+    @kagaaluSays("yonIntro2")
+    Game.positionCamera(@markerAt("base"))
+    @lookoutSays("yonIntro3")
+    Game.positionCamera(wellAt)
+    @kagaaluSays("yonIntro4")
+    @startObjective(OBJ_WELL, "yonWell", "sacrificialWell", @wellDescription())
+    @say("sacrificialWell", @human(), "sacrificialWellTitle", "yonOfferHint")
+    @say("sacrificialWell", @human(), "sacrificialWellTitle", "yonSacrificeHint")
+    if @captivesFreed() {
+      @kagaaluSays("yonCaptives")
+    }
+    @resumeTimer()
+  }
+
+  # ------------------------------------------------------------------ events
+
+  onSkillCast(caster, skillId) {
+    if skillId == SKILL_OFFER && caster.owner?.id == @human().id {
+      @afterOffering()
+    }
+  }
+
+  onAttack(attacker, defender) {
+    if defender != null && defender.type.id == "sacrificialWell" && defender.owner?.id == @human().id && @recall(KEY_WELL_HIT) == null {
+      @remember(KEY_WELL_HIT, "yes")
+      @queue("wellHit")
+    }
+  }
+
+  onDie(unit) {
+    typeId = unit.type.id
+    if unit.owner.id == @human().id {
+      if typeId == "sacrificialWell" {
+        if @isRisen() {
+          @queue("wellLost") # it has done its work
+        } else {
+          @defeat("yonWellDestroyed")
+        }
+        @releaseOfferSkill(unit)
+      } else if typeId == "kagaalu" {
+        @defeat(if @isRisen() "yonKagaaluDiedYonRisen" else "yonKagaaluDied")
+      } else if typeId == "yon" {
+        @defeat("yonYonDied")
+      }
+    } else if @inSet(KEY_BASE, unit.id) {
+      @queue("baseHit")
+    } else if unit.owner.id == @outsidersPlayer().id && !unit.isBuilding {
+      # Every mech has a crew, and the Well takes their blood too.
+      blood = if typeId == "devilhornTank" CREW_BLOOD_TANK else CREW_BLOOD
+      @human().addResources([u: blood])
+      Game.logEvent(@t("yonCrewBlood").format([blood]), LogLevels.positive, null)
+    }
+  }
+
+  onStateChange {
+    @ensureOfferSkill()
+    if Game.currentPlayerIndex == 0 && (@recall(KEY_PENDING) ?? "") != "" && @human().state == "active" {
+      events = @recall(KEY_PENDING)
+      @remember(KEY_PENDING, "")
+      @pauseTimer()
+      for event in EVENTS.where(=> ("," + $0 + ",") in events) {
+        @announce(event)
+      }
+      @resumeTimer()
+    }
+  }
+
+  onTurnStart {
+    @repairMechs()
+    @sendWave()
+    @dropTurrets()
+    @marchWaves()
+  }
+
+  checkVictory => null
+
+  announce(event) {
+    if event == "firstWave" {
+      Game.positionCamera(@markerAt("base"))
+      @lookoutSays("yonFirstWave")
+      Game.positionCamera(@markerAt("well"))
+    } else if event == "wave" {
+      Game.showMessage(@t("yonWave"))
+    } else if event == "mev" {
+      @kagaaluSays("yonMev")
+    } else if event == "wellHit" {
+      @kagaaluSays("yonWellHit")
+      @say("thrall", @human(), "thrallTitle", "yonRepairHint")
+    } else if event == "firstDrop" {
+      @lookoutSays("yonFirstDrop")
+    } else if event == "drop" {
+      Game.showMessage(@t("yonDrop"))
+    } else if event == "wellLost" {
+      @kagaaluSays("yonWellLost")
+    } else if event == "lastStand" {
+      Game.showMessage(@t("yonLastStand"))
+    } else if event == "baseHit" {
+      @baseHit()
+    } else if event == "victory" {
+      @victory()
+    }
+  }
+
+  # ------------------------------------------------------------------ the Well
+
+  afterOffering {
+    offered = @offeredBlood()
+    seen = @recallNum(KEY_SEEN)
+    @remember(KEY_SEEN, offered)
+    goal = @wellGoal()
+    if !@isRisen() {
+      Game.currentScenario.updateObjective(OBJ_WELL, [description: @wellDescription()])
+      Game.refreshState()
+      if offered >= goal {
+        @raiseYon()
+      } else if seen * 4 < goal * 3 && offered * 4 >= goal * 3 {
+        @kagaaluSays("yonAlmost")
+      } else if seen * 2 < goal && offered * 2 >= goal {
+        @kagaaluSays("yonHalf")
+      }
+    } else if offered > seen {
+      # Blood beyond the goal: Yon drinks it.
+      yon = @yonUnit()
+      if yon != null {
+        yon.restoreHealth((offered - seen) * FEED_HEAL)
+        Game.animateVisualFx([[type: "blood", coordinates: yon.coordinates]])
+      }
+      @updateBaseObjective()
+      Game.showMessage(@t("yonFeed").format([offered - goal]))
+    }
+  }
+
+  raiseYon {
+    @pauseTimer()
+    player = @human()
+    @remember(KEY_RISEN, "yes")
+    Game.currentScenario.updateObjective(OBJ_WELL, [description: @wellDescription(), state: ObjectiveStates.completed])
+    Game.refreshState()
+    wellAt = @markerAt("well")
+    Game.positionCamera(wellAt)
+    Game.zoomCamera(7)
+    @kagaaluSays("yonRise1")
+    Game.animateVisualFx([
+      [type: "blood", coordinates: wellAt],
+      [type: "ripple", coordinates: wellAt, color: "#8B0000"],
+      [type: "bonefire", coordinates: wellAt]
+    ])
+    Game.wait(0.5)
+    spot = @freeCellToward(wellAt, @markerAt("base"))
+    yon = spot.summon("yon", player)
+    @remember(KEY_YON, yon.id)
+    Game.animateVisualFx([[type: "aura", coordinates: yon.coordinates, color: "#FF0000"]])
+    Game.refreshState()
+    Game.positionCamera(yon.coordinates)
+    @say("yon", player, "yonTitle", "yonRise2")
+    @riseShock(wellAt, yon)
+    @kagaaluSays("yonRise3")
+    @kagaaluSays("yonRise4")
+    @startObjective(OBJ_BASE, "yonBase", "factory", @baseDescription())
+    @say("yon", player, "yonTitle", "yonRockHint")
+    if !@unitsIn(KEY_WAVES).isEmpty {
+      @lookoutSays("yonFallBack")
+    }
+    @lastStand()
+    @resumeTimer()
+    if @baseLeft() == 0 { # they burned the base before the Well was full
+      @victory()
+    }
+  }
+
+  # The ground heaves as Yon climbs out: the outsiders' machines near the Well are thrown about.
+  riseShock(wellAt, yon) {
+    outsidersId = @outsidersPlayer().id
+    here = Game.grid.elementAt(wellAt)
+    shaken = Game.grid.allUnits.where(=> $0.owner.id == outsidersId && $0.coordinates != null && !$0.isBuilding \
+      && here.distance($0.coordinates) <= RISE_RADIUS)
+    if shaken.isEmpty {
+      return
+    }
+    Game.animateVisualFx([[type: "ripple", coordinates: wellAt, color: "#8B0000"]])
+    for mech in shaken {
+      Game.animateVisualFx([[type: "explosion", coordinates: mech.coordinates]])
+      mech.takeDamage(RISE_DAMAGE, yon)
+    }
+    Game.refreshState()
+    @kagaaluSays("yonRiseShock")
+  }
+
+  # The Offer Blood skill isn't in the game data: the script gives it to the Well. It doesn't survive a save (and
+  # onStart doesn't run for a loaded game), so it's given again after every state change while the mission runs;
+  # addSkill does nothing if the Well already has it.
+  ensureOfferSkill {
+    if @recall(KEY_SKILL_DONE) == null {
+      @well()?.addSkill(SKILL_OFFER)
+    }
+  }
+
+  # addSkill adds the skill to the unit type, which other games share: take it away again when the mission ends
+  # (or the Well falls).
+  releaseOfferSkill(wellUnit) {
+    if @recall(KEY_SKILL_DONE) == null {
+      @remember(KEY_SKILL_DONE, "yes")
+      wellUnit?.removeSkill(SKILL_OFFER)
+    }
+  }
+
+  # ------------------------------------------------------------------ the base
+
+  baseHit {
+    if @isActive(OBJ_BASE) {
+      @updateBaseObjective()
+      if @baseLeft() == 0 {
+        @victory()
+      } else {
+        @kagaaluSays("yonBaseHit")
+      }
+    } else if @baseLeft() == 0 && @isActive(OBJ_WELL) {
+      @kagaaluSays("yonBaseFellEarly")
+    }
+  }
+
+  victory {
+    if !@isActive(OBJ_BASE) {
+      return # already over
+    }
+    @pauseTimer()
+    player = @human()
+    @complete(OBJ_BASE)
+    yon = @yonUnit()
+    if yon != null {
+      Game.positionCamera(yon.coordinates)
+    }
+    @kagaaluSays("yonVictory1")
+    @kagaaluSays("yonVictory2")
+    @say("yon", player, "yonTitle", "yonVictory3")
+    @saveProgress()
+    Server.win(player)
+    @releaseOfferSkill(@well())
+  }
+
+  # What later missions can build on.
+  saveProgress {
+    campaign = Game.campaign
+    if campaign != null {
+      progress = campaign.progressFor("ShapingOfYon")
+      if progress != null {
+        offered = @offeredBlood()
+        progress.addOrUpdateExtra("kagaaluLevel", "kagaaluLevel", "", @unitOf(@human(), "kagaalu")?.level ?? @carriedLevel())
+        progress.addOrUpdateExtra("bloodOffered", "bloodOffered", "", offered)
+        progress.addOrUpdateExtra("bloodSurplus", "bloodSurplus", "", Math.max(0, offered - @wellGoal()))
+        progress.addOrUpdateExtra("turns", "turns", "", Game.turn)
+      }
+      campaign.unlock("BattleOfBragi") # chapter 6
+      campaign.save()
+    }
+  }
+
+  defeat(lineKey) {
+    if (@recall("lost") ?? "") == "yes" {
+      return
+    }
+    @remember("lost", "yes")
+    for objectiveId in [OBJ_WELL, OBJ_BASE].where(=> @isActive($0)) {
+      @fail(objectiveId)
+    }
+    Game.showMessageToAll(@t(lineKey))
+    Game.lose(@human())
+    Game.refreshState()
+    @releaseOfferSkill(@well())
+  }
+
+  # ------------------------------------------------------------------ the outsiders
+
+  waveEvery => if @isHard() WAVE_EVERY_HARD else WAVE_EVERY_NORMAL
+  dropTurns => if @isHard() [6, 10, 14] else [8, 14]
+  turretsPerDrop => 1
+
+  # What the forward base sends with its nth wave (G golem, D devilhorn tank, M MEV).
+  # Normal, every 4 turns: GG, GM, GD, GGM, GD, then GGD. Hard, every 3 turns: a golem more in every wave, and
+  # from the fifth wave a second devilhorn.
+  waveUnits(index) {
+    band = ["steamGolem"]
+    if index == 1 || index == 4 || index >= 6 {
+      band.add("steamGolem")
+    }
+    if index == 3 || index >= 5 {
+      band.add("devilhornTank")
+    }
+    if index == 2 || index == 4 {
+      band.add("mev")
+    }
+    if @isHard() {
+      band.add("steamGolem")
+      if index >= 5 {
+        band.add("devilhornTank")
+      }
+    }
+    return band
+  }
+
+  sendWave {
+    if @isRisen() || Game.turn < @recallNum(KEY_NEXT_WAVE) {
+      return
+    }
+    if @unitsIn(KEY_WAVES).count(=> true) >= (if @isHard() MAX_ALIVE_HARD else MAX_ALIVE_NORMAL) {
+      @remember(KEY_NEXT_WAVE, Game.turn + 1) # the field is full: the next wave waits
+      return
+    }
+    waves = @recallNum(KEY_WAVE_COUNT) + 1
+    @remember(KEY_WAVE_COUNT, waves)
+    @remember(KEY_NEXT_WAVE, Game.turn + @waveEvery())
+    if @spawn(@waveUnits(waves)) {
+      @queue(if waves == 1 "firstWave" else "wave")
+    }
+  }
+
+  # Once Yon has risen, the base calls in what it has left to hold its ground (they gather there with the
+  # machines falling back from the camp: see marchWaves).
+  lastStand {
+    band = ["devilhornTank", "steamGolem"]
+    if @isHard() {
+      band.add("devilhornTank")
+      band.add("steamGolem")
+    }
+    if @spawn(band) {
+      @queue("lastStand")
+    }
+  }
+
+  spawn(band) {
+    outsiders = @outsidersPlayer()
+    sent = false
+    for typeId in band {
+      spot = @markers("spawn").first(=> $0.content == null) ?? @freeCellNear(@markerAt("spawn"), true)
+      if spot != null {
+        mech = spot.summon(typeId, outsiders)
+        @addToSet(KEY_WAVES, mech.id)
+        sent = true
+        if typeId == "mev" && @recall(KEY_SEEN_MEV) == null {
+          @remember(KEY_SEEN_MEV, "yes")
+          @queue("mev")
+        }
+      }
+    }
+    Game.refreshState()
+    return sent
+  }
+
+  # The airship drops autoturrets at the edge of the camp (until Yon rises).
+  dropTurrets {
+    drops = @recallNum(KEY_DROPS)
+    turns = @dropTurns()
+    if @isRisen() || drops >= turns.size || Game.turn < turns.(drops) {
+      return
+    }
+    @remember(KEY_DROPS, drops + 1)
+    outsiders = @outsidersPlayer()
+    for i in 0..@turretsPerDrop() {
+      spot = @markers("drop").first(=> $0.content == null)
+      if spot != null {
+        turret = spot.summon("autoturret", outsiders)
+        Game.currentScenario.addRevealedCell(spot.coordinates)
+        Game.animateVisualFx([[type: "explosion", coordinates: turret.coordinates]])
+      }
+    }
+    Game.refreshState()
+    @queue(if drops == 0 "firstDrop" else "drop")
+  }
+
+  # MEVs patch up the mechs next to them.
+  repairMechs {
+    outsidersId = @outsidersPlayer().id
+    for mev in Game.grid.allUnits.where(=> $0.owner.id == outsidersId && $0.type.id == "mev" && $0.coordinates != null) {
+      for near in Game.grid.ringAround(mev.coordinates, 1) {
+        mech = near.content
+        if mech != null && mech.owner.id == outsidersId && !mech.isBuilding && mech.hp < mech.health {
+          mech.restoreHealth(MEV_REPAIR)
+          Game.animateVisualFx([[type: "boost", coordinates: near.coordinates, color: "#D9D9D9"]])
+        }
+      }
+    }
+  }
+
+  # Waves march by the script, not by sight, and keep to open ground (they'd bog down in the jungle): towards the
+  # nearest of the tribe in CHASE_RANGE, otherwise towards the Well. They close in until they stand next to one of
+  # the tribe (MEVs stay a cell further back); their own turn does the fighting, and the guns that could shoot from
+  # two cells away are in the warriors' reach: the fight spills blood for the Well.
+  # Once Yon has risen, the machines fall back to defend their base (and hold there): the last fight is at the base.
+  marchWaves {
+    baseAt = @markerAt("base")
+    for mech in @unitsIn(KEY_WAVES) {
+      at = mech.coordinates
+      if @isRisen() {
+        if Game.grid.elementAt(at).distance(baseAt) > BASE_GUARD_RANGE {
+          @march(mech, baseAt, MARCH_STEPS, 0)
+        }
+      } else {
+        reach = if mech.type.id == "mev" 2 else 1
+        if @nearestPlayerUnit(at, reach) == null {
+          prey = @nearestPlayerUnit(at, CHASE_RANGE)
+          goal = prey?.coordinates ?? @well()?.coordinates ?? @markerAt("well")
+          @march(mech, goal, MARCH_STEPS, reach)
+        }
+      }
+    }
+  }
+
+  # Up to steps cells, each one closer to goal, over open ground if possible; stops early once a unit of the tribe
+  # is within reach.
+  march(walker, goal, steps, reach) {
+    origin = walker.coordinates
+    if origin == null || goal == null {
+      return false
+    }
+    at = Game.grid.elementAt(origin)
+    for i in 0..steps {
+      nextCell = @stepToward(at, goal, true) ?? @stepToward(at, goal, false)
+      if nextCell == null {
+        break
+      }
+      at = nextCell
+      if reach > 0 && @nearestPlayerUnit(at.coordinates, reach) != null {
+        break
+      }
+    }
+    if at.distance(origin) == 0 {
+      return false
+    }
+    Server.move(origin, at.coordinates, 0)
+    return true
+  }
+
+  stepToward(at, goal, openOnly) {
+    best = null
+    bestDistance = at.distance(goal)
+    for cell in Game.grid.ringAround(at.coordinates, 1) {
+      if cell.content == null && !(cell.terrain in WATER) && (!openOnly || cell.terrain in OPEN_GROUND) && cell.distance(goal) < bestDistance {
+        best = cell
+        bestDistance = cell.distance(goal)
+      }
+    }
+    return best
+  }
+
+  # ------------------------------------------------------------------ helpers
+
+  t(key) => Game.localizedStr(key)
+  # Cutscenes stop the turn timer; it starts again with the human's next action.
+  pauseTimer => Server.setTimeoutEnabled(false)
+  resumeTimer => Server.setTimeoutEnabledOnUserAction(true)
+  human => Game.players.0
+  outsidersPlayer => Game.players.1
+  isHard => Game.currentScenario.difficulty == "hard"
+  wellGoal => if @isHard() GOAL_HARD else GOAL_NORMAL
+
+  # Kagaalu's level from the last Sanghoy chapter he was in (chapter 3, else chapter 1).
+  carriedLevel {
+    campaign = Game.campaign
+    level = campaign?.progressFor("ThroughTheMire")?.getExtraValue("kagaaluLevel") \
+      ?? campaign?.progressFor("CalamityOnTheHorizon")?.getExtraValue("kagaaluLevel")
+    return if level == null 1 else Math.max(1, Math.round(level))
+  }
+
+  # Whether chapter 3's optional captives were freed (a count, or a yes/no).
+  captivesFreed {
+    value = Game.campaign?.progressFor("ThroughTheMire")?.getExtraValue("captivesFreed")
+    if value == null {
+      return false
+    }
+    text = "" + value
+    if text.lowercased() == "true" {
+      return true
+    }
+    if text.lowercased() == "false" || text == "" {
+      return false
+    }
+    return Math.round(value) > 0
+  }
+
+  offeredBlood => @recallNum(KEY_OFFERED)
+  isRisen => @recall(KEY_RISEN) == "yes"
+  wellDescription => @t("yonWellDescription").format([@offeredBlood(), @wellGoal()])
+  baseDescription => @t("yonBaseDescription").format([@baseLeft(), Math.max(0, @offeredBlood() - @wellGoal())])
+  updateBaseObjective {
+    if @isActive(OBJ_BASE) {
+      Game.currentScenario.updateObjective(OBJ_BASE, [description: @baseDescription()])
+      Game.refreshState()
+    }
+  }
+  baseLeft => @unitsIn(KEY_BASE).count(=> true)
+
+  say(portrait, owner, titleKey, lineKey) {
+    Game.showDialog(portrait, owner?.id, @t(titleKey), @t(lineKey))
+  }
+  kagaaluSays(lineKey) => @say("kagaalu", @human(), "kagaaluTitle", lineKey)
+  lookoutSays(lineKey) => @say("warrior", @human(), "yonSpeakerLookout", lineKey)
+
+  startObjective(objectiveId, keyBase, image, descriptionText) {
+    objective = [
+      id: objectiveId,
+      title: @t(keyBase + "Title"),
+      description: descriptionText ?? @t(keyBase + "Description"),
+      image: image,
+      state: ObjectiveStates.active
+    ]
+    Game.currentScenario.addObjective(objective)
+    Game.refreshState()
+  }
+  complete(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.completed])
+    Game.refreshState()
+  }
+  fail(objectiveId) {
+    Game.currentScenario.updateObjective(objectiveId, [state: ObjectiveStates.failed])
+    Game.refreshState()
+  }
+  isActive(objectiveId) => Game.currentScenario.objectiveState(objectiveId) == ObjectiveStates.active
+
+  remember(key, value) {
+    Game.currentScenario.addOrUpdateExtra(key, key, "", value)
+  }
+  recall(key) => Game.currentScenario.getExtraValue(key)
+  recallNum(key) {
+    value = @recall(key)
+    return if value == null 0 else Math.round(value)
+  }
+  queue(event) {
+    pending = @recall(KEY_PENDING) ?? ""
+    if !(("," + event + ",") in pending) {
+      @remember(KEY_PENDING, (if pending == "" "," else pending) + event + ",")
+    }
+  }
+  addToSet(key, unitId) {
+    @remember(key, (@recall(key) ?? ",") + unitId + ",")
+  }
+  inSet(key, unitId) => ("," + unitId + ",") in (@recall(key) ?? "")
+  unitsIn(key) {
+    members = @recall(key) ?? ""
+    return Game.grid.allUnits.where(=> $0.coordinates != null && ("," + $0.id + ",") in members)
+  }
+
+  marker(comment) => Game.grid.cells.first(=> $0.comment == comment)
+  markers(comment) => Game.grid.cells.where(=> $0.comment == comment)
+  markerAt(comment) => @marker(comment).coordinates
+  unitOf(player, typeId) => player.ownedUnits.first(=> $0.type.id == typeId && $0.coordinates != null)
+  well => @unitOf(@human(), "sacrificialWell")
+  yonUnit {
+    yonId = @recall(KEY_YON)
+    if yonId == null {
+      return null
+    }
+    return Game.grid.allUnits.first(=> $0.id == yonId && $0.coordinates != null)
+  }
+
+  # A free land cell near center (rings 1 to 3); landOnly: not in the jungle or the swamp either.
+  freeCellNear(center, anyTerrain) {
+    for radius in 1...3 {
+      for candidate in Game.grid.ringAround(center, radius) {
+        if candidate.content == null && !(candidate.terrain in WATER) && (anyTerrain || candidate.terrain in OPEN_GROUND) {
+          return candidate
+        }
+      }
+    }
+    return null
+  }
+
+  # The free cell next to center (else two cells out) nearest to toward.
+  freeCellToward(center, toward) {
+    for radius in 1...2 {
+      free = Game.grid.ringAround(center, radius).where(=> $0.content == null && !($0.terrain in WATER))
+      if !free.isEmpty {
+        return free.minBy(=> $0.distance(toward))
+      }
+    }
+    return @freeCellNear(center, true)
+  }
+
+  nearestPlayerUnit(origin, maxRange) {
+    if origin == null {
+      return null
+    }
+    playerId = @human().id
+    here = Game.grid.elementAt(origin)
+    best = null
+    bestDistance = maxRange + 1
+    for candidate in Game.grid.allUnits.where(=> $0.owner.id == playerId && $0.coordinates != null) {
+      candidateDistance = here.distance(candidate.coordinates)
+      if candidateDistance < bestDistance {
+        best = candidate
+        bestDistance = candidateDistance
+      }
+    }
+    return best
+  }
+}

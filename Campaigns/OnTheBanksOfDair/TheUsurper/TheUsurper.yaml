@@ -1,0 +1,58 @@
+id: TheUsurper
+title: theUsurperTitle
+description: theUsurperDescription
+ruleset:
+  id: TheUsurperRuleset
+  inherits: DefaultCampaign
+  timeoutLength: 60 # building takes longer than marching; cutscenes pause it (see the script)
+  factionData:
+    frenza:
+      startingData:
+        resources:
+          g: 15 # the script adds more on normal
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+    sanghoy:
+      startingData:
+        resources:
+          g: 0
+          u: 0
+        cards: { }
+        units: [ ]
+      upgradeTree:
+        nodes: [ ]
+  bans:
+    skills:
+      - buildMagistratesCourt
+      - buildMonument
+      - addMajorUpgrade
+      - addMinorUpgrade
+      - sendTribute
+      - foundPlantation
+      - buildRoad
+      - riseToWarchief
+      - pillage
+      - mountToDragoon # the Imperial garrison would mount every rifleman it lands; waves bring their own dragoons
+players:
+  - name: Player
+    color: blue
+    team: 1
+    faction: frenza
+  - name: Imperial Army
+    color: orange
+    team: 2
+    faction: frenza
+    ai: TerritorialAi
+  - name: Imperial Navy
+    color: yellow
+    team: 2
+    faction: frenza
+    ai: PassiveAi
+  - name: The tribes
+    color: purple
+    team: 3
+    faction: sanghoy
+    ai: TerritorialAi
