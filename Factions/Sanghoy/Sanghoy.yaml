@@ -386,6 +386,14 @@ units:
       select: Sounds/Shaper/Select
       cast: Sounds/Shaper/Cast
     merit: 160
+    ai:
+      skills:
+        shapeCyclops: 0.85
+        shapeForehorn: 0.85
+        shapeBeastlord: 0.85
+        shapeChironite: 0.8
+        shapeBloodBat: 0.8
+        shapeKavouros: 0.75
     h: 35
     a: 0
     d: 1
@@ -678,6 +686,9 @@ heroes:
     flavor: pyracmonFlavor
     canInteract: true
     merit: 1000
+    ai:
+      role: hero
+      upgradePath: [groundSlamL1, groundSlamL2, heroStatsL1, smite, heroStatsL2, bashL1, heroStatsL3, heroStatsL4]
     h: 50
     reg: 2
     a: 8
@@ -752,6 +763,9 @@ heroes:
     flavor: kagaaluFlavor
     canInteract: true
     merit: 1000
+    ai:
+      role: hero
+      upgradePath: [kagaalusSarcomancyL2, heroStatsL1, sacrificeOfHealth, sacrificeOfVigor, sacrificeOfDeath, heroStatsL2, heroStatsL3, heroStatsL4]
     h: 50
     reg: 2
     a: 6
@@ -831,6 +845,9 @@ heroes:
     flavor: maimFlavor
     canInteract: true
     merit: 1000
+    ai:
+      role: hero
+      upgradePath: [beastmastersWarcryL1, heroStatsL1, leapAttackL1, beastmastersWarcryL2, ferocityAuraL1, leapAttackL2, heroStatsL2, heroStatsL3]
     h: 50
     reg: 2
     a: 8

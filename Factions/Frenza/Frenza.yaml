@@ -367,6 +367,9 @@ units:
       cast: Sounds/Assassin/Cast
     canInteract: true
     merit: 160
+    ai:
+      skills:
+        sabotage: 0.77
     h: 40
     reg: 1
     a: 10
@@ -724,6 +727,9 @@ heroes:
     flavor: tofanFlavor
     canInteract: true
     merit: 1000
+    ai:
+      role: hero
+      upgradePath: [noxiousCloudL1, noxiousCloudL2, tofansKissL1, noxiousCloudL3, plagueSeeds, tofansKissL2, heroStatsL1, heroStatsL2]
     h: 50
     reg: 2
     a: 8
@@ -789,6 +795,9 @@ heroes:
     flavor: denburhinFlavor
     canInteract: true
     merit: 1000
+    ai:
+      role: hero
+      upgradePath: [reinforcedHull, repairCrews, improvedOnboarding, battleStations, antiAirTurrets, bombAutoloader, heroStatsL1, heroStatsL2]
     h: 45
     reg: 2
     a: 7
@@ -873,6 +882,9 @@ heroes:
     flavor: vitarronFlavor
     canInteract: true
     merit: 1000
+    ai:
+      role: hero
+      upgradePath: [governanceAuraL1, governanceAuraL2, heroStatsL1, governanceAuraL3, heroStatsL2, heroStatsL3, heroStatsL4, insurrection]
     h: 50
     reg: 2
     a: 8
