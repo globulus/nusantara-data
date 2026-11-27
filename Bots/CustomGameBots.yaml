@@ -1,6 +1,12 @@
 - id: EasyAi
   title: easyAiTitle
+  description: easyAiDescription
 - id: NormalAi
   title: normalAiTitle
+  description: normalAiDescription
 - id: HardAi
   title: hardAiTitle
+  description: hardAiDescription
+- id: BrutalAi
+  title: brutalAiTitle
+  description: brutalAiDescription

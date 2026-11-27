@@ -1,39 +1,66 @@
-
 REJECTED_ACTION = [
   considerations: [
     [condition: true, score: -1]
   ]
 ]
 
+# A utility bot: on every step, each candidate action is scored by summing its considerations, and the
+# best one runs if its score is above 0. Subclasses provide computeActions().
 ai ValueAi {
   awake {
     @movesSoFar = 0
+    @blockedActions = [:]
+    @lastActionKey = null
+    @lastActionRepeats = 0
   }
+
+  # How much random noise is added to positive scores. 0 plays the best move it sees; Easy bots add
+  # some so they make human-like mistakes.
+  scoreNoise => 0
 
   sumScores(scoreConditions) => scoreConditions.reduce(0, => $0 + if $1.condition() $1.score else 0)
 
   update {
     @movesSoFar += 1
     if @movesSoFar > this::maxMoves ?? Int.max {
-      Console.println("Max moves exceeded")
+      Console.debug("Max moves exceeded")
       return false
     }
-    actions = @computeActions()
-    # Console.println(actions)
-    if !actions.isEmpty {
-      scoreActions = actions.map(fn (action) => [
-        score: sumScores(action.considerations),
-        run: action::run
-      ])
-      # Console.println(scoreActions)
-      highestScoreAction = scoreActions.maxBy(=> $0.score)
-      Console.println(highestScoreAction)
-      if highestScoreAction.score > 0 {
-        highestScoreAction.run()
-        return true
+    candidates = @computeActions()
+    noise = scoreNoise()
+    best = null
+    bestScore = 0
+    for action in candidates {
+      if action == null || (action::key != null && @blockedActions.(action::key) != null) {
+        continue
+      }
+      actionScore = sumScores(action.considerations)
+      if noise > 0 && actionScore > 0 {
+        actionScore += (Math.randomFloat() - 0.5) * 2 * noise
+      }
+      if actionScore > bestScore {
+        bestScore = actionScore
+        best = action
       }
     }
-    return false
+    if best == null {
+      return false
+    }
+    # Actions can carry a key naming what they do and to whom (e.g. "cast:<unit id>:<skill>"). The same
+    # one picked again right after it ran means the server refused it (some skills have conditions the
+    # bot can't see), so it's skipped for the rest of the turn instead of being retried until the move cap.
+    key = best::key
+    if key != null && key == @lastActionKey {
+      @lastActionRepeats += 1
+      if @lastActionRepeats >= 2 {
+        @blockedActions.(key) = true
+      }
+    } else {
+      @lastActionKey = key
+      @lastActionRepeats = 0
+    }
+    best.run()
+    return true
   }
 }
 
@@ -54,28 +81,65 @@ fn skillCanBeCast(player, caster, skillId) {
   return skillIsEnabled(skill, caster)
 }
 
-fn castFirstTargetableSkill(player, caster, skills, targetsPredicate = null) {
+# Picks the castable skill with the highest score out of [skillId: score]. Skills scoring 0 or less are
+# skipped. targetsPredicate(skillId, targets) can pick the target cell; it's random by default.
+fn castBestTargetableSkill(player, caster, skills, targetsPredicate = null) {
+  bestSkill = null
+  bestScore = 0
+  bestTarget = null
   for skill in skills.keys {
-    if skillCanBeCast(player, caster, skill) {
-      targets = Game.castTargets(caster.coordinates, caster, skill)
-      if !targets.isEmpty {
-        # if skill == "sabotage" {
-        #   a = 5 # BP
-        # }
-        target = targetsPredicate(targets) ?? targets.randomItem
-        return [
-          considerations: [
-            [condition: true, score: skills.(skill)]
-          ],
-          run: fn {
-            Console.println("Casting $skill")
-            Server.cast(caster, target.coordinates, skill)
-          }
-        ]
-      }
+    skillScore = skills.(skill)
+    if skillScore == null || skillScore <= bestScore {
+      continue
     }
+    if !skillCanBeCast(player, caster, skill) {
+      continue
+    }
+    targets = Game.castTargets(caster.coordinates, caster, skill)
+    if targets.isEmpty {
+      continue
+    }
+    target = if targetsPredicate == null targets.randomItem else targetsPredicate(skill, targets) ?? targets.randomItem
+    bestSkill = skill
+    bestScore = skillScore
+    bestTarget = target
   }
-  return null
+  if bestSkill == null {
+    return null
+  }
+  return [
+    key: "cast:$(caster.id):$bestSkill",
+    considerations: [
+      [condition: true, score: bestScore]
+    ],
+    run: fn {
+      Console.debug("Casting $bestSkill")
+      Server.cast(caster, bestTarget.coordinates, bestSkill)
+    }
+  ]
+}
+
+# Kept for scenario and modded bots that still call it. It used to return the first castable skill in
+# the list rather than the best one.
+fn castFirstTargetableSkill(player, caster, skills, targetsPredicate = null) {
+  if targetsPredicate == null {
+    return castBestTargetableSkill(player, caster, skills)
+  }
+  return castBestTargetableSkill(player, caster, skills, fn (skill, targets) => targetsPredicate(targets))
+}
+
+# Static skill priorities from the unit type's `ai: skills:` hints (`aiHints` in scripts) in the faction data. Note the `?.`:
+# reading a field whose value is null with a plain `.` is an "undefined method" error.
+fn dataSkillScores(caster) {
+  hints = caster.type?.aiHints?.skills
+  if hints == null {
+    return [:]
+  }
+  scores = [:]
+  for skill in hints.keys {
+    scores.(skill) = hints.(skill)
+  }
+  return scores
 }
 
 fn sum(list) => list.reduce(0, => $0 + $1)
@@ -90,5 +154,20 @@ fn totalCountForSpellType(id) => Game.currentPlayer.hand.count(=> $0.type.id == 
 fn totalCountForUpgradeType(id) => \
   Game.currentPlayer.upgradeTree.allUpgrades.count(=> $0.type.id == id) + Game.currentPlayer.hand.count(=> $0.type.id == id)
 
+# `::kind`: only upgrade cards have a kind, and the hand holds other cards too
 fn totalCountForUpgradeKind(kind) => \
-  Game.currentPlayer.upgradeTree.allUpgrades.count(=> $0.type.kind == kind) + Game.currentPlayer.hand.count(=> $0.type.kind == kind)
+  Game.currentPlayer.upgradeTree.allUpgrades.count(=> $0.type::kind == kind) + Game.currentPlayer.hand.count(=> $0.type::kind == kind)
+
+# How much a unit is worth to its owner, for choosing targets and deciding what to risk.
+fn unitValue(unit) {
+  value = Math.max(unit.type.merit ?? 0, 40)
+  if unit.isHero {
+    value += 400
+  }
+  return value
+}
+
+# How much fighting a unit can still do: attack scaled by remaining health.
+fn combatStrength(unit) => Math.max(unit.type.a ?? 0, 1) * (unit.hp * 1.0 / Math.max(unit.health, 1))
+
+fn coordinatesKey(c) => "$(c.0),$(c.1),$(c.2)"
